@@ -1,0 +1,63 @@
+package com.mcredit.rule.engine.avgPayOnBills;
+
+import com.mcredit.model.object.RuleObject;
+
+global com.mcredit.rule.FormulaResult formulaResult;
+
+function String getVal(String val, int len, int max) {
+	String ret = val;
+	int start = 0;
+	if(val == null) {
+		ret = "";
+	} else {
+		start = val.length();
+	}
+	for(int i=start;i<len-1;i++) {
+		ret = ret + "N";
+	}
+	if(len < max) {
+		ret = ret + "Y";
+	} else if(ret.length() < max - 1) {
+		ret = ret + "N";
+	}
+
+	return ret;
+}
+
+rule "Check avg payment on bill < 450K"
+	when
+		RuleObject(avgPayValueOnBills != null && avgPayValueOnBills < 450000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 1, 7));
+end
+
+rule "Check avg payment on bill < 650K"
+	when
+		RuleObject(avgPayValueOnBills != null && avgPayValueOnBills < 650000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 2, 7));
+end
+
+rule "Check avg payment on bill < 200K"
+	when
+		RuleObject(avgPayValueOnBills != null && avgPayValueOnBills < 200000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 3, 7));
+end
+
+rule "Check avg payment on bill < 400K"
+	when
+		RuleObject(avgPayValueOnBills != null && avgPayValueOnBills < 400000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 4, 7));
+end
+
+rule "Check avg payment on bill < 100K"
+	when
+		RuleObject(avgPayValueOnBills != null && avgPayValueOnBills < 100000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 5, 6));
+end
+
+
+

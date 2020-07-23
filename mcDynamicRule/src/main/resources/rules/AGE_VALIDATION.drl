@@ -1,0 +1,169 @@
+package com.mcredit.rule.engine.ageValidation
+
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import com.mcredit.model.object.RuleObject;
+import java.util.Calendar;
+import java.text.DateFormat;
+
+global com.mcredit.rule.FormulaResult formulaResult;
+
+function String getVal(String val, int len, int max) {
+	String ret = val;
+	int start = 0;
+	if(val == null) {
+		ret = "";
+	} else {
+		start = val.length();
+	}
+	for(int i=start;i<len-1;i++) {
+		ret = ret + "N";
+	}
+	if(len < max) {
+		ret = ret + "Y";
+	} else if(ret.length() < max - 1) {
+		ret = ret + "N";
+	}
+
+	return ret;
+}
+
+
+function Date plusMonths(Date input , int month){
+	Calendar c = Calendar.getInstance();
+		c.setTime(input);
+		c.add(Calendar.MONTH, month);
+		return c.getTime();
+}
+
+function Date plusDate(Date input , int days){
+	Calendar c = Calendar.getInstance();
+		c.setTime(input);
+		c.add(Calendar.DATE, days);
+		return c.getTime();
+}
+function Date plusYear(Date input , int years){
+		Calendar c = Calendar.getInstance();
+		c.setTime(input);
+		c.add(Calendar.YEAR, years);
+		return c.getTime();
+}
+
+function Date toDate(String input){
+	Date date = null ;
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	
+	try {
+		date = sdf.parse(input.substring(0, 10));
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+	
+	return date;
+}
+
+function boolean over60add30( String checkAgeDate ,String birthDate ,int loanTenor){	
+	DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");  
+	String date1Str = dateFormat.format( plusDate(plusMonths(toDate(checkAgeDate), loanTenor),30));  
+	String date2Str = dateFormat.format(  plusYear(toDate(birthDate),60)); 
+	
+	boolean result =  date1Str.compareTo(date2Str) > 0;
+	System.out.println( " test " + result);
+	return result ;
+}
+
+function boolean over65add30( String checkAgeDate ,String birthDate ,int loanTenor){	
+	DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");  
+	String date1Str = dateFormat.format( plusDate(plusMonths(toDate(checkAgeDate), loanTenor),30));  
+	String date2Str = dateFormat.format(  plusYear(toDate(birthDate),65)); 
+	
+	boolean result =  date1Str.compareTo(date2Str) > 0;
+	return result ;
+}
+
+rule "Check range < 18"
+	when
+			RuleObject(plusYear(toDate(birthDate),18).after(toDate(checkAgeDate)))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 1, 1000));
+
+end
+
+rule "Check range < 20"
+	when
+			RuleObject(plusYear(toDate(birthDate),20).after(toDate(checkAgeDate)))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 2, 1000));
+
+end
+
+rule "Check range < 26"
+	when
+		RuleObject(plusYear(toDate(birthDate),26).after(toDate(checkAgeDate)))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 3, 1000));
+
+end
+
+rule "Check range > 55"
+	when
+		RuleObject(plusYear(plusMonths(toDate(birthDate),- loanTenor),55).before(toDate(checkAgeDate)))
+	then 
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 4, 1000));
+end
+
+rule "Check range > 60"
+	when	
+		RuleObject(plusYear(plusMonths(toDate(birthDate), -loanTenor),60).before(toDate(checkAgeDate)))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 5, 1000));
+end
+
+rule "Check range > 60  add 30day"
+	when
+		RuleObject(over60add30(checkAgeDate ,birthDate ,loanTenor))		
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 6, 1000));
+end
+
+rule "Check range > 70"
+	when	
+		RuleObject(plusYear(plusMonths(toDate(birthDate), -loanTenor),70).before(toDate(checkAgeDate)))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 7, 1000));
+end
+
+rule "Check range > 60 without loanTenor"
+	when	
+		RuleObject(plusYear(toDate(birthDate),60).before(toDate(checkAgeDate)))
+	then 
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 8, 1000));
+end
+
+rule "Check range < 23"
+	when
+		RuleObject(plusYear(toDate(birthDate),23).after(toDate(checkAgeDate)))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 9, 1000));
+end
+
+rule "Check range > 65  add 30day"
+	when
+		RuleObject(over65add30(checkAgeDate ,birthDate ,loanTenor))		
+	then 
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 10, 1000));
+end
+
+rule "Check range > 65"
+	when	
+		RuleObject(plusYear(plusMonths(toDate(birthDate), -loanTenor),65).before(toDate(checkAgeDate)))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 11, 1000));
+end
+
+rule "Check return true"
+	when
+		RuleObject(null != checkAgeDate)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(),12, 12));
+end

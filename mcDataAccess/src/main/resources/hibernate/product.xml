@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<sql-query name="getProductByPaging">
+		<![CDATA[select t.* from products t where product_code like :p_sale_channel order by id ]]>
+	</sql-query>
+	
+	<sql-query name="getCodeTableConfig">
+		<![CDATA[select c.id,c.code_value1,c.description1,c.status from mapping_hierarchy m, code_table c where c.id = m.map_id2 and m.map_type = :p_map_type and m.map_id1= :p_map_id1 ]]>
+	</sql-query>
+ 
+ 	<sql-query name="getCodeTableByMapping">
+		<![CDATA[select id,code_value1,description1,status from code_table where id in( select map_id2 from mapping_hierarchy where map_id1 = :p_map_id1 and map_type=:p_map_type ) ]]>
+	</sql-query>
+	
+	<sql-query name="getCommodityByChannel">
+		<![CDATA[ select c.id, c.code_value1, c.description1,c.status from code_table c, mapping_hierarchy m where c.id = m.map_id1 and m.map_id2=:p_channel and m.map_type ='MAP_COMM_CHANNEL' and c.category = 'COMM' and c.status ='A' order by c.description1 asc  ]]>
+	</sql-query>
+ 
+ 	<sql-query name="getProductByName">
+		<![CDATA[ select p.id, p.product_code, product_name, decode(sign(sysdate-end_eff_date), -1,'A', 'I') from PRODUCTS p where (p.product_name like :p_product_name or :p_product_name = '-1') and p.PRODUCT_CODE like :p_channel and P.START_EFF_DATE in (select max(START_EFF_DATE) START_EFF_DATE
+    				from PRODUCTS p2 where p2.START_EFF_DATE <= sysdate  
+    				and p2.PRODUCT_CODE =P.PRODUCT_CODE) and  length(product_code) = 8 ]]>
+	</sql-query>
+	
+ 	<sql-query name="getProductByCode">
+		<![CDATA[ select p.id, p.product_code, product_name, decode(sign(sysdate-end_eff_date), -1,'A', 'I') from PRODUCTS p where p.PRODUCT_CODE = :p_product_code 
+					and (P.PRODUCT_CODE, P.START_EFF_DATE) in (select PRODUCT_CODE,max(START_EFF_DATE) START_EFF_DATE
+					    from PRODUCTS where PRODUCT_CODE = :p_product_code
+					    	and START_EFF_DATE <= sysdate group by PRODUCT_CODE) and length(product_code) = 8 ]]>
+	</sql-query>
+      
+	<sql-query name="findCommodityDetail">
+		<![CDATA[ select tbl2.* from (select rownum tbl_rownum,tbl.*  from (select m.map_id2 modelId, 
+            c.description1 modelName, 
+            c.code_value1 modelCode,
+            m.map_id1 brandId,
+            (select c1.code_value1 from code_table c1 where c1.id = m.map_id1)  brandCode,
+            (select c1.description1 from code_table c1 where c1.id = m.map_id1)  brandName,
+            (select map_id2 from mapping_hierarchy where map_id1 = (select m1.map_id1 from mapping_hierarchy m1 where m1.id = m.parent_id) and map_type ='MAP_COMM_PRDGROUP') productGroupId,
+            (select c2.id from code_table c2 where c2.id = (select m1.map_id1 from mapping_hierarchy m1 where m1.id = m.parent_id)) commodityId,
+            (select c2.code_value1 from code_table c2 where c2.id = (select m1.map_id1 from mapping_hierarchy m1 where m1.id = m.parent_id)) commodityCode,
+            (select c2.description1 from code_table c2 where c2.id = (select m1.map_id1 from mapping_hierarchy m1 where m1.id = m.parent_id)) commodityName,
+            m.status status
+			from mapping_hierarchy m, code_table c where m.map_id2 = c.id and m.map_type='MAP_COMM_BRAND_MODEL' 
+            and m.parent_id in (select id from mapping_hierarchy m3 where m3.map_type='MAP_COMM_BRAND' and m3.map_id1 in (select m4.map_id1 from mapping_hierarchy m4 where map_type='MAP_COMM_CHANNEL' and map_id2 =:p_parent_id) and (m3.map_id1=:p_commodity or :p_commodity=-1) and (m3.map_id2 =:p_brand or :p_brand=-1)) 
+			order by commodityCode,brandCode) tbl
+			where tbl.brandId not in (select id from code_table where code_group='INST' and category='BRAND' and status  <> 'A')
+			and tbl.commodityId not in (select id from code_table where code_group='INST' and category='COMM' and status  <> 'A')) tbl2
+			where (tbl2.tbl_rownum BETWEEN :p_start and :p_end or :p_start=-1)
+			]]>
+	</sql-query>
+
+	<sql-query name="insertCodeTable">
+		<![CDATA[INSERT INTO CODE_TABLE (ID,RECORD_STATUS,CREATED_DATE,LAST_UPDATED_DATE,PRODUCT_CAT_ID,PRODUCT_GROUP_ID,PRODUCT_ID,CODE_GROUP,CATEGORY,CODE_VALUE1,DESCRIPTION1,STATUS)
+				values(SEQ_CODE_TABLE_ID.nextval,'A', sysdate,sysdate, 0, 0, 0, 'INST',:pCategory,:pCodeGroup,:pName,'A') ]]>
+	</sql-query>
+
+	<sql-query name="deleteProCommConfig">
+			<![CDATA[delete mapping_hierarchy where map_type='MAP_PROD_COMM' and map_id1 =:product_id ]]>
+	</sql-query>
+
+    <sql-query name="deleteProCommBrandConfig">
+            <![CDATA[delete mapping_hierarchy where map_type='MAP_PROD_COMM_BRAND' and parent_id in (select id from mapping_hierarchy where map_type='MAP_PROD_COMM' and map_id1 =:product_id) ]]>
+    </sql-query>
+            
+	<sql-query name="deleteMappingByMapId1">
+			<![CDATA[delete mapping_hierarchy where map_type=:map_type and map_id1 =:map_id1 ]]>
+	</sql-query>
+	
+	<sql-query name="getModelForBPM">
+			<![CDATA[ select c.id, c.code_value1, c.description1,m.status from code_table c, mapping_hierarchy m  where c.id = m.map_id2 
+			and m.map_type = 'MAP_COMM_BRAND_MODEL'
+			and m.parent_id =:parent_map_id
+			and ( m.status =:p_status or :p_status = '-1') ]]>
+	</sql-query>
+	 
+	<sql-query name="getCodeTableMapId2ById1">
+			<![CDATA[ select id, code_value1, description1,status from code_table where id in (select map_id2 from mapping_hierarchy where map_type=:p_type_map and map_id1 = :p_map_id1) and ( status =:p_status or :p_status = '-1') ]]>
+	</sql-query>
+	
+	<sql-query name="selectProCommConfig">
+			<![CDATA[ select id, code_value1, description1,status from code_table where id in (select map_id2 from mapping_hierarchy where map_type = 'MAP_PROD_COMM' and map_id1 =:product_id) and ( status =:p_status or :p_status = '-1') ]]> 
+	</sql-query>
+	
+	<sql-query name="selectProCommBrandConfig">
+			<![CDATA[ select id, code_value1, description1,status 
+    from code_table 
+    where id in (select map_id2 from MAPPING_HIERARCHY 
+        where map_type ='MAP_PROD_COMM_BRAND' 
+        and parent_id in (select id from MAPPING_HIERARCHY where map_type ='MAP_PROD_COMM' and map_id1= :product_id and map_id2= :p_comm_id)) ]]> 
+	</sql-query>
+	
+	<sql-query name="getCommByPrdGroup">
+			<![CDATA[ select id, code_value1, description1,status from code_table where id in (select map_id1 from mapping_hierarchy where map_type = 'MAP_COMM_PRDGROUP' and map_id2 =:product_group) and ( status =:p_status or :p_status = '-1') ]]> 
+	</sql-query>
+	
+	<sql-query name="getHistoryDetails">
+			<![CDATA[ 
+				select tbl2.id,tbl2.last_updated_date, tbl2.last_updated_by,tbl2.table_name, tbl2.action, tbl2.content from (select ROWNUM row_num, tbl.* from (select id,last_updated_date, last_updated_by,table_name, action, content from audit_data_change where table_name in ('CODE_TABLE','MAPPING_HIERARCHY') order by last_updated_date desc) tbl) tbl2 where (tbl2.row_num >:p_start or :p_start = -1) and (tbl2.row_num < :p_end or :p_end = -1)
+			 ]]> 
+	</sql-query>
+	
+	<sql-query name="getHistoryDetailsCount"> 
+			<![CDATA[ 
+			select count(tbl2.id) from (select ROWNUM row_num, tbl.* from (select id,last_updated_date, last_updated_by,table_name, action, content from audit_data_change where table_name in ('CODE_TABLE','MAPPING_HIERARCHY') order by last_updated_date desc) tbl) tbl2
+			]]> 
+	</sql-query>
+	
+	<sql-query name="getHistoryUpload">
+			<![CDATA[ select tbl2.id, tbl2.last_updated_date, tbl2.created_by from (select rownum row_num, tbl.* from (select  id, last_updated_date, created_by from upl_master where upl_type =  :p_upl_type order by last_updated_date desc) tbl) tbl2 where (tbl2.row_num >:p_start or :p_start = -1) and (tbl2.row_num < :p_end or :p_end = -1) ]]> 
+	</sql-query>
+	
+	<sql-query name="getProductInterestBy">
+		<![CDATA[ SELECT
+					pd.product_code,
+				    pd.product_name,
+				    pd.min_tenor,
+				    pd.max_tenor,
+				    pd.min_loan_amount,
+				    pd.max_loan_amount,
+				    it.monthly_rate,
+				    it.yearly_rate
+				FROM
+				    interest_table it,
+				    products pd
+				WHERE
+				    it.id = pd.rate_index
+				    AND pd.product_code = :p_product_code
+				    AND pd.end_eff_date >= SYSDATE ]]>
+	</sql-query>
+	
+	<sql-query name="getInterestYearlyById">
+		<![CDATA[ SELECT
+					yearly_rate
+				FROM
+				    interest_table
+				WHERE
+				    id = :id ]]>
+	</sql-query>
+	
+</hibernate-mapping>

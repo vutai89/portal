@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<query name="findCustomerByMcCustCode">
+        <![CDATA[select id
+	        	from CustomerPersonalInfo
+	        	where mcCustCode = :mcCustCode ]]>
+    </query>
+    
+    <query name="findCustomerByCoreCustCode">
+        <![CDATA[select id
+	        	from CustomerPersonalInfo
+	        	where coreCustCode = :coreCustCode ]]>
+    </query>
+    
+    <query name="findCustomerAccountLinkIdByCustId">
+        <![CDATA[select id
+	        	from CustomerAccountLink
+	        	where custId = :custId ]]>
+    </query>
+    
+    <query name="findCustomerAddlInfoIdByCustId">
+        <![CDATA[select id
+	        	from CustomerAddlInfo
+	        	where custId = :custId ]]>
+    </query>
+    
+    <query name="findCustContactInfoIdBy">
+        <![CDATA[select id
+	        	from CustomerContactInfo
+	        	where custId = :custId and contactType = :contactType and contactCategory = :contactCategory and contactValue = :contactValue ]]>
+    </query>
+    
+    <query name="findCustAddressInfoIdBy">
+        <![CDATA[select id
+	        	from CustomerAddressInfo
+	        	where custId = :custId and addrType = :addrType and address = :address ]]>
+    </query>
+    
+    <!-- <query name="findCustomerCompanyInfoIdByCustId">
+        <![CDATA[select id
+	        	from CustomerCompanyInfo
+	        	where custId = :custId ]]>
+    </query> -->
+    
+    <query name="findCustomerContactInfoIdByCustId">
+        <![CDATA[select id
+	        	from CustomerContactInfo
+	        	where custId = :custId ]]>
+    </query>
+    
+    <query name="findCustomerFinancialInfoIdByCustId">
+        <![CDATA[select id
+	        	from CustomerFinancialInfo
+	        	where custId = :custId ]]>
+    </query>
+    
+    <query name="findCustomerIdentityIdByCustId">
+        <![CDATA[select id
+	        	from CustomerIdentity
+	        	where custId = :custId ]]>
+    </query>
+    
+    <query name="findIdentityIdBy">
+        <![CDATA[select id
+	        	from CustomerIdentity
+	        	where custId = :custId and identityTypeId = :identityTypeId ]]>
+    </query>
+    
+    <query name="findCustIdByRelationIdMessageLog">
+        <![CDATA[ select distinct cpi.id from
+					MessageLog ml
+					inner join CreditApplicationBPM cab     on ml.relationId   = cab.bpmAppId
+					inner join CreditApplicationRequest car on cab.creditAppId = car.id
+					inner join CustomerPersonalInfo cpi     on car.custId      = cpi.id
+					where ml.relationId = :relationId ]]>
+    </query>
+    
+    <query name="findAppIdByRelationIdMessageLog">
+        <![CDATA[ select distinct cab.creditAppId from
+					MessageLog ml
+					inner join CreditApplicationBPM cab on ml.relationId = cab.bpmAppId
+					where ml.relationId = :relationId ]]>
+    </query>
+    
+    <query name="findCustomerByRelationIdMessageLog">
+        <![CDATA[ select cpi from
+					MessageLog ml
+					inner join CreditApplicationBPM cab     on ml.relationId   = cab.bpmAppId
+					inner join CreditApplicationRequest car on cab.creditAppId = car.id
+					inner join CustomerPersonalInfo cpi     on car.custId      = cpi.id
+					where ml.relationId = :relationId ]]>
+    </query>
+    
+    <!-- <query name="checkContractNumber">
+        <![CDATA[ select distinct ct.codeValue1
+					from CreditApplicationRequest car
+					inner join CreditApplicationLoanManagement cal on car.id               = cal.creditAppId
+					inner join CodeTable ct                        on cal.contractStatusId = ct.id
+					where car.mcContractNumber = :contractNumber ]]>
+    </query> -->
+    
+    <sql-query name="checkContractNumber">
+        <![CDATA[ select distinct ucc.STATUS
+		         	from UPL_CORE_CONTRACT ucc
+		          	where ucc.CONTRACT_REF = :contractNumber ]]>
+    </sql-query>
+    
+	<query name="findCustomerByLinkType">
+        <![CDATA[select cpi.coreCustCode, cal.linkType, cal.linkSeq, cal.linkValue, cal.linkName
+	        	from CustomerPersonalInfo cpi
+	        	left join CustomerAccountLink cal 
+	        	on cpi.id = cal.custId where cal.linkType = :lnk_type ]]>
+    </query>
+    
+	<sql-query name="findNativeCustomerByLinkType">
+		<![CDATA[select cpi.CORE_CUST_CODE, cal.LINK_TYPE, cal.LINK_SEQ, cal.LINK_VALUE, cal.LINK_NAME 
+				from CUST_PERSONAL_INFO cpi left join CUST_ACCOUNT_LINK cal
+				on cpi.ID = cal.CUST_ID where cal.LINK_TYPE = :lnk_type ]]>
+	</sql-query>
+	
+	<sql-query name="getCustomerPersonalInfoByPage">
+		<![CDATA[SELECT	ID,	MC_CUST_CODE, CORE_CUST_CODE, CUST_NAME, SHORT_CUST_NAME, OTHER_CUST_NAME, GENDER, BIRTH_DATE, IDENTITY_ID,
+		HOUSEHOLD_REG_NUMBER, HOUSEHOLD_REG_TYPE_ID, HOUSEHOLD_REG_ISSUE_DATE, HOUSEHOLD_REG_ISSUE_PLACE, HOME_PHONE, MARITAL_STATUS, IS_PROSPECT,
+		RECORD_STATUS, CREATED_DATE, CREATED_BY, LAST_UPDATED_DATE,	LAST_UPDATED_BY
+		FROM CUST_PERSONAL_INFO ORDER BY MC_CUST_CODE DESC OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY ]]>
+	</sql-query>
+	
+	<sql-query name="getCustomerAddlInfoByCusID">
+		<![CDATA[SELECT	ID, CUST_ID, RECORD_STATUS, CREATED_DATE, CREATED_BY, LAST_UPDATED_DATE, LAST_UPDATED_BY, MONTH_EXPERIENCE, YEAR_EXPERIENCE, REF_FULL_NAME1,
+		REF_FULL_NAME2, INCOME_SPOUSE, LIFETIME_IN_MONTH, LIFETIME_IN_YEAR, REF_PERSON1_MOBILE, REF_PERSON2_MOBILE, NUMBER_OF_DEPENDANTS, RELATION_SPOUSE, RELATION_REF_PERSON1,
+		RELATION_REF_PERSON2, SPOUSE_COMPANY_NAME, SPOUSE_DOB, SPOUSE_IDENTITY_NUMBER, SPOUSE_MOBILE, SPOUSE_NAME, SPOUSE_POSITION, EDUCATION, TEMP_SAME_PERM_ADDR, OLD_IDENTITY_NUMBER,
+		MILITARY_ID, MILITARY_ISSUE_DATE, MILITARY_ISSUE_PLACE, LABOUR_CONTRACT_TYPE, PAYROLL_METHOD, ACCOMMODATION_TYPE, IS_BLACK_LIST, BLACK_LIST_TYPE, PROFESSIONAL, DEPARTMENT,
+		POSITION_IN_COMP, CUST_COMPANY_ID
+		FROM CUST_ADDL_INFO WHERE CUST_ID = :cusID ]]>
+	</sql-query>
+	
+	<sql-query name="getCustomerFinancialInfoByCusID">
+		<![CDATA[SELECT	ID, CUST_ID, CUST_INCOME, CREDIT_IN_OTHER_BANK, LIFE_INSU_COMPANY_NAME, INSU_TERM, INSU_TERM_FEE, INSU_TERM_OTHER,
+		SPOUSE_CREDIT_IN_OTHER_BANK, S37_DATA, PAYMENT_AMOUNT_AT_BANK, ACCOUNT_NUMBER_AT_BANK, BANK_NAME, BANK_BRANCH, AVG_ACCOUNT_BAL,	AVG_ELECTRIC_BILL,
+		RECORD_STATUS, CREATED_BY, CREATED_DATE, LAST_UPDATED_DATE, LAST_UPDATED_BY
+		FROM CUST_FINANCIAL_INFO WHERE CUST_ID = :cusID	]]>
+	</sql-query>
+	
+	<sql-query name="getCustomerContactInfoByCusID">
+        <![CDATA[SELECT	ID, CUST_ID, EMAIL, MOBILE, PERMANENT_ADDR, PERMANENT_DISTRICT, PERMANENT_PROVINCE, PERMANENT_WARD,
+		SPOUSE_ADDR, SPOUSE_DISTRICT, SPOUSE_PROVINCE, SPOUSE_WARD, TEMP_ADDR, TEMP_DISTRICT, TEMP_PROVINCE, TEMP_WARD, CURRENT_ADDR_SPOUSE,
+		RECORD_STATUS, CREATED_DATE, CREATED_BY, LAST_UPDATED_DATE, LAST_UPDATED_BY
+		FROM CUST_CONTACT_INFO WHERE CUST_ID = :cusID ]]>
+    </sql-query>
+	
+	<!-- Customer account link -->
+	<query name="findCardInformationByCardId">
+        <![CDATA[ select cal.coreLnAppId, cpi.custName, ci.identityNumber, cao.dueBalance, cao.paymentAmount, ct3.codeValue1
+				from CreditApplicationLoanManagement        cal
+				inner join CreditApplicationRequest 	car on car.id    = cal.creditAppId
+				inner join CustomerPersonalInfo cpi on cpi.id = car.custId
+				left  join CustomerIdentity     ci  on cpi.identityId    = ci.id
+				left  join CodeTable            ct1 on ci.identityTypeId = ct1.id
+				left  join CreditApplicationOutstanding cao on car.id = cao.creditAppId 
+				left  join CreditApplicationAdditional cad on car.id = cad.creditAppId
+				left  join CodeTable            ct3 on cad.cardStatusId = ct3.id
+				where cal.coreLnAppId = :cardId ]]>
+	</query>
+    <!-- For Payment get Information Customer -->
+    <!-- <query name="findCardInformationAllByCardId">
+        <![CDATA[ select distinct cal.linkValue, cpi.id, cpi.custName, ci.identityNumber, ci.identityIssueDate, ct2.codeValue1 , cci.mobile ,cpi.coreCustCode
+					from CustomerAccountLink        cal
+					inner join CustomerPersonalInfo cpi on cal.custId  = cpi.id
+					inner JOIN CustomerContactInfo  cci on cpi.id = cci.custId
+					inner join CustomerIdentity     ci  on cpi.id = ci.custId
+					inner join CodeTable            ct1 on ci.identityTypeId      = ct1.id
+					left  join CodeTable            ct2 on (ci.identityIssuePlace = ct2.id and ct2.category  = 'IDPLACE')
+					where cal.linkType = 'I' and upper(cal.linkValue) = upper(:cardId) ]]>
+    </query> -->
+	<query name="findCardInformationAllByCardId">
+        <![CDATA[ select distinct cal.linkValue, cpi.id, cpi.custName, ci.identityNumber, ci.identityIssueDate, ct2.codeValue1 , cci.contactValue, cpi.coreCustCode
+					from CustomerAccountLink        cal
+					inner join CustomerPersonalInfo cpi on cal.custId  = cpi.id
+					inner join CustomerContactInfo  cci on (cpi.id = cci.custId and cci.contactType     = (select id from CodeTable where category='CONTAC_TYP' and codeValue1='MOBILE')
+			  																    and cci.contactCategory = (select id from CodeTable where category='CONTAC_CAT' and codeValue1='CUSTOMER'))
+					inner join CustomerIdentity     ci  on cpi.id = ci.custId
+					inner join CodeTable            ct1 on ci.identityTypeId      = ct1.id
+					left  join CodeTable            ct2 on (ci.identityIssuePlace = ct2.id and ct2.category  = 'IDPLACE')
+					where cal.linkType = 'I' and upper(cal.linkValue) = upper(:cardId) ]]>
+    </query>
+	
+	<query name="findAllCustomerAccountLink">
+        <![CDATA[select cal.id, cal.linkType, cal.linkSeq, cal.recordStatus, cal.createdDate, cal.createdBy, cal.linkValue, cal.linkName, cal.linkSystem, cal.linkCurrency, cal.linkProduct, cpi.custName
+	        	from CustomerAccountLink cal
+	        	left join CustomerPersonalInfo cpi 
+	        	on cal.custId = cpi.id]]>
+    </query>
+    <query name="findCustomerAccountLinkById">
+        <![CDATA[select cal.linkType, cal.linkSeq, cal.recordStatus, cal.createdDate, cal.createdBy, cal.linkValue, cal.linkName, cal.linkSystem, cal.linkCurrency, cal.linkProduct, cpi.custName
+	        	from CustomerAccountLink cal
+	        	left join CustomerPersonalInfo cpi 
+	        	on cal.custId = cpi.id where cal.id = :custAccLinkId]]>
+    </query>
+    
+    <!-- Customer company info -->
+    <!-- <query name="findAllCustomerCompanyInfo">
+        <![CDATA[select cci.id, cci.recordStatus, cci.createdDate, cci.createdBy, cci.compAddrStreet, cci.compAddrProvince, cci.compAddrDistrict, cci.compAddrWard, cci.compName, cci.compTaxNumber, cci.officePhoneNumber, cpi.custName
+        		from CustomerCompanyInfo cci
+	        	left join CustomerPersonalInfo cpi 
+	        	on cci.custId = cpi.id]]>
+    </query>
+    <query name="findCustomerCompanyInfoById">
+        <![CDATA[select cci.recordStatus, cci.createdDate, cci.createdBy, cci.compAddrStreet, cci.compAddrProvince, cci.compAddrDistrict, cci.compAddrWard, cci.compName, cci.compTaxNumber, cci.officePhoneNumber, cpi.custName
+	        	from CustomerCompanyInfo cci
+	        	left join CustomerPersonalInfo cpi 
+	        	on cci.custId = cpi.id where cci.id = :custCoInfoId]]>
+    </query> -->
+    
+    <!-- Customer identity -->
+    <query name="findAllCustomerIdentity">
+        <![CDATA[select ci.id, ci.recordStatus, ci.createdDate, ci.createdBy, ci.identityNumber, ci.identityIssueDate, ci.identityIssuePlace, ci.identityExpiryDate , cpi.custName
+	        	from CustomerIdentity ci
+	        	left join CustomerPersonalInfo cpi on ci.custId = cpi.id
+	        	left join CodeTable ct on ci.identityTypeId = ct.id]]>
+    </query>
+    <query name="findCustomerIdentityById">
+        <![CDATA[select ci.recordStatus, ci.createdDate, ci.createdBy, ci.identityNumber, ci.identityIssueDate, ci.identityIssuePlace, ci.identityExpiryDate , cpi.custName
+	        	from CustomerIdentity ci
+	        	left join CustomerPersonalInfo cpi on ci.custId = cpi.id
+	        	left join CodeTable ct on ci.identityTypeId = ct.id
+	        	where ci.id = :custIdentityId]]>
+    </query>
+    
+    <sql-query name="getAllCompForCheckCat">
+		<![CDATA[select ID, COMP_NAME, COMP_TAX_NUMBER, COMP_ADDR_STREET, 
+						OFFICE_PHONE_NUMBER, LAST_UPDATED_DATE, LAST_UPDATED_BY 
+						from CUST_COMPANY_INFO where PROCESSING = '0']]>
+	</sql-query>
+	
+	<sql-query name="countComp">
+		<![CDATA[select count(1) from CUST_COMPANY_INFO where PROCESSING = '0']]>
+	</sql-query>
+    
+    <query name="checkCompRemove">
+		<![CDATA[select compTaxNumber from CustomerCompanyInfo where compTaxNumber =:taxNumber]]>
+	</query>
+	
+	<sql-query name="checkTopComp">
+		<![CDATA[select count(*) from CODE_TABLE where CATEGORY =:ctCat and CODE_VALUE1 = :taxNumber]]>
+	</sql-query>
+	
+	<sql-query name="insertCompToCodeTable">
+		<![CDATA[INSERT INTO CODE_TABLE (ID,RECORD_STATUS,CREATED_DATE,LAST_UPDATED_DATE,PRODUCT_CAT_ID,PRODUCT_GROUP_ID,PRODUCT_ID,CODE_GROUP,CATEGORY,CODE_VALUE1,DESCRIPTION1,STATUS)
+				values(SEQ_CODE_TABLE_ID.nextval,'A', sysdate,sysdate, 0, 0, 0, 'CORP',:ctCat,:taxNumber,:compName,'A')]]>
+	</sql-query>
+	
+	<query name="checkCompExist">
+		<![CDATA[from CustomerCompanyInfo where compTaxNumber = :taxNumber]]>
+	</query>
+	
+	<sql-query name="getChapterGroup">
+		<![CDATA[SELECT CODE_VALUE2 FROM CODE_TABLE WHERE CODE_GROUP = 'CORP' and CATEGORY= 'TAX_CHAPTER_GROUP' and CODE_VALUE1 = :taxChapter]]>
+	</sql-query>
+	
+	<sql-query name="getCompHaving">
+		<![CDATA[SELECT DESCRIPTION1 FROM CODE_TABLE WHERE CATEGORY = :groupTaxChapter AND CODE_VALUE1 = :typeCheck]]>
+	</sql-query>
+	
+	<sql-query name="deteleTopComp">
+		<![CDATA[DELETE FROM Code_Table WHERE category = :ctCat and code_Value1 in (:lstTaxNumber)]]>
+	</sql-query>
+	
+	<query name="removeCompany">
+		<![CDATA[DELETE CustomerCompanyInfo WHERE compTaxNumber in (:lstTaxNumber)]]>
+	</query>
+	
+	<sql-query name="changeProcessingAfterAdjustComp">
+		<![CDATA[UPDATE cust_company_info SET processing = 0, LAST_UPDATED_DATE = sysdate, LAST_UPDATED_BY = :loginId WHERE COMP_TAX_NUMBER in (:lstTaxNumber)]]>
+	</sql-query>
+	
+	<sql-query name="getCusIdByIdentityAndBirthDay">
+	<![CDATA[Select per.id from cust_personal_info per inner join cust_identity ide on per.id = ide.cust_id where ide.identity_number = :identityNumber AND per.birth_date=:birthDay order by per.created_date desc]]>
+	</sql-query>
+    
+    <!-- TEST -->
+    <!-- <sql-query name="getLstAccountLinkNativeSql">
+        <![CDATA[select cal.ID as id, cpi.CUST_NAME as custName
+	        	from CUST_ACCOUNT_LINK cal
+	        	left join CUST_PERSONAL_INFO cpi 
+	        	on cal.CUST_ID = cpi.ID]]>
+    </sql-query>
+    <query name="getLstAccountLink">
+        <![CDATA[from CustomerAccountLink]]>
+    </query> -->
+    <!-- // -->
+</hibernate-mapping>

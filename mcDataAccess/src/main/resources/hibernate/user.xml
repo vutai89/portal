@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<query name="findActiveUser">
+	 	<![CDATA[ from Users WHERE RECORD_STATUS ='A' Order by USR_FULL_NAME asc ]]>
+	</query>
+
+	<sql-query name="findActiveEmployee">
+	 	<![CDATA[ select u.ID as id, u.CREATED_BY as createdBy, u.CREATED_DATE as createdDate, u.LAST_UPDATED_BY as lastUpdatedBy,
+	 	 		u.LAST_UPDATED_DATE as lastUpdatedDate, u.LOGIN_ID as loginId, u.EMP_ID as empId, u.USR_FULL_NAME as usrFullName, u.USR_TYPE as usrType,
+	 	 		u.STATUS as status, u.START_EFF_DATE as startEffDate, u.END_EFF_DATE as endEffDate, u.RECORD_STATUS as recordStatus, 0 as allocatedFreshNumber,
+	 	 		0 as allocatedWipNumber, 0 as allocationMasterId, '' as superVisor, 0 as bdsId, '' as bdsCode, '' as teamLead, '' as empCode,
+	 	 		nvl(e.email, (concat(trim(u.login_id), '@mcredit.com.vn'))) as email, ct.DESCRIPTION1 as departmentName
+	 	 		from USERS u
+	 	 		left JOIN EMPLOYEES e on u.EMP_ID = e.ID
+	 	 		left  JOIN EMPLOYEE_LINK el on e.ID = el.EMP_ID
+	 	 		left  JOIN CODE_TABLE ct on el.DEPARTMENT = ct.ID
+	 	 		WHERE u.RECORD_STATUS ='A' order by u.LOGIN_ID ]]>
+	</sql-query>
+
+	<sql-query name="findUserMenu">
+        <![CDATA[ select mn.tree_level,mn.MODULE MENU_MODULE,mn.MENU_CODE,
+					mn.MENU_TITLE,mn.PARENT_MENU,mn.MENU_TYPE,fn.*,mn.ID MENU_ID from 
+					(select urm.OBJECT_TYPE,rd.ACCESS_RIGHT,rd.ROLE_ID,rd.OBJECT_ID FUNCTION_ID,
+					f.MODULE,f.FUNCTION_CODE,f.URL from USERS_ROLE_MAPPING urm
+					inner join ROLE_DETAILS rd on urm.OBJECT_TYPE = 'R' and rd.OBJECT_TYPE = 'F' and rd.ROLE_ID = urm.OBJECT_ID
+					inner join FUNCTIONS f on f.ID = rd.OBJECT_ID
+					where urm.USER_ID = (select ID from USERS u where u.LOGIN_ID = :loginId)
+					and urm.STATUS = 'A' and rd.STATUS = 'A' and f.STATUS = 'A'
+					union all
+					select urm.OBJECT_TYPE,nvl(urm.ACCESS_RIGHT, f.PAGE_ACCESS_RIGHT) ACCESS_RIGHT,null,f.ID FUNCTION_ID,
+					f.MODULE,f.FUNCTION_CODE,f.URL from USERS_ROLE_MAPPING urm
+					inner join FUNCTIONS f on urm.OBJECT_TYPE = 'F' and f.ID = urm.OBJECT_ID
+					where urm.USER_ID = (select ID from USERS u where u.LOGIN_ID = :loginId)
+					and urm.STATUS = 'A' and f.STATUS = 'A') fn inner join
+					(select level tree_level, m.* from MENU m
+					where m.STATUS = 'A' and m.MENU_CODE <> 'ROOT'
+					connect by prior m.ID = m.PARENT_MENU
+					start with m.MENU_CODE = 'ROOT') mn on fn.FUNCTION_ID = mn.FUNCTION_ID
+					order by fn.FUNCTION_ID, decode(fn.OBJECT_TYPE,'F',2,1) ]]>
+	</sql-query>
+
+	<sql-query name="findUserService">
+        <![CDATA[ select * from 
+					(select urm.OBJECT_TYPE,rd.ACCESS_RIGHT,rd.ROLE_ID,rd.OBJECT_ID SERVICE_ID,
+					s.MODULE,s.SERVICE_NAME, s.SERVICE_PATH, s.POSTING_GROUP from USERS_ROLE_MAPPING urm
+					inner join ROLE_DETAILS rd on urm.OBJECT_TYPE = 'R' and rd.OBJECT_TYPE = 'S' and rd.ROLE_ID = urm.OBJECT_ID
+					inner join SERVICES s on s.ID = rd.OBJECT_ID
+					where urm.USER_ID = (select ID from USERS u where u.LOGIN_ID = :loginId)
+					and urm.STATUS = 'A' and rd.STATUS = 'A' and s.STATUS = 'A'
+					union all
+					select urm.OBJECT_TYPE,urm.ACCESS_RIGHT,null ROLE_ID,s.ID SERVICE_ID,
+					s.MODULE,s.SERVICE_NAME, s.SERVICE_PATH, s.POSTING_GROUP from USERS_ROLE_MAPPING urm
+					inner join SERVICES s on urm.OBJECT_TYPE = 'S' and s.ID = urm.OBJECT_ID 
+					where urm.USER_ID = (select ID from USERS u where u.LOGIN_ID = :loginId)
+					and urm.STATUS = 'A' and s.STATUS = 'A') sv
+					order by sv.SERVICE_ID, decode(sv.OBJECT_TYPE,'S',2,1) ]]>
+	</sql-query>
+
+	<!-- <sql-query name="findUserBySessionKey"> <![CDATA[ select u.ID as id, 
+		u.CREATED_BY as createdBy, u.CREATED_DATE, u.LAST_UPDATED_BY, u.LAST_UPDATED_DATE, 
+		u.LOGIN_ID, u.EMP_ID, u.USR_FULL_NAME, u.USR_TYPE, u.STATUS, u.START_EFF_DATE, 
+		u.END_EFF_DATE, u.RECORD_STATUS, 0 as allocatedFreshNumber, 0 as allocatedWipNumber, 
+		0 as allocationMasterId, ( select ct.CODE_VALUE1 from EMPLOYEE_LINK el inner 
+		join CODE_TABLE ct on (el.EMP_POSITION = ct.ID and ct.CODE_VALUE1 = 'TSP') 
+		where el.EMP_ID = u.EMP_ID ) as superVisor, ( select ct.CODE_VALUE1 from 
+		EMPLOYEE_LINK el inner join CODE_TABLE ct on (el.EMP_POSITION = ct.ID and 
+		ct.CODE_VALUE1 = 'ASM') where el.EMP_ID = u.EMP_ID ) as asm, bds.EMP_ID as 
+		bdsId, bds.EMP_CODE as bdsCode, ( select MANAGER_ID from TEAMS team where 
+		u.ID = team.MANAGER_ID and team.STATUS='A' and rownum = 1 ) as teamLead, 
+		(select LISTAGG(el1.EMP_CODE, ',') WITHIN GROUP (ORDER BY el1.EMP_CODE) from 
+		EMPLOYEE_LINK el1 where el1.EMP_ID = u.EMP_ID group by el1.EMP_ID) as empCode 
+		from USERS u inner join USERS_SESSION us on u.LOGIN_ID = us.LOGIN_ID left 
+		join (select el.EMP_ID, el.EMP_CODE from EMPLOYEE_LINK el inner join CODE_TABLE 
+		ct on el.EMP_POSITION = ct.ID and ct.CODE_VALUE1 = 'BDS') bds on u.EMP_ID 
+		= bds.EMP_ID where us.SESSION_KEY = :SESSION_KEY ]]> </sql-query> -->
+
+	<sql-query name="findUserBySessionKey">
+        <![CDATA[ select u.ID as id, u.CREATED_BY as createdBy, u.CREATED_DATE, u.LAST_UPDATED_BY, u.LAST_UPDATED_DATE, u.LOGIN_ID, u.EMP_ID, u.USR_FULL_NAME, 
+			 u.USR_TYPE, u.STATUS, u.START_EFF_DATE, u.END_EFF_DATE, u.RECORD_STATUS,
+			 0 as allocatedFreshNumber, 0 as allocatedWipNumber, 0 as allocationMasterId, 
+			 ( select ct.CODE_VALUE1 
+			       from EMPLOYEE_LINK el 
+			       inner join CODE_TABLE ct on (el.EMP_POSITION = ct.ID and ct.CODE_VALUE1 = 'ASM')  
+			       where el.EMP_ID = u.EMP_ID 
+			 ) as superVisor, 
+			    bds.EMP_ID as bdsId, 
+			    bds.EMP_CODE as bdsCode,
+			 ( select MANAGER_ID from TEAMS team 
+			      where u.ID = team.MANAGER_ID and team.STATUS='A' and rownum = 1 
+			 ) as teamLead,
+			 (select LISTAGG(el1.EMP_CODE, ',') WITHIN GROUP (ORDER BY el1.EMP_CODE)
+			    from EMPLOYEE_LINK el1 where el1.EMP_ID = u.EMP_ID group by el1.EMP_ID) as empCode, null as email, null as departmentName, us.LAST_UPDATE_DATE as userSessionCreatedTime
+			 from USERS u inner join USERS_SESSION us on u.LOGIN_ID = us.LOGIN_ID 
+			 left join (select el.EMP_ID, el.EMP_CODE from EMPLOYEE_LINK el 
+			    inner join CODE_TABLE ct on el.EMP_POSITION = ct.ID and ct.CODE_VALUE1 = 'BDS') bds on u.EMP_ID = bds.EMP_ID
+			 where us.SESSION_KEY = :SESSION_KEY ]]>
+	</sql-query>
+
+	<sql-query name="findUserByLoginID">
+        <![CDATA[ select u.ID as id, u.CREATED_BY as createdBy, u.CREATED_DATE, u.LAST_UPDATED_BY, u.LAST_UPDATED_DATE, u.LOGIN_ID, u.EMP_ID, u.USR_FULL_NAME, 
+			 ct1.CODE_VALUE1 as usrType, u.STATUS, u.START_EFF_DATE, u.END_EFF_DATE, u.RECORD_STATUS,
+			 0 as allocatedFreshNumber, 0 as allocatedWipNumber, 0 as allocationMasterId, 
+			 ( select CODE_VALUE1 
+			       from CODE_TABLE
+			       where CODE_GROUP='SALE' and CATEGORY='TELESALE_SUP' and RECORD_STATUS = 'A' and STATUS = 'A' and CODE_VALUE1 = u.LOGIN_ID
+			 ) as superVisor, 
+			    bds.EMP_ID as bdsId, 
+			    bds.EMP_CODE as bdsCode,
+			 ( select MANAGER_ID from TEAMS team 
+			      where u.ID = team.MANAGER_ID and team.STATUS='A' and rownum = 1 
+			 ) as teamLead,
+			 (select LISTAGG(el1.EMP_CODE, ',') WITHIN GROUP (ORDER BY el1.EMP_CODE)
+			    from EMPLOYEE_LINK el1 where el1.EMP_ID = u.EMP_ID group by el1.EMP_ID) as empCode, '' as email, 
+		     '' as departmentName, null as userSessionCreatedTime, up.CONTACT_CENTER_ID as extNumber, up.DEVICE_NAME as deviceName
+			 from USERS u
+			 left join USERS_PROFILES up on u.ID = up.USER_ID
+			 left join CODE_TABLE ct1 on ct1.ID = u.USR_TYPE
+			 left join (select el.EMP_ID, el.EMP_CODE from EMPLOYEE_LINK el 
+			    inner join CODE_TABLE ct on ct.ID = el.EMP_POSITION and ct.CODE_VALUE1 = 'BDS') bds on u.EMP_ID = bds.EMP_ID 
+			 where u.login_id = :loginid ]]>
+	</sql-query>
+
+	<sql-query name="getExtNumber">
+        <![CDATA[ select up.CONTACT_CENTER_ID as extNumber, up.DEVICE_NAME as deviceName
+				from USERS u inner join USERS_PROFILES up on u.ID = up.USER_ID
+				where u.LOGIN_ID = :loginId ]]>
+	</sql-query>
+
+	<sql-query name="getUserRoles">
+	 	<![CDATA[ select u.LOGIN_ID, r.ROLE_CODE from USERS u 
+			inner join USERS_ROLE_MAPPING urm on u.ID = urm.USER_ID 
+			inner join ROLES r on urm.OBJECT_ID = r.ID 
+			where urm.OBJECT_TYPE = 'R'
+			order by u.LOGIN_ID, r.ROLE_CODE ]]>
+	</sql-query>
+
+	<sql-query name="findAllRoles">
+        <![CDATA[ select id, created_by, last_updated_by, role_code, role_type, role_name, status 
+        from roles where RECORD_STATUS = 'A' ORDER BY ROLE_CODE ASC ]]>
+	</sql-query>
+
+	<sql-query name="findRolesForUser">
+        <![CDATA[ select r.id, r.created_by, r.last_updated_by, r.role_code, r.role_type, r.role_name, r.status 
+        from roles r inner join users_role_mapping urm on urm.object_id = r.id
+		inner join users u on u.id = urm.user_id where u.login_id = :login_id and urm.object_type = 'R' ]]>
+	</sql-query>
+
+	<sql-query name="findRolesForUserId">
+        <![CDATA[ select urm.object_id from users_role_mapping urm
+		inner join users u on u.id = urm.user_id where u.id = :userId and urm.object_type = 'R']]>
+	</sql-query>
+
+	<sql-query name="insertRoleUserId">
+        <![CDATA[ Insert into USERS_ROLE_MAPPING (ID,RECORD_STATUS,CREATED_DATE,LAST_UPDATED_DATE,CREATED_BY,LAST_UPDATED_BY,USER_ID,OBJECT_TYPE,OBJECT_ID,ACCESS_RIGHT,STATUS) 
+		values (null,'A',sysdate,null,null,null,:userId,'R',:roleId,'NNNNYNNNN','A') ]]>
+	</sql-query>
+
+	<sql-query name="deleteRoleUserId">
+        <![CDATA[ delete from USERS_ROLE_MAPPING where USER_ID = :userId and OBJECT_ID =:roleId ]]>
+	</sql-query>
+
+	<sql-query name="findUserById">
+        <![CDATA[ select * from USERS where login_id in (:loginId) ]]>
+	</sql-query>
+
+
+</hibernate-mapping>

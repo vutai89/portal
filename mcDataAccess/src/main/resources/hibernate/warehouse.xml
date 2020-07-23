@@ -1,0 +1,888 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+
+
+	<sql-query name="getErrorByWHId">
+	<![CDATA[SELECT whc.id, whc.wh_doc_id, whc.created_by, TO_CHAR(whc.created_date,'DD/MM/YYYY HH24:MI:SS') AS created_date, whc.err_type,
+ 		ct_type.code_value1 AS type_code, ct_type.description1 AS type_name ,whc.UPDATE_REQUEST FROM wh_document_err whc LEFT JOIN code_table ct_type ON ct_type.id = whc.err_type
+		WHERE whc.wh_doc_id = :whDocId]]>
+	</sql-query>
+
+	<sql-query name="getListWareHouseErrorListCaseByWHId">
+	<![CDATA[SELECT wde.ID,wde.WH_DOC_ID,wde.CREATED_BY,wde.CREATED_DATE,wde.ERR_TYPE,wde.UPDATE_REQUEST, ct_type.CODE_VALUE1 as errorCode ,ct_type.DESCRIPTION1 as errorName FROM  Wh_Document_Err wde
+		LEFT JOIN  CODE_TABLE ct_type on ct_type.id = wde.ERR_TYPE Where  wde.WH_DOC_ID in(:whDocId) ]]>
+	</sql-query>
+	
+	<!-- <sql-query name="getListAllWareHouseErrorCase">
+	<![CDATA[SELECT whc.ID,whc.WH_DOC_ID, whc.TYPE, ct_type.CODE_VALUE1  as TYPE_CODE, ct_type.DESCRIPTION1  as TYPE_NAME, whc.NOTE, whc.CREATED_BY,   TO_CHAR(whc.CREATED_DATE, 'DD/MM/YYYY HH24:MI:SS') as CREATED_DATE ,
+		whc.ID_CODE_TABLE, whc.APPENDIX_CONTRACT ,ct_error.CODE_VALUE1  as ERR_CODE, ct_error.DESCRIPTION1  as ERR_NAME
+		FROM WH_DOCUMENT_CHANGE  whc
+		LEFT JOIN  CODE_TABLE ct_type on ct_type.id = whc.TYPE
+		LEFT JOIN  CODE_TABLE ct_error on ct_error.id = whc.ID_CODE_TABLE Where ct_type.CODE_VALUE1 = 'WH_ERR' AND whc.WH_DOC_ID IN(:whDocId)]]>
+	</sql-query>
+	
+	<sql-query name="getListAllWareHouseErrorCase">
+	<![CDATA[SELECT whc.ID,whc.WH_DOC_ID, whc.TYPE, ct_type.CODE_VALUE1  as TYPE_CODE, ct_type.DESCRIPTION1  as TYPE_NAME, whc.NOTE, whc.CREATED_BY,   TO_CHAR(whc.CREATED_DATE, 'DD/MM/YYYY HH24:MI:SS') as CREATED_DATE ,
+		whc.ID_CODE_TABLE, whc.APPENDIX_CONTRACT ,ct_error.CODE_VALUE1  as ERR_CODE, ct_error.DESCRIPTION1  as ERR_NAME
+		FROM WH_DOCUMENT_CHANGE  whc
+		LEFT JOIN  CODE_TABLE ct_type on ct_type.id = whc.TYPE
+		LEFT JOIN  CODE_TABLE ct_error on ct_error.id = whc.ID_CODE_TABLE Where ct_type.CODE_VALUE1 = 'WH_ERR' AND whc.WH_DOC_ID IN(:whDocId)]]>
+	</sql-query> -->
+
+	<sql-query name="getListWareHouseCavetErrorByWHId">
+	<![CDATA[SELECT whc.ID,whc.WH_DOC_ID, whc.TYPE, ct_type.CODE_VALUE1  as TYPE_CODE, ct_type.DESCRIPTION1  as TYPE_NAME, whc.NOTE, whc.CREATED_BY,   TO_CHAR(whc.CREATED_DATE, 'DD/MM/YYYY HH24:MI:SS') as CREATED_DATE ,
+		whc.ID_CODE_TABLE, ct_error.CODE_VALUE1  as ERR_CODE, ct_error.DESCRIPTION1  as ERR_NAME
+		FROM WH_DOCUMENT_CHANGE  whc
+		LEFT JOIN  CODE_TABLE ct_type on ct_type.id = whc.TYPE
+		LEFT JOIN  CODE_TABLE ct_error on ct_error.id = whc.ID_CODE_TABLE Where ct_type.CODE_VALUE1 = 'WH_ERR' AND whc.WH_DOC_ID = :whDocId]]>
+	</sql-query>
+
+	<sql-query name="getListError">
+		<![CDATA[SELECT whc.ID,whc.WH_DOC_ID, whc.TYPE, ct_type.CODE_VALUE1  as TYPE_CODE, ct_type.DESCRIPTION1  as TYPE_NAME, whc.NOTE, whc.CREATED_BY,   TO_CHAR(whc.CREATED_DATE, 'DD/MM/YYYY HH24:MI:SS') as CREATED_DATE ,
+		whc.ID_CODE_TABLE, ct_error.CODE_VALUE1  as ERR_CODE, ct_error.DESCRIPTION1  as ERR_NAME
+		FROM WH_DOCUMENT_CHANGE  whc
+		LEFT JOIN  CODE_TABLE ct_type on ct_type.id = whc.TYPE
+		LEFT JOIN  CODE_TABLE ct_error on ct_error.id = whc.ID_CODE_TABLE Where ct_type.CODE_VALUE1 = 'WH_ERR' AND whc.CREDIT_APP_ID= :creditAppId]]>
+	</sql-query>
+
+	<sql-query name="getWhBorrowedDocumentById">
+		<![CDATA[ select ID,WH_DOC_ID,CREATED_BY,OBJECT_TO,APPOINTMENT_DATE,EXTENSION_DATE,APPROVE_STATUS,APPROVE_DATE,APPROVE_BY,REJECT_REASON,TYPE,CREATED_DATE,DEPARTMENT_NAME,RECORD_STATUS,BORROWED_DATE,RETURN_DATE from WH_BORROWED_RETURN_DOCUMENT where WH_DOC_ID = :whDocId and record_status ='A' and type = :type and ROWNUM = 1   ]]>
+	</sql-query>
+
+	<query name="updateStatusWhCode">
+		<![CDATA[update WhCode set status = :newStatus where upper(code) = upper(:code)]]>
+	</query>
+
+	<query name="findWhDocumentById">
+		<![CDATA[FROM WhDocument WHERE ID = :id]]>
+	</query>
+
+	<!-- <sql-query name="findRemainDocumentAllocation"> <![CDATA[ select u.LOGIN_ID 
+		as employeeLoginId, u.USR_FULL_NAME as employeeFullName, count(ad.STATUS) 
+		as remainDocumentNumber from WH_DOCUMENT wd inner join ALLOCATION_DETAIL 
+		ad on wd.ID = ad.UPL_OBJECT_ID inner join USERS u on ad.assignee_id = u.ID 
+		where wd.STATUS in (select ID from CODE_TABLE where CODE_GROUP='WH' and category='WH_LOGDE' 
+		and CODE_VALUE1 in ('WH_NEW_WAIT')) group by u.LOGIN_ID, u.USR_FULL_NAME 
+		]]> </sql-query> -->
+	<sql-query name="findRemainDocumentAllocation">
+	<![CDATA[ select u.LOGIN_ID as employeeLoginId, u.USR_FULL_NAME as employeeFullName, count(ad.STATUS) as remainDocumentNumber 
+			  from WH_DOCUMENT wd 
+              left join (select * from WH_DOCUMENT_CHANGE where ID IN ( select ID from WH_DOCUMENT_CHANGE where  TYPE = (SELECT ID FROM CODE_TABLE where CODE_GROUP = 'WH' AND CATEGORY = 'WH_CHAN_TYPE' AND CODE_VALUE1 = 'WH_SAVE_AND_MOVE'))) whdProsess ON whdProsess.WH_DOC_ID = wd.ID
+			  inner join ALLOCATION_DETAIL ad on wd.ID = ad.UPL_OBJECT_ID 
+			  inner join USERS u on ad.assignee_id = u.ID 
+			  where wd.STATUS in (SELECT ID FROM code_table WHERE code_group = 'WH' AND code_value1 IN ('WH_NEW_WAIT','WH_LODGED_ERR_UPDATE_BORROW','WH_LODGE_COMPLETE_BORROW','WH_WAIT_COMPLETE','WH_WAIT_COMPLETE','WH_WAIT_ERR_UPDATE','WH_LODGED_COMPLETE','WH_LODGED_ERR_UPDATE'))
+              and whdProsess.ID is null
+              and ad.STATUS in (select id from code_table where code_group='WH' and category='WH_ASS_TYPE' and code_value1 in ('WH_MANY', 'WH_ONE'))
+			  group by u.LOGIN_ID, u.USR_FULL_NAME ]]>
+	</sql-query>
+
+	<sql-query name="getListWhId">
+		<![CDATA[SELECT ad.ID,ad.ALLOCATED_NUMBER,ad.ALLOCATION_MASTER_ID,ad.ASSIGNEE_ID,ad.OBJECT_TYPE,ad.STATUS,ad.UPL_OBJECT_ID,ad.UPL_DETAIL_ID,ad.NOTE FROM ALLOCATION_DETAIL ad
+	INNER JOIN UPL_DETAIL ud ON ud.ID = ad.UPL_DETAIL_ID
+	INNER JOIN UPL_MASTER um ON um.ID = ud.UPL_MASTER_ID
+	where um.UPL_CODE = 'WH_ALLOCATION' and UPL_OBJECT_ID in (:lstwhDocId)  ]]>
+	</sql-query>
+
+	<sql-query name="getLstReturnDocument">
+		<![CDATA[SELECT whd.id, whd.doc_type, ct_whd.code_value1 AS doc_type_code, ct_whd.description1 AS doc_type_desc, whd.created_date ,
+				 whd.status, ct_whd_st.code_value1 AS status_code, ct_whd_st.description1 AS status_desc ,whcode.CODE   
+			FROM
+			    wh_document whd   
+			    INNER JOIN code_table ct_whd ON ct_whd.id = whd.doc_type
+			    INNER JOIN code_table ct_whd_st ON ct_whd_st.id = whd.status 
+			    LEFT JOIN WH_CODE whcode ON whcode.ID = whd.WH_CODE_ID  
+			WHERE
+		    whd.DOC_TYPE in (SELECT ID FROM CODE_TABLE WHERE CODE_GROUP = 'WH' AND CATEGORY = 'WH_DOC_TYPE' AND ( CODE_TABLE.CODE_VALUE1 in('WH_LOAN_DOC','WH_ERR_UPDATE','WH_CAVET'))) AND whd.id = :whDocId]]>
+	</sql-query>
+
+	<sql-query name="getLstResultsDocumentInfo">
+		<![CDATA[SELECT whr.ERR_TYPE, ct_error.code_value1 AS errorcode, ct_error.description1 AS errorname, whr.UPDATE_REQUEST FROM WH_DOCUMENT_ERR whr  INNER JOIN code_table ct_error ON ct_error.id = whr.ERR_TYPE WHERE  whr.wh_doc_id =:whDocId ]]>
+	</sql-query>
+
+	<sql-query name="deleteDocuments">
+		<![CDATA[delete WH_DOCUMENT where Id in (:whIds)]]>
+	</sql-query>
+
+	<sql-query name="updateBatch">
+		<![CDATA[UPDATE WH_DOCUMENT SET batch_id = :batch_id where batch_id in (select batch_id from WH_DOCUMENT where Id in (:whIds)) and version is null]]>
+	</sql-query>
+	
+	<sql-query name="updateActive">
+		<![CDATA[
+			UPDATE WH_DOCUMENT
+			SET IS_ACTIVE = 1
+			WHERE ID =
+			    (SELECT MAX(ID)
+			     FROM WH_DOCUMENT
+			     WHERE CREDIT_APP_ID = :creditAppId
+			       AND DOC_TYPE = :docType
+			       AND IS_ACTIVE = 0
+			       AND VERSION IS NOT NULL)
+		]]>
+	</sql-query>
+
+	<query name="checkPemisionData">
+		<![CDATA[ from AllocationDetail where objectId=:userId and uplCustomerId =:objectId ]]>
+	</query>
+
+	<sql-query name="getLstIdDocument">
+		<![CDATA[select a.id from  wh_document a, CODE_TABLE c where a.DOC_TYPE = c.id and c.CODE_GROUP = 'WH' AND c.CATEGORY = 'WH_DOC_TYPE' 
+                          AND ( c.CODE_VALUE1 in('WH_LOAN_DOC','WH_ERR_UPDATE')) and a.CREDIT_APP_ID = (select b.CREDIT_APP_ID from wh_document b where b.ID =:whDocId) 
+                          AND TRUNC(a.created_date) <= TRUNC((select b.created_date from wh_document b where b.ID =:whDocId))
+                          AND (a.CONTRACT_CAVET_TYPE <> 2 or a.CONTRACT_CAVET_TYPE is null)]]>
+	</sql-query>
+
+	<sql-query name="getLstIdCavet">
+		<![CDATA[select a.id from  wh_document a, CODE_TABLE c where a.DOC_TYPE = c.id and c.CODE_GROUP = 'WH' AND c.CATEGORY = 'WH_DOC_TYPE' 
+                          AND ( c.CODE_VALUE1 in('WH_CAVET','WH_ERR_UPDATE')) and a.CREDIT_APP_ID = (select b.CREDIT_APP_ID from wh_document b where b.ID =:whDocId) 
+                          AND TRUNC(a.created_date) <= TRUNC((select b.created_date from wh_document b where b.ID =:whDocId))                            
+                          AND (a.CONTRACT_CAVET_TYPE <> 1 or a.CONTRACT_CAVET_TYPE is null)]]>
+	</sql-query>
+
+	<sql-query name="getLstDocId">
+		<![CDATA[SELECT whd.id, whd.doc_type, ct_whd.code_value1 AS doc_type_code, ct_whd.description1 AS doc_type_desc, whd.created_date ,
+				 whd.status, ct_whd_st.code_value1 AS status_code, ct_whd_st.description1 AS status_desc, whcode.CODE, whd.contract_cavet_type,
+                                 whd.is_Active, whd.is_Original, whd.appendix_Contract 
+			FROM
+			    wh_document whd   
+			    INNER JOIN code_table ct_whd ON ct_whd.id = whd.doc_type
+			    INNER JOIN code_table ct_whd_st ON ct_whd_st.id = whd.status 
+			    LEFT JOIN WH_CODE whcode ON whcode.ID = whd.WH_CODE_ID  
+			WHERE
+		    whd.DOC_TYPE in (SELECT ID FROM CODE_TABLE WHERE CODE_GROUP = 'WH' AND CATEGORY = 'WH_DOC_TYPE' AND ( CODE_TABLE.CODE_VALUE1 in('WH_LOAN_DOC','WH_ERR_UPDATE','WH_CAVET'))) 
+                AND whd.id in (:whDocId) ORDER BY whd.IS_ORIGINAL desc , whd.created_date, whd.id asc]]>
+	</sql-query>
+	
+	<sql-query name="getSendThankLetterByCreditAppId">
+		<![CDATA[  SELECT wed.CREDIT_APP_ID ,wed.EXPECTED_DATE FROM WH_EXPECTED_DATE wed INNER JOIN CODE_TABLE ct ON wed.DOC_TYPE = ct.ID WHERE ct.code_group = 'WH' AND ct.category = 'WH_HISTORY_EXPORT' AND ct.code_value1 = 'WH_SEND_THANKLATTER' AND wed.CREDIT_APP_ID IN(:creditAppIdLst) ]]>
+	</sql-query>
+	
+	<sql-query name="getDateErrCavetByCreditAppId">
+			<![CDATA[  SELECT wed.CREDIT_APP_ID ,wed.EXPECTED_DATE FROM WH_EXPECTED_DATE wed INNER JOIN CODE_TABLE ct ON wed.DOC_TYPE = ct.ID WHERE ct.code_group = 'WH' AND ct.category = 'WH_HIS_EXPECTED_DATE' AND ct.code_value1 = 'WH_EXPECTED_CAVET' AND wed.CREDIT_APP_ID IN(:creditAppIdLst) ]]>
+		</sql-query>
+	
+	<sql-query name="getDateErrLoanDocByCreditAppId">
+			<![CDATA[  SELECT wed.CREDIT_APP_ID ,wed.EXPECTED_DATE FROM WH_EXPECTED_DATE wed INNER JOIN CODE_TABLE ct ON wed.DOC_TYPE = ct.ID WHERE ct.code_group = 'WH' AND ct.category = 'WH_HIS_EXPECTED_DATE' AND ct.code_value1 = 'WH_EXPECTED_LOAN_DOC' AND wed.CREDIT_APP_ID IN(:creditAppIdLst) ]]>
+		</sql-query>
+
+	<sql-query name="getUpdateErrorCreditAppIdCavet">
+        <![CDATA[ SELECT CREATED_DATE FROM WH_DOCUMENT_CHANGE  WHERE WH_DOC_ID = ( SELECT min( id ) FROM WH_DOCUMENT  WHERE CREDIT_APP_ID =:creditAppId 
+		AND VERSION IS NOT NULL  AND DOC_TYPE = ( SELECT id FROM CODE_TABLE WHERE CATEGORY = 'WH_DOC_TYPE' AND ( CODE_VALUE1 ='WH_CAVET' ))) 
+		AND ID_CODE_TABLE = ( SELECT id FROM CODE_TABLE WHERE CODE_GROUP = 'WH' AND CATEGORY = 'WH_LOGDE' AND CODE_VALUE1 = 'WH_WAIT_ERR_UPDATE' ) 
+		AND rownum = 1  ORDER BY CREATED_DATE ]]>
+	</sql-query>
+	
+	<sql-query name="getUpdateErrorCreditAppIdLoanDoc">
+        <![CDATA[ SELECT CREATED_DATE  FROM WH_DOCUMENT_CHANGE  WHERE WH_DOC_ID = ( SELECT min( id ) FROM WH_DOCUMENT  WHERE CREDIT_APP_ID =:creditAppId 
+		AND VERSION IS NOT NULL  AND DOC_TYPE = ( SELECT id FROM CODE_TABLE WHERE CATEGORY = 'WH_DOC_TYPE' AND ( CODE_VALUE1 ='WH_LOAN_DOC' ))) 
+		AND ID_CODE_TABLE = ( SELECT id FROM CODE_TABLE WHERE CODE_GROUP = 'WH' AND CATEGORY = 'WH_LOGDE' AND CODE_VALUE1 = 'WH_WAIT_ERR_UPDATE' ) 
+		AND rownum = 1  ORDER BY CREATED_DATE ]]>
+	</sql-query>
+
+	<sql-query name="checkIdWHDocument">
+		<![CDATA[  SELECT id as docId from WH_DOCUMENT where ID IN (:idDocuments)]]>
+	</sql-query>
+
+	<sql-query name="updateStatusReturnDoc">
+		<![CDATA[  update WH_DOCUMENT set STATUS=(:status) where id =(:docId)]]>
+	</sql-query>
+
+	<sql-query name="findLodgeCodeByDocId">
+		<![CDATA[  select code from (select distinct a.code, b.CREATED_DATE
+									from WH_CODE a
+									inner join WH_MAP_DOC_CODE b on a.ID = b.WH_CODE_ID
+									inner join WH_DOCUMENT c on b.WH_DOC_ID = c.ID
+									where c.ID = :documentId
+									order by b.CREATED_DATE desc)]]>
+	</sql-query>
+
+	<sql-query name="getLstAttributeRootDoc">
+		<![CDATA[ select wh.id from  wh_document wh, CODE_TABLE ctt, CODE_TABLE cts  where wh.DOC_TYPE = ctt.id and wh.STATUS = cts.id 
+                        and ctt.CODE_GROUP = 'WH' AND ctt.CATEGORY = 'WH_DOC_TYPE' AND ctt.CODE_VALUE1 in ('WH_LOAN_DOC','WH_ERR_UPDATE','WH_CAVET')
+                        and wh.CREDIT_APP_ID = (select a.CREDIT_APP_ID from wh_document a where a.ID = :whDocId)                           
+                        and cts.CODE_GROUP = 'WH' AND cts.CATEGORY = 'WH_LOGDE' AND cts.CODE_VALUE1 not in ('WH_NOT_RECEIVE','WH_NEW_WAIT')]]>
+	</sql-query>
+
+	<sql-query name="getRootUpdateErr">
+		<![CDATA[ select a.ID,a.VERSION,a.CREDIT_APP_ID,a.DOC_TYPE,a.BATCH_ID,a.ORDER_BY,a.ESTIMATE_DATE,
+                            a.WH_CODE_ID,a.WH_LODGE_DATE,a.CREATED_DATE,a.CREATED_BY,
+                            a.LAST_UPDATED_BY,a.LAST_UPDATED_DATE,a.CONTRACT_CAVET_TYPE,a.STATUS,a.WH_LODGE_BY,a.PROCESS_STATUS,a.BILL_CODE,a.DELIVERY_ERROR,a.PROCESS_DATE,a.IS_ACTIVE,
+                            a.IS_ORIGINAL,a.APPENDIX_CONTRACT,a.NOTE
+                            from wh_document a,
+                            (SELECT  whl.whDocumentId  ,whl.docChangeId , whl.typeChange,
+                                 RANK() OVER( 
+                                     PARTITION BY whl.typeChange 
+                                     ORDER BY 
+                                whl.docChangeId DESC 
+                                 ) dest_rank 
+                             FROM 
+                        (select wh.id as whDocumentId, wdc.id as docChangeId, wdc.type as typeChange from  wh_document wh, CODE_TABLE ctw, wh_document_change wdc, CODE_TABLE ctc  where wh.DOC_TYPE = ctw.id AND ctw.CATEGORY = 'WH_DOC_TYPE' 
+                          AND ctw.CODE_VALUE1 = :contractCavetType and wh.id = wdc.wh_doc_id and wdc.type = ctc.id AND ctc.CATEGORY = 'WH_CHAN_TYPE' 
+                          AND ctc.CODE_VALUE1 = 'WH_SAVE_AND_MOVE'
+                          and wh.CREDIT_APP_ID = (select a.CREDIT_APP_ID from wh_document a where a.ID = :whDocId)) whl) b where a.id = b.whDocumentId and b.dest_rank=1 ]]>
+	</sql-query>
+
+	<sql-query name="getBorrowDate">
+		<![CDATA[ SELECT ID,WH_DOC_ID,TYPE,NOTE,CREATED_BY,CREATED_DATE,ID_CODE_TABLE,APPENDIX_CONTRACT,SCAN_ID,CREDIT_APP_ID FROM WH_DOCUMENT_CHANGE WHERE TYPE = ( SELECT  ID as type FROM CODE_TABLE WHere CODE_GROUP = 'WH' AND CATEGORY = 'WH_CHAN_TYPE' AND CODE_VALUE1 =:typeCode) AND ID_CODE_TABLE = (SELECT  ID as IdCodeTable FROM CODE_TABLE WHere CODE_GROUP = 'WH' AND CATEGORY = 'WH_CHAN_TYPE' AND Code_value1 =:changeStatusCode)  AND WH_DOC_ID =:whDocId ORDER BY CREATED_DATE DESC FETCH FIRST ROW only  ]]>
+	</sql-query>
+
+	<sql-query name="countExportPaperReceipt">
+		<![CDATA[ select to_char((count(1) + 1),'000') from wh_document_change a, code_table b where a.type = b.id and b.CATEGORY = 'WH_HISTORY_EXPORT' 
+                          AND b.CODE_VALUE1 = 'WH_EXPORT_PAPER_RECEIPT' and a.credit_app_id = :creditAppId ]]>
+	</sql-query>
+	
+	<sql-query name="getLstHistoryWhDataField1">
+		<![CDATA[ SELECT whd.id,
+                    to_char(whd.created_date,'dd/mm/yyyy') ,
+                    whd.created_by as receiveBy,
+                    null as dataField3,null as dataField4,null as dataField5,null as dataField6                    
+                FROM wh_document whd
+                where whd.id = :whId
+                ORDER BY
+                whd.created_date asc
+                 ]]>
+	</sql-query>
+	
+	<sql-query name="getLstHistoryWhDataField2">
+		<![CDATA[ SELECT  whd.id,
+                to_char(ah.created_date,'dd/mm/yyyy'), ah.created_by ,us.LOGIN_ID,null as dataField4,null as dataField5,null as dataField6        
+                FROM
+                    wh_document whd 
+                     JOIN ALLOCATION_DETAIL ad  ON ad.UPL_OBJECT_ID = whd.id    
+                     JOIN ALLOCATION_HISTORY ah on ah.ALLOCATION_DETAIL_ID = ad.id 
+                     JOIN code_table ct on ct.id = ah.STATUS and ct.category = 'WH_ASS_TYPE' AND ct.code_value1 = 'WH_ONE'
+                    JOIN users us on us.id= ah.ASSIGNEE_ID
+                    where whd.id = :whId
+                ORDER BY
+                    ah.created_date asc
+                 ]]>
+	</sql-query>
+	
+	<sql-query name="getLstHistoryWhDataField3">
+		<![CDATA[ SELECT  whd.id,
+                to_char(ah.created_date,'dd/mm/yyyy'), ah.created_by ,us.LOGIN_ID,null as dataField4,null as dataField5,null as dataField6      
+                FROM
+                    wh_document whd 
+                     JOIN ALLOCATION_DETAIL ad  ON ad.UPL_OBJECT_ID = whd.id    
+                     JOIN ALLOCATION_HISTORY ah on ah.ALLOCATION_DETAIL_ID = ad.id 
+                     JOIN code_table ct on ct.id = ah.STATUS and ct.category = 'WH_ASS_TYPE' AND ct.code_value1 = 'WH_MANY'
+                    JOIN users us on us.id= ah.ASSIGNEE_ID
+                    where whd.id = :whId
+                ORDER BY
+                    ah.created_date asc
+                 ]]>
+	</sql-query>
+	
+	<sql-query name="getLstHistoryWhDataField4">
+		<![CDATA[ SELECT  whd.id,
+                    whc.created_by, to_char(whc.created_date,'dd/mm/yyyy'), null as dataField3,null as dataField4,null as dataField5,null as dataField6 
+                    FROM
+                        wh_document whd 
+                         JOIN wh_document_change whc on whc.WH_DOC_ID = whd.id
+                         JOIN code_table ct on ct.id = whc.type and ct.category = 'WH_CHAN_TYPE' AND ct.code_value1 = 'WH_SAVE_AND_MOVE'
+                    where whd.id = :whId
+                    ORDER BY
+                        whc.created_date asc
+                 ]]>
+	</sql-query>
+	
+	<sql-query name="getLstHistoryWhDataField5">
+		<![CDATA[ SELECT  whd.id,
+                    ct.description1, null as dataField2,null as dataField3,null as dataField4,null as dataField5,null as dataField6 
+                    FROM
+                        wh_document whd 
+                         JOIN wh_document_err wde on wde.WH_DOC_ID = whd.id
+                         JOIN code_table ct on ct.id = wde.err_type 
+                    where whd.id = :whId
+                 ]]>
+	</sql-query>
+	
+	<sql-query name="getLstHistoryWhDataField6">
+		<![CDATA[ SELECT  whd.id,
+                        to_char(whc.created_date,'dd/mm/yyyy'), whc.created_by, null as dataField3,null as dataField4,null as dataField5,null as dataField6
+                        FROM
+                            wh_document whd 
+                             JOIN wh_document_change whc on whc.WH_DOC_ID = whd.id
+                             JOIN code_table ct on ct.id = whc.id_code_table and ct.category = 'WH_LOGDE' AND ct.code_value1 = 'WH_RETURN_DOC_NOT_RECEIVE'
+                        where whd.id = :whId
+                        ORDER BY
+                            whc.created_date asc
+                 ]]>
+	</sql-query>
+	
+	<sql-query name="getLstHistoryWhDataField7">
+		<![CDATA[ SELECT  whd.id,
+                        whd.wh_lodge_by,
+                            whd.wh_lodge_date,
+                            wc.code,null as dataField4,null as dataField5,null as dataField6
+                        FROM
+                            wh_document whd 
+                            JOIN wh_code wc ON wc.id = whd.wh_code_id
+                        where whd.id = :whId
+                 ]]>
+	</sql-query>
+	
+	<sql-query name="getLstHistoryWhDataField8">
+		<![CDATA[ SELECT  whd.id,
+                        to_char(whc.created_date,'dd/mm/yyyy') ,
+                        whc.created_by ,
+                           usbr.LOGIN_ID , 
+                           wbd.DEPARTMENT_NAME,
+                           wbd.EXTENSION_DATE,
+                           wbd.APPOINTMENT_DATE
+                       FROM
+                           wh_document whd 
+                           JOIN wh_document_change whc on whc.WH_DOC_ID = whd.id
+                           JOIN code_table ct on ct.id = whc.id_code_table and ct.category = 'WH_CHAN_TYPE' AND ct.code_value1 = 'WH_APP_BORROW'
+                           JOIN WH_BORROWED_RETURN_DOCUMENT wbd ON wbd.WH_DOC_ID = whd.id
+                           JOIN users usbr ON usbr.id = wbd.OBJECT_TO
+                       where whd.id = :whId
+                       ORDER BY
+                           whc.created_date asc
+                 ]]>
+	</sql-query>
+	
+	<sql-query name="getLstHistoryWhDataField9">
+		<![CDATA[ SELECT  whd.id,
+                        whc.created_by,    
+                        to_char(whc.created_date,'dd/mm/yyyy') , null as dataField3,null as dataField4,null as dataField5,null as dataField6
+                       FROM
+                           wh_document whd 
+                           JOIN wh_document_change whc on whc.WH_DOC_ID = whd.id
+                           JOIN code_table ct on ct.id = whc.id_code_table and ct.category = 'WH_LOGDE' AND  ct.code_value1 in ('WH_LODGED_ERR_UPDATE_RETURN','WH_LODGED_COMPLETE_RETURN')
+                       where whd.id = :whId
+                       ORDER BY
+                           whc.created_date asc
+                 ]]>
+	</sql-query>
+	<sql-query name="getLstHistoryWhDataField10">
+		<![CDATA[ SELECT  whd.id,
+                        to_char(whc.created_date,'dd/mm/yyyy') ,
+                        whc.created_by , null as dataField3,null as dataField4,null as dataField5,null as dataField6  
+                       FROM
+                           wh_document whd 
+                           JOIN wh_document_change whc on whc.WH_DOC_ID = whd.id
+                           JOIN code_table ct on ct.id = whc.id_code_table and ct.category = 'WH_LOGDE' AND  ct.code_value1 = 'WH_WAIT_RETURN'
+                       where whd.id = :whId
+                       ORDER BY
+                           whc.created_date asc
+                 ]]>
+	</sql-query>
+
+	<sql-query name="getOriginalByCreditAppId">
+       		<![CDATA[ SELECT whd.ID,whd.VERSION,whd.CREDIT_APP_ID,whd.DOC_TYPE,ctDocType.CoDE_VALUE1,whd.BATCH_ID,whd.ORDER_BY,whd.ESTIMATE_DATE,whd.WH_CODE_ID,whd.WH_LODGE_DATE,whd.CREATED_DATE,whd.CREATED_BY,
+				whd.LAST_UPDATED_BY,whd.LAST_UPDATED_DATE,whd.CONTRACT_CAVET_TYPE,whd.STATUS,whd.WH_LODGE_BY,whd.PROCESS_STATUS,whd.BILL_CODE,whd.DELIVERY_ERROR,whd.PROCESS_DATE,whd.IS_ACTIVE,whd.IS_ORIGINAL  
+				FROM WH_DOCUMENT  whd
+				INNER JOIN CODE_TABLE ctDocType on whd.DOC_TYPE = ctDocType.ID  Where whd.CREDIT_APP_ID in (:creditAppIdLst)]]>
+	</sql-query>
+
+	<!-- binhnt.ho -->
+	<sql-query name="findWhId">
+		<![CDATA[
+			SELECT ad.ID,
+			       ad.ALLOCATED_NUMBER,
+			       ad.ALLOCATION_MASTER_ID,
+			       ad.ASSIGNEE_ID,
+			       ad.OBJECT_TYPE,
+			       ad.STATUS,
+			       ad.UPL_OBJECT_ID,
+			       ad.UPL_DETAIL_ID,
+			       ad.NOTE,
+                   ad.created_by, 
+                   ad.created_date, 
+                   ad.last_updated_by,
+                   ad.last_updated_date
+			FROM ALLOCATION_DETAIL ad
+			INNER JOIN UPL_DETAIL ud ON ud.ID = ad.UPL_DETAIL_ID
+			INNER JOIN UPL_MASTER um ON um.ID = ud.UPL_MASTER_ID
+			WHERE um.UPL_CODE = 'WH_ALLOCATION'
+			  AND ad.UPL_OBJECT_ID = :documentId
+		]]>
+	</sql-query>
+
+	<sql-query name="getCheckRecordsCavet">
+		<![CDATA[ 
+			SELECT *
+			FROM
+			  (SELECT whd.ID AS WH_ID,
+			          whd.CREDIT_APP_ID,
+			          whd.DOC_TYPE AS DOC_TYPE_ID,
+			          ct1.CODE_VALUE1 AS DOC_TYPE_CODE,
+			          ct1.DESCRIPTION1 AS DOC_TYPE_NAME,
+			          whd.STATUS AS STATUS_ID,
+			          ct2.CODE_VALUE1 AS STATUS_CODE,
+			          ct2.DESCRIPTION1 AS STATUS_NAME,
+			          whc.CODE AS WH_CODE_NAME,
+			          whd.CREATED_BY,
+			          whd.CREATED_DATE,
+			          whd.CONTRACT_CAVET_TYPE,
+			          whd.PROCESS_STATUS,
+			          whd.PROCESS_DATE,
+			          whd.IS_ACTIVE,
+			          whd.IS_ORIGINAL,
+			          whd.APPENDIX_CONTRACT,
+			          whd.NOTE,
+			          cab.BPM_APP_NUMBER,
+			          car.MC_CONTRACT_NUMBER,
+			          car.CONTRACT_DATE,
+			          car.YEARLY_INT_RATE,
+			          car.TRANS_OFFICE_ID AS POS_ID,
+			          ct5.CODE_VALUE1 AS POS_CODE,
+			          ct5.DESCRIPTION1 AS POS_NAME,
+			          cat.USER_COMMENT,
+			          cpi.CUST_NAME,
+			          ci.IDENTITY_NUMBER,
+			          ci.IDENTITY_ISSUE_DATE,
+			          ci.IDENTITY_ISSUE_PLACE AS IDENTITY_ISSUE_PLACE_ID,
+			          ct6.CODE_VALUE1 AS IDENTITY_ISSUE_PLACE_CODE,
+			          ct6.DESCRIPTION1 AS IDENTITY_ISSUE_PLACE_NAME,
+			          ci.IDENTITY_ISSUE_PLACE_TEXT,
+			          caa.APPROVED_AMOUNT,
+			          caa.INSURRANCE_FEE,
+			          caa.APPROVED_DOWNPAYMENT_AMOUNT,
+			          caa.APPROVED_TENOR,
+			          cac.COLOR,
+			          SUM(cac.PRICE) OVER (PARTITION BY whd.CREDIT_APP_ID) AS PRICE,
+			                              cac.COMM_ID,
+			                              ct3.CODE_VALUE1 AS COMM_CODE,
+			                              ct3.DESCRIPTION1 AS COMM_NAME,
+			                              cac.COMM_OTHER,
+			                              cac.BRAND_ID,
+			                              ct4.CODE_VALUE1 AS BRAND_CODE,
+			                              ct4.DESCRIPTION1 AS BRAND_NAME,
+			                              cac.BRAND,
+			                              nvl((select DESCRIPTION1 from CODE_TABLE where category = 'MODEL' and code_value1 = cac.MODEL),cac.MODEL) MODEL,
+			                              cac.FRAME_NUMBER,
+			                              cac.NUMBER_PLATE,
+			                              emp1.FULL_NAME AS SALE_NAME,
+			                              emp1.MOBILE_PHONE AS SALE_MOBILE_PHONE,
+			                              NVL(emp1.EMAIL, CONCAT(u1.LOGIN_ID, '@mcredit.com.vn')) AS SALE_EMAIL,
+			                              emp2.FULL_NAME AS BSD_NAME,
+			                              emp2.MOBILE_PHONE AS BSD_MOBILE_PHONE,
+			                              NVL(emp2.EMAIL, CONCAT(u2.LOGIN_ID, '@mcredit.com.vn')) AS BSD_EMAIL,
+			                              whci1.ID AS CAVET_ID,
+			                              whci1.BRAND AS CAVET_BRAND,
+			                              whci1.MODEL_CODE AS CAVET_MODEL,  
+			                              whci1.COLOR AS CAVET_COLOR,
+			                              whci1.ENGINE AS CAVET_ENGINE,
+			                              whci1.CHASSIS AS CAVET_CHASSIS,
+			                              whci1.N_PLATE AS CAVET_N_PLATE,
+			                              whci1.CAVET_NUMBER AS CAVET_CAVET_NUMBER,
+			                              whci2.ID AS APPENDIX_ID,
+			                              whci2.BRAND AS APPENDIX_BRAND,
+			                              whci2.MODEL_CODE AS APPENDIX_MODEL,
+			                              whci2.COLOR AS APPENDIX_COLOR,
+			                              whci2.ENGINE AS APPENDIX_ENGINE,
+			                              whci2.CHASSIS AS APPENDIX_CHASSIS,
+			                              whci2.N_PLATE AS APPENDIX_N_PLATE,
+			                              whci2.CAVET_NUMBER AS APPENDIX_CAVET_NUMBER,
+			                              u.LOGIN_ID AS OPERATOR2
+			   FROM
+			     (SELECT ID,
+			             CREDIT_APP_ID,
+			             DOC_TYPE,
+			             STATUS,
+			             WH_CODE_ID,
+			             CREATED_BY,
+			             CREATED_DATE,
+			             CONTRACT_CAVET_TYPE,
+			             PROCESS_STATUS,
+			             PROCESS_DATE,
+			             IS_ACTIVE,
+			             IS_ORIGINAL,
+			             APPENDIX_CONTRACT,
+			             NOTE
+			      FROM WH_DOCUMENT
+			      WHERE ID = :whId ) whd
+			   LEFT JOIN CODE_TABLE ct1 ON ct1.ID = whd.DOC_TYPE
+			   LEFT JOIN CODE_TABLE ct2 ON ct2.ID = whd.STATUS
+			   LEFT JOIN WH_CODE whc ON whc.ID = whd.WH_CODE_ID
+			   LEFT JOIN
+			     (SELECT whci.*
+			      FROM WH_CAVET_INFO whci
+			      INNER JOIN CODE_TABLE ct ON ct.ID = whci.TYPE
+			      WHERE ct.CODE_VALUE1 = 'WH_IN_CAVET' ) whci1 ON whci1.WH_DOC_ID = whd.ID
+			   LEFT JOIN
+			     (SELECT whci.*
+			      FROM WH_CAVET_INFO whci
+			      INNER JOIN CODE_TABLE ct ON ct.ID = whci.TYPE
+			      WHERE ct.CODE_VALUE1 = 'WH_IN_APPENDIX' ) whci2 ON whci2.WH_DOC_ID = whd.ID
+			   LEFT JOIN CREDIT_APP_COMMODITIES cac ON cac.CREDIT_APP_ID = whd.CREDIT_APP_ID
+			   LEFT JOIN CODE_TABLE ct3 ON ct3.ID = cac.COMM_ID
+			   LEFT JOIN CODE_TABLE ct4 ON ct4.ID = cac.BRAND_ID
+			   LEFT JOIN CREDIT_APP_BPM cab ON cab.CREDIT_APP_ID = whd.CREDIT_APP_ID
+			   LEFT JOIN
+			     (SELECT t.*
+			      FROM CREDIT_APP_TRAIL t
+			      WHERE t.TRAIL_SEQ = 1
+			        AND t.FROM_USER_CODE = 'OP2'
+			        AND t.ACTION =
+			          (SELECT ID
+			           FROM CODE_TABLE
+			           WHERE CODE_GROUP = 'ACT'
+			             AND CATEGORY = 'ACTION_CS'
+			             AND CODE_VALUE1 = 'OPERATION')
+			        AND t.TRAIL_ORDER = 2000) cat ON cat.CREDIT_APP_ID = whd.CREDIT_APP_ID
+			   LEFT JOIN CREDIT_APP_APPRAISAL caa ON caa.CREDIT_APP_ID = whd.CREDIT_APP_ID
+			   LEFT JOIN CREDIT_APP_REQUEST car ON car.id = whd.CREDIT_APP_ID
+			   LEFT JOIN CODE_TABLE ct5 ON ct5.ID = car.TRANS_OFFICE_ID
+			   LEFT JOIN CUST_PERSONAL_INFO cpi ON cpi.id = car.CUST_ID
+			   LEFT JOIN CUST_IDENTITY ci ON ci.id = cpi.IDENTITY_ID
+			   LEFT JOIN CODE_TABLE ct6 ON ct6.ID = ci.IDENTITY_ISSUE_PLACE
+			   LEFT JOIN EMPLOYEES emp1 ON emp1.ID = car.SALE_ID
+			   LEFT JOIN EMPLOYEE_LINK el ON el.EMP_ID = emp1.ID
+				 LEFT JOIN USERS u1 ON u1.EMP_ID = emp1.ID
+			   LEFT JOIN EMPLOYEES emp2 ON emp2.ID = el.MANAGER_ID
+				 LEFT JOIN USERS u2 ON u2.EMP_ID = emp2.ID
+			   LEFT JOIN ALLOCATION_DETAIL ad ON ad.UPL_OBJECT_ID = whd.ID
+			   AND UPL_DETAIL_ID = :upldetaiId
+			   LEFT JOIN USERS u ON u.ID = ad.ASSIGNEE_ID)
+			WHERE rownum = 1
+		]]>
+	</sql-query>
+	
+	<sql-query name="getCurrentBatchId">
+		<![CDATA[
+			SELECT whd.BATCH_ID
+			FROM WH_DOCUMENT whd
+			WHERE whd.CREATED_BY = :loginId
+			  AND whd.STATUS =
+			    (SELECT ct.ID
+			     FROM CODE_TABLE ct
+			     WHERE ct.CATEGORY = 'WH_LOGDE'
+			       AND ct.CODE_VALUE1 = 'WH_NEW_DOCUMENT' )
+			  AND rownum = 1
+ 		]]>
+	</sql-query>
+	
+	<sql-query name="getVersionDocumentByAppId">
+		<![CDATA[
+			SELECT MAX(VERSION)
+			FROM WH_DOCUMENT
+			WHERE CREDIT_APP_ID = :CREDIT_APP_ID
+			  AND DOC_TYPE = :DOC_TYPE
+		]]>
+	</sql-query>
+
+	<sql-query name="getCurrentOrderBy">
+		<![CDATA[
+			SELECT MAX(ORDER_BY)
+			FROM WH_DOCUMENT
+			WHERE CREDIT_APP_ID = :CREDIT_APP_ID
+			  AND DOC_TYPE = :DOC_TYPE
+		]]>
+	</sql-query>
+
+	<sql-query name="getCheckDoc">
+		<![CDATA[ 
+			SELECT whd.ID,
+			       whd.VERSION,
+			       whd.CREDIT_APP_ID,
+			       whd.DOC_TYPE,
+			       whd.BATCH_ID,
+			       whd.ORDER_BY,
+			       whd.ESTIMATE_DATE,
+			       whd.WH_CODE_ID,
+			       whd.WH_LODGE_DATE,
+			       whd.CREATED_DATE,
+			       whd.CREATED_BY,
+			       whd.LAST_UPDATED_BY,
+			       whd.LAST_UPDATED_DATE,
+			       whd.CONTRACT_CAVET_TYPE,
+			       whd.STATUS,
+			       whd.WH_LODGE_BY,
+			       whd.PROCESS_STATUS,
+			       whd.BILL_CODE,
+			       whd.DELIVERY_ERROR,
+			       whd.PROCESS_DATE,
+			       whd.IS_ACTIVE,
+			       whd.IS_ORIGINAL,
+			       whd.APPENDIX_CONTRACT,
+			       whd.NOTE
+			FROM WH_DOCUMENT whd
+			WHERE whd.CREDIT_APP_ID = :creditAppId
+			  AND whd.DOC_TYPE = :docType
+			  AND (VERSION IS NULL
+			       OR (whd.IS_ORIGINAL = 1
+			           OR (whd.IS_ORIGINAL = 0
+			               AND whd.IS_ACTIVE = 1)))
+		]]>
+	</sql-query>
+
+	<sql-query name="getDiffersCurrentDoc">
+		<![CDATA[ 
+			SELECT whd.ID,
+			       whd.VERSION,
+			       whd.CREDIT_APP_ID,
+			       whd.DOC_TYPE,
+			       whd.BATCH_ID,
+			       whd.ORDER_BY,
+			       whd.ESTIMATE_DATE,
+			       whd.WH_CODE_ID,
+			       whd.WH_LODGE_DATE,
+			       whd.CREATED_DATE,
+			       whd.CREATED_BY,
+			       whd.LAST_UPDATED_BY,
+			       whd.LAST_UPDATED_DATE,
+			       whd.CONTRACT_CAVET_TYPE,
+			       whd.STATUS,
+			       whd.WH_LODGE_BY,
+			       whd.PROCESS_STATUS,
+			       whd.BILL_CODE,
+			       whd.DELIVERY_ERROR,
+			       whd.PROCESS_DATE,
+			       whd.IS_ACTIVE,
+			       whd.IS_ORIGINAL,
+			       whd.APPENDIX_CONTRACT,
+			       whd.NOTE
+			FROM WH_DOCUMENT whd
+			WHERE whd.CREDIT_APP_ID = :creditAppId
+			  AND whd.DOC_TYPE = :docType
+			  AND whd.ID <> :whId
+		]]>
+	</sql-query>
+
+	<sql-query name="getListDocByBatchId">
+		<![CDATA[
+			SELECT whd.ID,
+			whd.VERSION,
+			whd.CREDIT_APP_ID,
+			whd.DOC_TYPE,
+			whd.BATCH_ID,
+			whd.ORDER_BY,
+			whd.ESTIMATE_DATE,
+			whd.WH_CODE_ID,
+			whd.WH_LODGE_DATE,
+			whd.CREATED_DATE,
+			whd.CREATED_BY,
+			whd.LAST_UPDATED_BY,
+			whd.LAST_UPDATED_DATE,
+			whd.CONTRACT_CAVET_TYPE,
+			whd.STATUS,
+			whd.WH_LODGE_BY,
+			whd.PROCESS_STATUS,
+			whd.BILL_CODE,
+			whd.DELIVERY_ERROR,
+			whd.PROCESS_DATE,
+			whd.IS_ACTIVE,
+			whd.IS_ORIGINAL,
+			whd.APPENDIX_CONTRACT,
+			whd.NOTE
+			FROM WH_DOCUMENT whd
+			WHERE whd.BATCH_ID =
+			    (SELECT BATCH_ID
+			     FROM WH_DOCUMENT
+			     WHERE CREATED_BY = :loginId
+			       AND STATUS =
+			         (SELECT ID
+			          FROM CODE_TABLE
+			          WHERE CATEGORY = 'WH_LOGDE'
+			            AND CODE_VALUE1 = 'WH_NEW_DOCUMENT' )
+			       AND rownum = 1 )
+			  AND (VERSION IS NULL
+			       OR (whd.IS_ORIGINAL = 1
+			           OR (whd.IS_ORIGINAL = 0
+			               AND whd.IS_ACTIVE = 1)))
+		 ]]>
+	</sql-query>
+
+	<sql-query name="getCountDocumentByLoadBatchAndOriginal">
+		<![CDATA[
+			SELECT count(1)
+			FROM WH_DOCUMENT whd
+			WHERE whd.BATCH_ID =
+			    (SELECT BATCH_ID
+			     FROM WH_DOCUMENT
+			     WHERE CREATED_BY = :loginId
+			       AND STATUS =
+			         (SELECT ID
+			          FROM CODE_TABLE
+			          WHERE CATEGORY = 'WH_LOGDE'
+			            AND CODE_VALUE1 = 'WH_NEW_DOCUMENT' )
+			       AND rownum = 1 )
+			  AND (whd.VERSION IS NULL
+			       OR whd.IS_ORIGINAL = 1)
+			  AND whd.DOC_TYPE = :docType
+			  AND whd.CREDIT_APP_ID = :creditAppId
+		]]>
+	</sql-query>
+	
+	<sql-query name="getCountDocumentByLoadBatchAndActive">
+		<![CDATA[
+			SELECT count(1)
+			FROM WH_DOCUMENT whd
+			WHERE whd.BATCH_ID =
+			    (SELECT BATCH_ID
+			     FROM WH_DOCUMENT
+			     WHERE CREATED_BY = :loginId
+			       AND STATUS =
+			         (SELECT ID
+			          FROM CODE_TABLE
+			          WHERE CATEGORY = 'WH_LOGDE'
+			            AND CODE_VALUE1 = 'WH_NEW_DOCUMENT' )
+			       AND rownum = 1 )
+			  AND (whd.VERSION IS NULL
+			       OR whd.IS_ACTIVE = 1)
+			  AND whd.DOC_TYPE = :docType
+			  AND whd.CREDIT_APP_ID = :creditAppId
+		]]>
+	</sql-query>
+	
+	<sql-query name="getCountDocumentByLoadBatch">
+		<![CDATA[
+			SELECT count(1)
+			FROM WH_DOCUMENT whd
+			WHERE whd.BATCH_ID =
+			    (SELECT BATCH_ID
+			     FROM WH_DOCUMENT
+			     WHERE STATUS =
+			         (SELECT ID
+			          FROM CODE_TABLE
+			          WHERE CATEGORY = 'WH_LOGDE'
+			            AND CODE_VALUE1 = 'WH_NEW_DOCUMENT' )
+			       AND DOC_TYPE = :docType
+			       AND CREDIT_APP_ID = :creditAppId
+			       AND rownum = 1 )
+			  AND (whd.VERSION IS NULL
+			       OR (whd.IS_ORIGINAL = 1
+			           OR (whd.IS_ORIGINAL = 0
+			               AND whd.IS_ACTIVE = 1)))
+		]]>
+	</sql-query>
+	
+	<sql-query name="deleteLstErr">
+		<![CDATA[DELETE FROM WH_DOCUMENT_ERR WHERE WH_DOC_ID = :whDocumentId]]>
+	</sql-query>
+	
+	<sql-query name="getDocumentByActive">
+		<![CDATA[
+			SELECT whd.ID,
+			       whd.VERSION,
+			       whd.CREDIT_APP_ID,
+			       whd.DOC_TYPE,
+			       whd.BATCH_ID,
+			       whd.ORDER_BY,
+			       whd.ESTIMATE_DATE,
+			       whd.WH_CODE_ID,
+			       whd.WH_LODGE_DATE,
+			       whd.CREATED_DATE,
+			       whd.CREATED_BY,
+			       whd.LAST_UPDATED_BY,
+			       whd.LAST_UPDATED_DATE,
+			       whd.CONTRACT_CAVET_TYPE,
+			       whd.STATUS,
+			       whd.WH_LODGE_BY,
+			       whd.PROCESS_STATUS,
+			       whd.BILL_CODE,
+			       whd.DELIVERY_ERROR,
+			       whd.PROCESS_DATE,
+			       whd.IS_ACTIVE,
+			       whd.IS_ORIGINAL,
+			       whd.APPENDIX_CONTRACT,
+			       whd.NOTE
+			FROM WH_DOCUMENT whd
+			WHERE whd.CREDIT_APP_ID = :creditAppId
+			  AND whd.DOC_TYPE = :docType
+			  AND whd.IS_ACTIVE = 1
+			  AND NOT EXISTS
+			    (SELECT 1
+			     FROM CODE_TABLE
+			     WHERE CODE_GROUP = 'WH'
+			       AND CATEGORY = 'WH_LOGDE'
+			       AND CODE_VALUE1 = 'WH_RETURN_DOC_NOT_RECEIVE'
+			       AND whd.STATUS = CODE_TABLE.ID )
+			  AND rownum = 1
+  		]]>
+	</sql-query>
+	
+	<sql-query name="getWhIdByOriginal">
+		<![CDATA[
+			SELECT whd.ID
+			FROM WH_DOCUMENT whd
+			WHERE whd.CREDIT_APP_ID = :creditAppId
+			  AND whd.DOC_TYPE = :docType
+			  AND whd.IS_ORIGINAL = 1
+  		]]>
+	</sql-query>
+	
+	<sql-query name="getWhIdByStatusProcess">
+		<![CDATA[
+			SELECT whd.ID
+			FROM WH_DOCUMENT whd
+			WHERE whd.CREDIT_APP_ID = :creditAppId
+			  AND whd.DOC_TYPE = :docType
+			  AND whd.PROCESS_STATUS = 1
+  		]]>
+	</sql-query>
+	
+	<sql-query name="getLstGoods">
+		<![CDATA[
+			SELECT cac.ID AS GOODS_ID,
+			       cac.COMM_ID,
+			       ct1.CODE_VALUE1 AS COMM_CODE,
+			       ct1.DESCRIPTION1 AS COMM_NAME,
+			       cac.COMM_OTHER,
+			       cac.FRAME_NUMBER,
+			       cac.PRICE,
+			       cac.SERIAL_NUMBER,
+			       (select DESCRIPTION1 from CODE_TABLE where category = 'MODEL' and code_value1 = cac.MODEL) MODEL,
+			       cac.COLOR,
+			       cac.REG_NUMBER,
+			       cac.NUMBER_PLATE,
+			       cac.DOWN_PAYMENT_AMOUNT,
+			       cac.BRAND_ID,
+			       ct2.CODE_VALUE1 AS BRAND_CODE,
+			       ct2.DESCRIPTION1 AS BRAND_NAME,
+			       cac.BRAND
+			FROM CREDIT_APP_COMMODITIES cac
+			INNER JOIN
+			  (SELECT ID,
+			          CREDIT_APP_ID
+			   FROM WH_DOCUMENT
+			   WHERE ID = :whId) wdc ON cac.CREDIT_APP_ID = wdc.CREDIT_APP_ID
+			LEFT JOIN CODE_TABLE ct1 ON cac.COMM_ID = ct1.ID
+			LEFT JOIN CODE_TABLE ct2 ON cac.BRAND_ID = ct2.ID
+  		]]>
+	</sql-query>
+	
+	<sql-query name="getLstReturnDocument2">
+		<![CDATA[
+			SELECT whd.ID AS WH_ID,
+			       whd.DOC_TYPE AS DOC_TYPE_ID,
+			       ct1.CODE_VALUE1 AS DOC_TYPE_CODE,
+			       ct1.DESCRIPTION1 AS DOC_TYPE_NAME,
+			       whd.CREATED_DATE,
+			       whd.STATUS,
+			       ct2.CODE_VALUE1 AS STATUS_CODE,
+			       ct2.DESCRIPTION1 AS STATUS_NAME,
+			       whc.CODE AS WH_CODE,
+			       whd.CONTRACT_CAVET_TYPE,
+			       whd.IS_ACTIVE,
+			       whd.IS_ORIGINAL
+			FROM WH_DOCUMENT whd
+			INNER JOIN CODE_TABLE ct1 ON whd.DOC_TYPE = ct1.ID
+			INNER JOIN CODE_TABLE ct2 ON whd.STATUS = ct2.ID
+			LEFT JOIN WH_CODE whc ON whd.WH_CODE_ID = whc.ID
+			WHERE whd.CREDIT_APP_ID =
+			    (SELECT CREDIT_APP_ID
+			     FROM WH_DOCUMENT
+			     WHERE ID = :whId)
+			ORDER BY whd.IS_ORIGINAL DESC,
+			         whd.CREATED_DATE
+  		]]>
+	</sql-query>
+	<!-- binhnt.ho -->
+        
+    <sql-query name="deleteExpectedDate">
+		<![CDATA[DELETE FROM WH_EXPECTED_DATE WHERE CREDIT_APP_ID = :creditAppId and DOC_TYPE = :docType ]]>
+	</sql-query>
+	
+	<sql-query name="getWareHouseUplDetailId"> SELECT ID FROM upl_detail WHERE upl_master_id = ( SELECT id FROM upl_master WHERE upl_code = 'WH_ALLOCATION' ) </sql-query>
+    <sql-query name="checkExitExpectedDate">
+		<![CDATA[select count(1) FROM WH_EXPECTED_DATE WHERE CREDIT_APP_ID = :creditAppId and DOC_TYPE = :docType]]>
+	</sql-query>    
+</hibernate-mapping>

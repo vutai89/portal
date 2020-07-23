@@ -1,0 +1,180 @@
+package com.mcredit.rule.engine.generalScore;
+
+import com.mcredit.model.object.RuleObject;
+
+global com.mcredit.rule.FormulaResult formulaResult;
+
+function String getVal(String val, int len, int max) {
+	String ret = val;
+	int start = 0;
+	if(val == null) {
+		ret = "";
+	} else {
+		start = val.length();
+	}
+	for(int i=start;i<len-1;i++) {
+		ret = ret + "N";
+	}
+	if(len < max) {
+		ret = ret + "Y";
+	} else if(ret.length() < max - 1) {
+		ret = ret + "N";
+	}
+
+	return ret;
+}
+
+rule "Check range lgTsScore [646, 850]"
+	when
+		RuleObject(lgTsScore != null && lgTsScore >= 646 && lgTsScore <= 850)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 1, 1000));
+end
+
+rule "Check range lgTsScore [601, 645]"
+	when
+		RuleObject(lgTsScore != null && lgTsScore >= 601 && lgTsScore <= 645)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 2, 1000));
+end
+
+rule "Check range lgTsScore [550, 600]"
+	when
+		RuleObject(lgTsScore != null && lgTsScore >= 550 && lgTsScore <= 600)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 3, 1000));
+end
+
+rule "Check range lgTsScore [626, 850]"
+	when
+		RuleObject(lgTsScore != null && lgTsScore >= 626 && lgTsScore <= 850)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 4, 1000));
+end
+
+rule "Check range lgTsScore [586, 625]"
+	when
+		RuleObject(lgTsScore != null && lgTsScore >= 586 && lgTsScore <= 625)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 5, 1000));
+end
+
+rule "Check range lgTsScore [550, 585]"
+	when
+		RuleObject(lgTsScore != null && lgTsScore >= 550 && lgTsScore <= 585)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 6, 1000));
+end
+
+rule "Check range lgCicScore [651, max)"
+	when
+		RuleObject(lgCicScore != null && lgCicScore >= 651)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 7, 1000));
+end
+
+rule "Check range lgCicScore [601, 650]"
+	when
+		RuleObject(lgCicScore != null && lgCicScore >= 601 && lgCicScore <= 650)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 8, 1000));
+end
+
+rule "Check range lgCicScore [550, 600]"
+	when
+		RuleObject(lgCicScore != null && lgCicScore >= 550 && lgCicScore <= 600)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 9, 1000));
+end
+
+rule "Check range lgCicScore [671, max)"
+	when
+		RuleObject(lgCicScore != null && lgCicScore >= 671)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 10, 1000));
+end
+
+rule "Check range lgCicScore [550, 670]"
+	when
+		RuleObject(lgCicScore != null && lgCicScore >= 550 && lgCicScore <= 670)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 11, 1000));
+end
+
+rule "Check range cicScore [671, max)"
+	when
+		RuleObject(cicScore != null && cicScore >= 671)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 12, 1000));
+end
+
+rule "Check range cicScore [550, 670]"
+	when
+		RuleObject(cicScore != null && cicScore >= 550 && cicScore <= 670)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 13, 1000));
+end
+
+rule "Check range tsScore [550, 600]"
+	when
+		RuleObject(tsScore != null && tsScore >= 550 && tsScore <= 600)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 14, 1000));
+end
+
+rule "Check range tsScore [601, 645]"
+	when
+		RuleObject(tsScore != null && tsScore >= 601 && tsScore <= 645)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 15, 1000));
+end
+
+rule "Check range tsScore [646, 850]"
+	when
+		RuleObject(tsScore != null && tsScore >= 646 && tsScore <= 850)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 16, 1000));
+end
+
+rule "Check range tsScore [550, 585]"
+	when
+		RuleObject(tsScore != null && tsScore >= 550 && tsScore <= 585)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 17, 1000));
+end
+
+rule "Check range tsScore [586, 625]"
+	when
+		RuleObject(tsScore != null && tsScore >= 586 && tsScore <= 625)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 18, 1000));
+end
+
+rule "Check range tsScore [626, 850]"
+	when
+		RuleObject(tsScore != null && tsScore >= 626 && tsScore <= 850)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 19, 1000));
+end
+
+rule "Check range tsScore [620, max)"
+	when
+		RuleObject(tsScore != null && tsScore >= 620)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 20, 1000));
+end
+
+rule "Check range tsScore [560, 619]"
+	when
+		RuleObject(tsScore != null && tsScore >= 560 && tsScore <= 619)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 21, 1000));
+end
+
+rule "Check range tsScore [520, 559]"
+	when
+		RuleObject(tsScore != null && tsScore >= 520 && tsScore <= 559)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 22, 1000));
+end
+

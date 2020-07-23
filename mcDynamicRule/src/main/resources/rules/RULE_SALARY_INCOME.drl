@@ -1,0 +1,84 @@
+package com.mcredit.rule.engine.salaryIncome;
+
+import com.mcredit.model.object.RuleObject;
+
+global com.mcredit.rule.FormulaResult formulaResult;
+
+function String getVal(String val, int len, int max) {
+	String ret = val;
+	int start = 0;
+	if(val == null) {
+		ret = "";
+	} else {
+		start = val.length();
+	}
+	for(int i=start;i<len-1;i++) {
+		ret = ret + "N";
+	}
+	if(len < max) {
+		ret = ret + "Y";
+	} else if(ret.length() < max - 1) {
+		ret = ret + "N";
+	}
+
+	return ret;
+}
+
+rule "Check range 0 - 3M"
+	when
+		RuleObject(customerIncome >= 0 && customerIncome < 3000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 1, 1000));
+
+end
+
+rule "Check range 0 - 6M"
+	when
+		RuleObject(customerIncome >= 0 && customerIncome < 6000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 2, 1000));
+
+end
+
+rule "Check range 0 - 8M"
+	when
+		RuleObject(customerIncome >= 0 && customerIncome < 8000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 3, 1000));
+
+end
+
+rule "Check range > 6M"
+	when
+		RuleObject(customerIncome >= 6000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 4, 1000));
+
+end
+
+rule "Check range > 8M"
+	when
+		RuleObject(customerIncome >= 8000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 5, 1000));
+
+end
+
+rule "Check range 0 - 5M"
+	when
+		RuleObject(customerIncome >= 0 && customerIncome < 5000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 6, 1000));
+
+end
+
+
+rule "Check range > 0"
+	when
+		RuleObject(customerIncome >= 0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 7, 7));
+
+end
+
+

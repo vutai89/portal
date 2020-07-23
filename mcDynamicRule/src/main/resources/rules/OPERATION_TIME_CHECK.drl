@@ -1,0 +1,120 @@
+package com.mcredit.rule.engine.amtAfterInsurance
+
+import com.mcredit.model.object.RuleObject;
+
+global com.mcredit.rule.FormulaResult formulaResult;
+
+function String getVal(String val, int len, int max) {
+	String ret = val;
+	int start = 0;
+	if(val == null) {
+		ret = "";
+	} else {
+		start = val.length();
+	}
+	for(int i=start;i<len-1;i++) {
+		ret = ret + "N";
+	}
+	if(len < max) {
+		ret = ret + "Y";
+	} else if(ret.length() < max - 1) {
+		ret = ret + "N";
+	}
+
+	return ret;
+}
+
+rule "Check range >=60"
+	when
+		RuleObject(operationTime >= 60)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 1, 1000));
+
+end
+
+rule "Check range >=36,<60"
+	when
+		RuleObject(operationTime >= 36 && operationTime < 60)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 2, 1000));
+
+end
+
+rule "Check range >=36"
+	when
+		RuleObject(operationTime >= 36)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 3, 1000));
+
+end
+
+rule "Check range >=24,<36"
+	when
+		RuleObject(operationTime >= 24 && operationTime < 36 )
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 4, 1000));
+
+end
+
+
+rule "Check range >=24"
+	when
+		RuleObject(operationTime >= 24 )
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 5, 1000));
+
+end
+
+
+
+rule "Check range >=12,<24"
+	when
+		RuleObject(operationTime >= 12 && operationTime < 24 )
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 6, 1000));
+
+end
+
+rule "Check range <12"
+	when
+		RuleObject(operationTime <12 )
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 7, 1000));
+
+end
+
+rule "Check range ALL"
+	when
+		RuleObject(operationTime > 0 )
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 8,1000));
+
+end
+
+rule "Check range >=12,<36"
+	when
+		RuleObject(operationTime >= 12 && operationTime < 36 )
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 9,1000));
+
+end
+
+rule "Check range >=12,<60"
+	when
+		RuleObject(operationTime >= 12 && operationTime < 60 )
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 10,1000));
+
+end
+
+rule "Check range >=12"
+	when
+		RuleObject(operationTime >= 12 )
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 11,1000));
+
+end
+
+
+
+

@@ -1,0 +1,8 @@
+{
+	"apps": [{
+		"name": "MC PORTAL SERVICE",
+		"heathCheckEndPoint": ["http://dev-mcportal.mcredit.com.vn/mcService/service/v1.0/heath-check/ping"],
+		"restartEndPoint": "http://ci.mcredit.com.vn:8080/job/DEV_MCPortal_MC_Service/build"
+	}],
+	"log4jPath": "E:\\Gitlab\\GIT_MCredit_Portal_CI\\mcHealthCheck\\log4j.properties"
+}

@@ -1,0 +1,157 @@
+package rules
+ 
+
+import com.mcredit.model.object.Applicant;
+
+rule "Rating - D"
+	when
+		$a: Applicant( totalScore < 494)
+	then
+		$a.setRating("D");
+		
+end
+rule "Rating - C"
+	when
+		$a: Applicant( totalScore >= 494 && totalScore < 505)
+	then
+		$a.setRating("C");
+		
+end
+
+rule "Rating - CC"
+	when
+		$a: Applicant( totalScore >= 505 && totalScore < 514)
+	then
+		$a.setRating("CC");
+		
+end
+
+rule "Rating - CCC"
+	when
+		$a: Applicant( totalScore >= 514 && totalScore < 523)
+	then
+		$a.setRating("CCC");
+		
+end
+
+
+rule "Rating - B"
+	when
+		$a: Applicant( totalScore >= 523 && totalScore < 530)
+	then
+		$a.setRating("B");
+		
+end
+
+
+rule "Rating - BB"
+	when
+		$a: Applicant( totalScore >= 530 && totalScore < 537)
+	then
+		$a.setRating("BB");
+		
+end
+
+
+
+rule "Rating - BBB"
+	when
+		$a: Applicant( totalScore >= 537 && totalScore < 546)
+	then
+		$a.setRating("BBB");
+		
+end
+
+
+
+rule "Rating - A"
+	when
+		$a: Applicant( totalScore >= 546 && totalScore < 556)
+	then
+		$a.setRating("A");
+		
+end
+
+
+rule "Rating - AA"
+	when
+		$a: Applicant( totalScore >= 556 && totalScore < 573)
+	then
+		$a.setRating("AA");
+		
+end
+
+
+rule "Rating - AAA"
+	when
+		$a: Applicant( totalScore >= 573)
+	then
+		$a.setRating("AAA");
+		
+end
+
+rule "Proposal-for-DataChecker-Type1"
+	when
+		$a: Applicant( policyRegulation == "Pass" && fraud == "No" &&loanAmount<7500000 && totalScore >= 483)
+	then
+		$a.setProposalForDataChecker("Move to Approve");
+		
+end
+
+rule "Proposal-for-DataChecker-Type2"
+	when
+		$a: Applicant( policyRegulation == "Pass" && fraud == "No" &&loanAmount>=7500000 &&loanAmount<10000000 && totalScore >= 502)
+	then
+		$a.setProposalForDataChecker("Move to Approve");
+		
+end
+
+rule "Proposal-for-Call-Type1"
+	when
+		$a: Applicant( policyRegulation == "Pass" && fraud == "No" && downPayment >= 50 && totalScore >= 520)
+	then
+		$a.setProposalForCall("Waive reference call");
+		
+end
+
+rule "Proposal-for-Call-Type2"
+	when
+		$a: Applicant( policyRegulation == "Pass" && fraud == "No" && downPayment < 50 && loanAmount < 5000000 && totalScore >= 530)
+	then
+		$a.setProposalForCall("Waive reference call");
+		
+end
+
+rule "Proposal-for-Approve-Type1"
+	when
+		$a: Applicant( policyRegulation == "Pass" && fraud == "No" &&loanAmount<7500000 && totalScore >= 483 && dataCorrectorDecision==4)
+	then
+		$a.setProposalForApprove("Approve");
+		
+end
+
+rule "Proposal-for-Approve-Type2"
+	when
+		$a: Applicant( policyRegulation == "Pass" && fraud == "No" && downPayment >= 50 && totalScore >= 467)
+	then
+		$a.setProposalForApprove("Approve");
+		
+end
+
+
+rule "Proposal-for-Approve-Type3"
+	when
+		$a: Applicant( policyRegulation == "Pass" && fraud == "No" && downPayment >= 30 && downPayment < 50 && totalScore >= 516)
+	then
+		$a.setProposalForApprove("Approve");
+		
+end
+
+rule "Proposal-for-Approve-Type4"
+	when
+		$a: Applicant( policyRegulation == "Pass" && fraud == "No" &&loanAmount>=7500000 &&loanAmount<10000000 && totalScore >= 502 && dataCorrectorDecision==4)
+	then
+		$a.setProposalForApprove("Approve");
+		
+end
+

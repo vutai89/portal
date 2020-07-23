@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<sql-query name="getServices">
+	 	<![CDATA[ SELECT 
+			id, 
+			to_char(CREATED_DATE, 'dd/mm/yyyy') AS CREATED_DATE,
+			service_name,
+			service_path,
+			description,
+			module,
+			service_access_right
+		FROM services
+		ORDER BY module DESC ]]>
+	</sql-query>
+	
+	<sql-query name="getRoleById">
+	 	<![CDATA[
+		 	select id, created_by, last_updated_date, role_code, role_type, role_name, status 
+	        from roles  where id = :role_id and RECORD_STATUS = 'A'
+	        ORDER BY ROLE_CODE ASC 
+        ]]>
+	</sql-query>
+	
+	<sql-query name="getServicesByRoleId">
+	 	<![CDATA[ SELECT 
+			s.id,
+			to_char(s.CREATED_DATE, 'dd/mm/yyyy') AS CREATED_DATE,
+			s.service_name,
+			s.service_path,
+			s.description,
+			s.module,
+			s.service_access_right
+		FROM services s
+		INNER JOIN ROLE_DETAILS rd ON rd.OBJECT_ID = s.id
+		WHERE rd.ROLE_ID = :role_id
+		ORDER BY module DESC ]]>
+	</sql-query>
+	
+	<sql-query name="getServiceIdsByRoleId">
+	 	<![CDATA[ 
+	 	SELECT OBJECT_ID FROM ROLE_DETAILS WHERE ROLE_ID = :role_id AND OBJECT_TYPE = 'S'
+	]]>
+	</sql-query>
+	
+	<sql-query name="insertRoleService">
+	 	<![CDATA[ 
+	 	INSERT INTO ROLE_DETAILS (RECORD_STATUS, CREATED_DATE,LAST_UPDATED_DATE,CREATED_BY,LAST_UPDATED_BY,OBJECT_TYPE,ROLE_ID,OBJECT_ID,ACCESS_RIGHT,STATUS)
+		VALUES ('A', SYSDATE, SYSDATE,null,null,'S', :role_id , :service_id,'Y','A')
+	]]>
+	</sql-query>
+	
+	<sql-query name="removeRoleService">
+	 	<![CDATA[ 
+	 	DELETE FROM ROLE_DETAILS WHERE ROLE_ID = :role_id AND OBJECT_ID = :service_id
+	]]>
+	</sql-query>
+
+</hibernate-mapping>

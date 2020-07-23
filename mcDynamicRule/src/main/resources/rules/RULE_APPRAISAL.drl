@@ -1,0 +1,130 @@
+package com.mcredit.rule.engine.appraisalValidation;
+
+import com.mcredit.model.object.RuleObject;
+
+global com.mcredit.rule.FormulaResult formulaResult;
+
+function String getVal(String val, int len, int max) {
+	String ret = val;
+	int start = 0;
+	if(val == null) {
+		ret = "";
+	} else {
+		start = val.length();
+	}
+	for(int i=start;i<len-1;i++) {
+		ret = ret + "N";
+	}
+	if(len < max) {
+		ret = ret + "Y";
+	} else if(ret.length() < max - 1) {
+		ret = ret + "N";
+	}
+
+	return ret;
+}
+
+rule "Check TCTC >= 5"
+	when
+		RuleObject(numberOfRelationOrganize != null && numberOfRelationOrganize >= 5)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 1, 1000));
+end
+
+rule "Check CTTC >= 2"
+	when
+		RuleObject(numberOfRelationFinanceCompany != null && numberOfRelationFinanceCompany >= 2)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 2, 1000));
+end
+
+rule "Check total outstanding loan at CIC > 140M"
+	when
+		RuleObject(totalOutstandingLoanAtCIC != null && totalOutstandingLoanAtCIC > 140000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 3, 1000));
+end
+
+rule "Check PTI > 30%"
+	when
+		RuleObject(pti != null && pti > 30)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 4, 1000));
+end
+
+rule "Check PTI > 35%"
+	when
+		RuleObject(pti != null && pti > 35)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 5, 1000));
+end
+
+rule "Check DTI > 45%"
+	when
+		RuleObject(dti != null && dti > 45)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 6, 1000));
+end
+
+rule "Check DTI > 40%"
+	when
+		RuleObject(dti != null && dti > 40)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 7, 1000));
+end
+
+rule "Check loan amount with avg electric bill (A)"
+	when
+		RuleObject(averageElectricBill != null && loanAmount != null && loanAmount > (averageElectricBill * 40))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 8, 1000));
+end
+
+rule "Check loan amount with avg electric bill (B)"
+	when
+		RuleObject(averageElectricBill != null && loanAmount != null && loanAmount > (averageElectricBill * 60))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 9, 1000));
+end
+
+rule "Check loan amount with avg account balance (C)"
+	when
+		RuleObject(averageAccountBalance != null && loanAmount != null && loanAmount > averageAccountBalance * 6)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 10, 1000));
+end
+
+rule "Check loan amount with customer income interpolate (D)"
+	when
+		RuleObject(customerIncome != null && loanAmount != null && loanAmount > (customerIncome * 10))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 11, 1000));
+end
+
+rule "Check loan amount with customer income interpolate (E)"
+	when
+		RuleObject(customerIncome != null && loanAmount != null && loanAmount > (customerIncome * 8))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 12, 1000));
+end
+
+rule "Check loan amount with customer income interpolate (F)"
+	when
+		RuleObject(customerIncome != null && loanAmount != null && loanAmount > (customerIncome * 6))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 13, 1000));
+end
+
+rule "Check loan amount with customer income interpolate (G)"
+	when
+		RuleObject(customerIncome != null && loanAmount != null && loanAmount > (customerIncome * 4))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 14, 1000));
+end
+
+rule "Check loan amount with annual life insuarance fee (H)"
+	when
+		RuleObject(annualFeeLifeInsurance != null && loanAmount != null && loanAmount > (annualFeeLifeInsurance * 20))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 15, 16));
+end

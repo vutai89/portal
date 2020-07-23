@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n"/>
+    </Console>
+    <RollingFile name="RollingFile" fileName="/opt/tomcat/webapps/logs/precheck/PrecheckResult.csv"
+                 filePattern="/opt/tomcat/webapps/logs/precheck/PrecheckResult-%d{ddMMyyyy}-%i.csv">
+      <CsvParameterLayout delimiter="," charset="UTF-8"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1"/>
+      </Policies>
+	  <DefaultRolloverStrategy max="30" />
+    </RollingFile>
+  </Appenders> 
+  <Loggers> 
+	<Logger name="PRE_CHECK_TOOL" level="info" additivity="false">
+		<appender-ref ref="RollingFile"/>
+	</Logger>
+    <Root level="info">
+      <appender-ref ref="Console"/>
+    </Root>
+  </Loggers>
+</Configuration>

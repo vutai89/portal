@@ -1,0 +1,560 @@
+package rules
+ 
+
+import com.mcredit.model.object.Applicant;
+
+rule "Classify Applicant - init-Score"
+	when
+		$a: Applicant( typeOfLoan == Applicant.CASH_LOAN )
+	then
+		$a.addScore(0);
+		
+end
+
+
+rule "Classify Applicant - Gender-Female"
+	when
+		$a: Applicant( gender == "Nu" )
+	then
+		$a.addScore(85);
+		
+end
+
+
+rule "Classify Applicant - Gender-Male"
+	when
+		$a: Applicant( gender == "Nam" )
+	then
+		$a.addScore(73);
+	
+end
+
+
+rule "Classify Applicant - Age-level1"
+	when
+		$a: Applicant( age <= 23 )
+	then
+		$a.addScore(60);
+	
+end
+
+
+rule "Classify Applicant - Age-level2"
+	when
+		$a: Applicant( age > 23 && age <= 43 )
+	then
+		$a.addScore(79);
+	
+end
+
+
+rule "Classify Applicant - Age-level3"
+	when
+		$a: Applicant( age > 43 )
+	then
+		$a.addScore(98);
+	
+end
+
+
+rule "Classify Applicant - maritalStatus_Kethon"
+	when
+		$a: Applicant( maritalStatus == "Ket hon" )
+	then
+		$a.addScore(81);
+	
+end
+
+
+rule "Classify Applicant - maritalStatus_Docthan"
+	when
+		$a: Applicant( maritalStatus == "Doc than" )
+	then
+		$a.addScore(73);
+	
+end
+
+
+rule "Classify Applicant - maritalStatus_Lyhon"
+	when
+		$a: Applicant( maritalStatus == "Ly hon" )
+	then
+		$a.addScore(80);
+	
+end
+
+
+rule "Classify Applicant - maritalStatus_Goa"
+	when
+		$a: Applicant( maritalStatus == "Goa" )
+	then
+		$a.addScore(80);
+	
+end
+
+
+rule "Classify Applicant - maritalStatus_Lythan"
+	when
+		$a: Applicant( maritalStatus == "Ly than" )
+	then
+		$a.addScore(80);
+	
+end
+
+
+rule "Classify Applicant - job_HuuTri"
+	when
+		$a: Applicant( job == "Huu tri" )
+	then
+		$a.addScore(85);
+	
+end
+
+
+rule "Classify Applicant - job_CongChucNhaNuoc"
+	when
+		$a: Applicant( job == "Cong chuc nha nuoc" )
+	then
+		$a.addScore(85);
+	
+end
+
+rule "Classify Applicant - job_NhanVienCongTy"
+	when
+		$a: Applicant( job == "Nhan vien cong ty" )
+	then
+		$a.addScore(85);
+	
+end
+
+
+rule "Classify Applicant - job_HocSinhSinhVien"
+	when
+		$a: Applicant( job == "Hoc sinh sinh vien" )
+	then
+		$a.addScore(68);
+	
+end
+
+rule "Classify Applicant - job_PhuViecGiupViec"
+	when
+		$a: Applicant( job == "Phu viec/Giup viec" )
+	then
+		$a.addScore(68);
+	
+end
+
+
+rule "Classify Applicant - job_NoiTro"
+	when
+		$a: Applicant( job == "Noi tro" )
+	then
+		$a.addScore(68);
+	
+end
+
+
+
+rule "Classify Applicant - job_CongNhan"
+	when
+		$a: Applicant( job == "Cong nhan" )
+	then
+		$a.addScore(81);
+	
+end
+
+rule "Classify Applicant - job_HoKinhDoanhCaThe"
+	when
+		$a: Applicant( job == "Ho kinh doanh ca the" )
+	then
+		$a.addScore(68);
+	
+end
+
+
+rule "Classify Applicant - job_KinhDoanhTuDo"
+	when
+		$a: Applicant( job == "Kinh doanh tu do" )
+	then
+		$a.addScore(72);
+	
+end
+
+
+rule "Classify Applicant - job_QuanNhan"
+	when
+		$a: Applicant( job == "Quan nhan" )
+	then
+		$a.addScore(85);
+	
+end
+
+
+rule "Classify Applicant - salaryPayment_QuaTaiKhoanMB"
+	when
+		$a: Applicant( salaryPayment == "Qua tai khoan MB")
+	then
+		$a.addScore(93);
+	
+end
+
+
+rule "Classify Applicant - salaryPayment_QuaTaiKhoanNganHangKhac"
+	when
+		$a: Applicant( salaryPayment == "Qua tai khoan ngan hang khac")
+	then
+		$a.addScore(93);
+	
+end
+
+
+rule "Classify Applicant - salaryPayment_TienMat"
+	when
+		$a: Applicant( salaryPayment == "Tien mat")
+	then
+		$a.addScore(66);
+	
+end
+
+
+rule "Classify Applicant - accommodationType_Sohuu"
+	when
+		$a: Applicant( accommodationType == "So huu")
+	then
+		$a.addScore(0);
+	
+end
+
+
+rule "Classify Applicant - accommodationType_Onho"
+	when
+		$a: Applicant( accommodationType == "O nho")
+	then
+		$a.addScore(0);
+	
+end
+
+
+rule "Classify Applicant - accommodationType_Songvoibome"
+	when
+		$a: Applicant( accommodationType == "Song voi bo me")
+	then
+		$a.addScore(0);
+	
+end
+
+
+rule "Classify Applicant - accommodationType_Thue"
+	when
+		$a: Applicant( accommodationType == "Thue")
+	then
+		$a.addScore(0);
+	
+end
+
+
+rule "Classify Applicant - accommodationType_TaiDonViDongQuan"
+	when
+		$a: Applicant( accommodationType == "Tai don vi dong quan")
+	then
+		$a.addScore(0);
+	
+end
+
+
+rule "Classify Applicant - eiExpenseIncome_level1"
+	when
+		$a: Applicant(eiExpenseIncome <= 30)
+	then
+		$a.addScore(0);
+	
+end
+
+
+rule "Classify Applicant - eiExpenseIncome_level2"
+	when
+		$a: Applicant( eiExpenseIncome > 30 && eiExpenseIncome <= 50)
+	then
+		$a.addScore(0);
+	
+end
+
+
+rule "Classify Applicant - eiExpenseIncome_level3"
+	when
+		$a: Applicant( eiExpenseIncome > 50 && eiExpenseIncome <= 70)
+	then
+		$a.addScore(0);
+	
+end
+
+
+rule "Classify Applicant - eiExpenseIncome_level4"
+	when
+		$a: Applicant( eiExpenseIncome > 70 )
+	then
+		$a.addScore(0);
+	
+end
+
+
+rule "Classify Applicant - MucDichVay_MuaSam"
+	when
+		$a: Applicant( MucDichVay == "Mua sam" )
+	then
+		$a.addScore(76);
+	
+end
+
+
+rule "Classify Applicant - MucDichVay_MuaSamHangHoaDoNoiThat"
+	when
+		$a: Applicant( MucDichVay == "Mua sam hang hoa/do noi that" )
+	then
+		$a.addScore(76);
+	
+end
+
+
+rule "Classify Applicant - MucDichVay_KhamChuaBenh"
+	when
+		$a: Applicant( MucDichVay == "Kham/chua benh" )
+	then
+		$a.addScore(84);
+	
+end
+
+
+rule "Classify Applicant - MucDichVay_ChuaBenh"
+	when
+		$a: Applicant( MucDichVay == "Chua benh" )
+	then
+		$a.addScore(84);
+	
+end
+
+
+rule "Classify Applicant - MucDichVay_CuoiHoi"
+	when
+		$a: Applicant( MucDichVay == "Cuoi hoi" )
+	then
+		$a.addScore(84);
+	
+end
+
+
+rule "Classify Applicant - MucDichVay_DiDuLich"
+	when
+		$a: Applicant( MucDichVay == "Di du lich" )
+	then
+		$a.addScore(84);
+	
+end
+
+
+rule "Classify Applicant - MucDichVay_NhuCauKhac"
+	when
+		$a: Applicant( MucDichVay == "Nhu cau khac" )
+	then
+		$a.addScore(84);
+	
+end
+
+
+rule "Classify Applicant - MucDichVay_NopHocPhi"
+	when
+		$a: Applicant( MucDichVay == "Nop hoc phi" )
+	then
+		$a.addScore(84);
+	
+end
+
+
+rule "Classify Applicant - MucDichVay_SuaNha"
+	when
+		$a: Applicant( MucDichVay == "Sua nha" )
+	then
+		$a.addScore(84);
+	
+end
+
+
+
+rule "Classify Applicant - Staff_card"
+	when
+		$a: Applicant( SchemeProduct == "T0000001" )
+	then
+		$a.addScore(80);
+	
+end
+
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule1"
+	when
+		$a: Applicant( paymentHistory == "Khach hang moi" && totalLoanAtCreditInstitutionsandOtherInstitutions == 0)
+	then
+		$a.addScore(70);
+	
+end
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule2"
+	when
+		$a: Applicant( paymentHistory == "Khach hang moi" && totalLoanAtCreditInstitutionsandOtherInstitutions >= 1)
+	then
+		$a.addScore(70);
+	
+end
+
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule3"
+	when
+		$a: Applicant( paymentHistory == "Tra no dung han (Bucket 1)" && totalLoanAtCreditInstitutionsandOtherInstitutions == 0)
+	then
+		$a.addScore(85);
+	
+end
+
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule4"
+	when
+		$a: Applicant( paymentHistory == "Tra no dung han (Bucket 1)" && totalLoanAtCreditInstitutionsandOtherInstitutions >= 1)
+	then
+		$a.addScore(84);
+	
+end
+
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule5"
+	when
+		$a: Applicant( paymentHistory == "Bucket 2" && totalLoanAtCreditInstitutionsandOtherInstitutions == 0)
+	then
+		$a.addScore(-200);
+	
+end
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule6"
+	when
+		$a: Applicant( paymentHistory == "Bucket 2" && totalLoanAtCreditInstitutionsandOtherInstitutions >= 1)
+	then
+		$a.addScore(-200);
+	
+end
+
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule7"
+	when
+		$a: Applicant( paymentHistory == "Bucket 3+" && totalLoanAtCreditInstitutionsandOtherInstitutions == 0)
+	then
+		$a.addScore(-200);
+	
+end
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule8"
+	when
+		$a: Applicant( paymentHistory == "Bucket 3+" && totalLoanAtCreditInstitutionsandOtherInstitutions >= 1)
+	then
+		$a.addScore(-200);
+	
+end
+
+rule "Classify Applicant - education_SauDaiHoc"
+	when
+		$a: Applicant( education == "Sau dai hoc" )
+	then
+		$a.addScore(0);
+	
+end
+
+rule "Classify Applicant - education_DaiHoc"
+	when
+		$a: Applicant( education == "Dai hoc" )
+	then
+		$a.addScore(0);
+	
+end
+
+rule "Classify Applicant - education_CaoDang"
+	when
+		$a: Applicant( education == "Cao dang" )
+	then
+		$a.addScore(0);
+	
+end
+
+rule "Classify Applicant - education_TrungCap"
+	when
+		$a: Applicant( education == "Trung cap" )
+	then
+		$a.addScore(0);
+	
+end
+
+
+rule "Classify Applicant - education_PhoThong"
+	when
+		$a: Applicant( education == "Pho thong" )
+	then
+		$a.addScore(0);
+	
+end
+
+
+rule "Classify Applicant - experience_level1"
+	when
+		$a: Applicant( experience < 12 )
+	then
+		$a.addScore(0);
+	
+end
+
+rule "Classify Applicant - experience_level2"
+	when
+		$a: Applicant( experience >= 12 && experience < 36 )
+	then
+		$a.addScore(0);
+	
+end
+
+
+
+rule "Classify Applicant - experience_level3"
+	when
+		$a: Applicant( experience >= 36 && experience < 60 )
+	then
+		$a.addScore(0);
+	
+end
+
+
+
+rule "Classify Applicant - experience_level4"
+	when
+		$a: Applicant( experience >= 60 && experience < 120 )
+	then
+		$a.addScore(0);
+	
+end
+
+
+rule "Classify Applicant - experience_level5"
+	when
+		$a: Applicant( experience >= 120 )
+	then
+		$a.addScore(0);
+	
+end
+
+
+
+
+
+
+

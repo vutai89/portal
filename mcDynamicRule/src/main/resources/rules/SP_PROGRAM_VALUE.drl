@@ -1,0 +1,289 @@
+package com.mcredit.rule.engine.gprice
+
+import com.mcredit.model.object.RuleObject;
+
+global com.mcredit.rule.FormulaResult formulaResult;
+
+function String getVal(String val, int len, int max) {
+	String ret = val;
+	int start = 0;
+	if(val == null) {
+		ret = "";
+	} else {
+		start = val.length();
+	}
+	for(int i=start;i<len-1;i++) {
+		ret = ret + "N";
+	}
+	if(len < max) {
+		ret = ret + "Y";
+	} else if(ret.length() < max - 1) {
+		ret = ret + "N";
+	}
+
+	return ret;
+}
+
+rule "Check range 10M - 50M"
+	when
+		RuleObject(goodsPrice >= 10000000 && goodsPrice <= 50000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 1, 100));
+
+end
+
+rule "Check range 15M - 60M"
+	when
+		RuleObject(goodsPrice >= 15000000 && goodsPrice <= 60000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 2, 100));
+
+end
+
+rule "Check range 0M - 40M"
+	when
+		RuleObject(goodsPrice >= 0 && goodsPrice < 40000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 3, 100));
+
+end
+
+rule "Check range >= 9M"
+	when
+		RuleObject(goodsPrice >= 9000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 4, 100));
+
+end
+
+rule "Check range 0M - 9M"
+	when
+		RuleObject(goodsPrice >= 0 && goodsPrice < 9000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 5, 100));
+
+end
+
+rule "Check range 2222222- 333333333"
+	when
+		RuleObject(goodsPrice >= 2222222 && goodsPrice <= 333333333)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 6, 100));
+
+end
+
+rule "Check range 13M- 85M"
+	when
+		RuleObject(goodsPrice >= 13000000 && goodsPrice <= 85000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 7, 100));
+
+end
+
+rule "Check range 12M- 85M"
+	when
+		RuleObject(goodsPrice >= 12000000 && goodsPrice <= 85000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 8, 100));
+
+end
+
+rule "Check range 12M- 153M"
+	when
+		RuleObject(goodsPrice >= 12000000 && goodsPrice <= 153000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 9, 100));
+
+end
+
+rule "Check range 10M- 90M"
+	when
+		RuleObject(goodsPrice >= 10000000 && goodsPrice <= 90000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 10, 100));
+
+end
+
+rule "Check range > 9M"
+	when
+		RuleObject(goodsPrice > 9000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 11, 100));
+
+end
+
+rule "Check range <= 9M"
+	when
+		RuleObject(goodsPrice >= 0 && goodsPrice <= 9000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 12, 100));
+
+end
+
+rule "Check range 2M-90M"
+	when
+		RuleObject(goodsPrice >= 2000000 && goodsPrice <= 90000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 13, 100));
+
+end
+
+rule "Check range 2M-29999999"
+	when
+		RuleObject(goodsPrice >= 2000000 && goodsPrice <= 29999999)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 14, 100));
+
+end
+
+rule "Check range 30M-90"
+	when
+		RuleObject(goodsPrice >= 30000000 && goodsPrice <= 90000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 15, 100));
+
+end
+
+rule "Check range 2M-120M"
+	when
+		RuleObject(goodsPrice >= 2000000 && goodsPrice <= 120000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 16, 100));
+
+end
+
+rule "Check range 6,25M-333,333,333"
+	when
+		RuleObject(goodsPrice >= 6250000 && goodsPrice <= 333333333)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 17, 100));
+
+end
+
+rule "Check range 12,5M-333,333,333"
+	when
+		RuleObject(goodsPrice >= 12500000 && goodsPrice <= 333333333)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 18, 100));
+
+end
+
+rule "Check range > 60M"
+	when
+		RuleObject(goodsPrice > 60000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 19, 100));
+
+end
+
+rule "Check range 0-20M"
+	when
+		RuleObject(goodsPrice >= 0 && goodsPrice < 20000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 20, 100));
+
+end
+
+rule "Check range 2M-70M"
+	when
+		RuleObject(goodsPrice >= 2000000 && goodsPrice <= 70000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 21, 100));
+
+end
+
+rule "Check range 3M-70M"
+	when
+		RuleObject(goodsPrice >= 3000000 && goodsPrice <= 70000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 22, 100));
+
+end
+
+rule "Check range 3M-100M"
+	when
+		RuleObject(goodsPrice >= 3000000 && goodsPrice <= 100000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 23, 100));
+
+end
+
+rule "Check range 3M-130M"
+	when
+		RuleObject(goodsPrice >= 3000000 && goodsPrice <= 130000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 24, 100));
+
+end
+
+rule "Check range 3M-50M"
+	when
+		RuleObject(goodsPrice >= 3000000 && goodsPrice <= 50000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 25, 100));
+
+end
+
+rule "Check range 3M-90M"
+	when
+		RuleObject(goodsPrice >= 3000000 && goodsPrice <= 90000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 26, 100));
+
+end
+
+rule "Check range 2M-100M"
+	when
+		RuleObject(goodsPrice >= 2000000 && goodsPrice <= 100000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 27, 100));
+
+end
+
+rule "Check range 20M-100M"
+	when
+		RuleObject(goodsPrice >= 20000000 && goodsPrice <= 100000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 28, 100));
+
+end
+
+rule "Check range 30M-100M"
+	when
+		RuleObject(goodsPrice >= 30000000 && goodsPrice <= 100000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 29, 100));
+
+end
+
+rule "Check range 2M-max"
+	when
+		RuleObject(goodsPrice >= 2000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 30, 100));
+
+end
+
+rule "Check range 5M-max"
+	when
+		RuleObject(goodsPrice >= 5000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 31, 100));
+
+end
+
+rule "Check range 40M-max"
+	when
+		RuleObject(goodsPrice >= 40000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 32, 100));
+
+end
+
+rule "Check range > 0"
+	when
+		RuleObject(goodsPrice >= 0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 33, 33));
+
+end

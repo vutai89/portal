@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration SYSTEM
+	"classpath://org/hibernate/hibernate-configuration-3.0.dtd">
+<hibernate-mapping>
+
+<!-- 
+	<query name="findActiveUser">
+	 	<![CDATA[ from Users WHERE RECORD_STATUS ='A' Order by USR_FULL_NAME asc ]]>
+	</query>
+ -->
+ 
+	<sql-query name="getDocumentsToUpload">
+	 	<![CDATA[ select dte.ID,dte.DOCUMENT_ID,dte.DOCUMENT_SOURCE,dte.BPM_APP_NUMBER,dte.BPM_APP_ID,dte.LD_NUMBER,
+            dte.PRODUCT_ID,dte.ID_NUMBER,dte.CUST_NAME,dte.USER_FILE_NAME,dte.SERVER_FILE_NAME,
+            dte.REMARK,dte.STATUS,prd.PRODUCT_CODE,prd.PRODUCT_NAME,doc.DOCUMENT_TYPE,doc.DOCUMENT_CODE,
+            doc.DOCUMENT_NAME,doc.DOCUMENT_CODE_VN,doc.SUB_FOLDER,car.LN_AMOUNT,car.LN_TENOR,car.PRODUCT_GROUP,
+            cab.WORKFLOW,nvl(dte.FOLDER,to_char(cab.CREATED_DATE,'YYYY/MM/DD')) FOLDER
+            from DOCUMENT_TO_ECM dte
+            left join PRODUCTS prd on prd.ID = dte.PRODUCT_ID
+            left join DOCUMENTS doc on doc.ID = dte.DOCUMENT_ID
+            left join CREDIT_APP_BPM cab on cab.BPM_APP_ID = dte.BPM_APP_ID
+            left join CREDIT_APP_REQUEST car on car.ID = cab.CREDIT_APP_ID
+            where dte.STATUS = 'P' and dte.DELETE_FLAG = 'N'
+            order by dte.BPM_APP_ID,dte.DOCUMENT_ID ]]>
+	</sql-query>
+
+	<sql-query name="updateDocumentToEcm">
+	 	<![CDATA[ update DOCUMENT_TO_ECM set STATUS = :docStatus,
+		 		ECM_OBJECT_ID = :objectId,
+		 		UPLOAD_TIME = sysdate,
+		 		ERROR_MESSAGE = :errMessage
+	 		where ID = :docId ]]>
+	</sql-query>
+
+	<sql-query name="updateDocumentToProcess">
+	 	<![CDATA[ update DOCUMENT_TO_ECM set STATUS = 'P',
+		 		ERROR_MESSAGE = null
+	 		where STATUS in ('N','E') ]]>
+	</sql-query>
+
+	<sql-query name="getDocumentForFas">
+	 	<![CDATA[ select cab.BPM_APP_ID,cab.BPM_APP_NUMBER, to_char(cab.CREATED_DATE,'YYYY/MM/DD') CREATED_DATE,
+			car.PRODUCT_ID,cpi.CUST_NAME,ci.IDENTITY_NUMBER,
+			car.MC_CONTRACT_NUMBER, null as LD_ID from CREDIT_APP_BPM cab
+			inner join CREDIT_APP_REQUEST car on car.ID = cab.CREDIT_APP_ID
+			left join CUST_PERSONAL_INFO cpi on cpi.ID = car.CUST_ID
+			left join CUST_IDENTITY ci on ci.ID = cpi.IDENTITY_ID
+			where cab.BPM_APP_ID in (:appList) ]]>
+	</sql-query>
+
+	<sql-query name="getDocumentForCollection">
+	 	<![CDATA[ select cab.BPM_APP_ID,cab.BPM_APP_NUMBER, to_char(cab.CREATED_DATE,'YYYY/MM/DD') CREATED_DATE,
+            car.PRODUCT_ID,cpi.CUST_NAME,ci.IDENTITY_NUMBER,
+            car.MC_CONTRACT_NUMBER,null as LD_ID from CREDIT_APP_REQUEST car
+            inner join CREDIT_APP_BPM cab on car.ID = cab.CREDIT_APP_ID
+            left join CUST_PERSONAL_INFO cpi on cpi.ID = car.CUST_ID
+            left join CUST_IDENTITY ci on ci.ID = cpi.IDENTITY_ID
+            where car.MC_CONTRACT_NUMBER in (:contractList) ]]>
+	</sql-query>
+
+	<sql-query name="getDocumentForCollection-old">
+	 	<![CDATA[ select cab.BPM_APP_ID,cab.BPM_APP_NUMBER, to_char(cab.CREATED_DATE,'YYYY/MM/DD') CREATED_DATE,
+            car.PRODUCT_ID,cpi.CUST_NAME,ci.IDENTITY_NUMBER,
+            car.MC_CONTRACT_NUMBER,ucc.LD_ID from CREDIT_APP_REQUEST car
+            inner join UPL_CORE_CONTRACT ucc on car.MC_CONTRACT_NUMBER = ucc.CONTRACT_REF
+            inner join CREDIT_APP_BPM cab on car.ID = cab.CREDIT_APP_ID
+            left join CUST_PERSONAL_INFO cpi on cpi.ID = car.CUST_ID
+            left join CUST_IDENTITY ci on ci.ID = cpi.IDENTITY_ID
+            where car.MC_CONTRACT_NUMBER in (:contractList) or ucc.LD_ID in (:contractList) ]]>
+	</sql-query>
+
+</hibernate-mapping>

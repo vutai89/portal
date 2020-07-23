@@ -1,0 +1,130 @@
+package com.mcredit.rule.engine.checkDtiPti;
+
+import com.mcredit.model.object.RuleObject;
+
+global com.mcredit.rule.FormulaResult formulaResult;
+
+function String getVal(String val, int len, int max) {
+	String ret = val;
+	int start = 0;
+	if(val == null) {
+		ret = "";
+	} else {
+		start = val.length();
+	}
+	for(int i=start;i<len-1;i++) {
+		ret = ret + "N";
+	}
+	if(len < max) {
+		ret = ret + "Y";
+	} else if(ret.length() < max - 1) {
+		ret = ret + "N";
+	}
+
+	return ret;
+}
+
+rule "Check 40% - DTI < 5%"
+	when
+		RuleObject(dti != null && dti > 0.35)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 1, 1000));
+end
+
+rule "Check 5% <= 40% - DTI <= 10%"
+	when
+		RuleObject(dti != null && dti <= 0.35 && dti >= 0.3)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 2, 1000));
+end
+
+rule "Check 40% - DTI >10%"
+	when
+		RuleObject(dti != null && dti < 0.3)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 3, 1000));
+end
+
+rule "Check 45% - DTI < 5%"
+	when
+		RuleObject(dti != null && dti > 0.4)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 4, 1000));
+end
+
+rule "Check 5% <= 45% - DTI <= 10%"
+	when
+		RuleObject(dti != null && dti <= 0.4 && dti >= 0.35)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 5, 1000));
+end
+
+rule "Check 45% - DTI >10%"
+	when
+		RuleObject(dti != null && dti < 0.35)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 6, 1000));
+end
+
+rule "Check 60% - DTI < 5%"
+	when
+		RuleObject(dti != null && dti > 0.55)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 7, 1000));
+end
+
+rule "Check 5% <= 60% - DTI <= 10%"
+	when
+		RuleObject(dti != null && dti <= 0.55 && dti >= 0.5)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 8, 1000));
+end
+
+rule "Check 60% - DTI >10%"
+	when
+		RuleObject(dti != null && dti < 0.5)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 9, 1000));
+end
+
+rule "Check 30% - PTI < 5%"
+	when
+		RuleObject(pti != null && pti > 0.25)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 10, 1000));
+end
+
+rule "Check 5% <=30% - PTI <= 10%"
+	when
+		RuleObject(pti != null && pti <= 0.25 && pti >= 0.2)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 11, 1000));
+end
+
+rule "Check 30% - PTI >10%"
+	when
+		RuleObject(pti != null && pti < 0.2)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 12, 1000));
+end
+
+rule "Check 35% - PTI < 5%"
+	when
+		RuleObject(pti != null && pti > 0.3)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 13, 1000));
+end
+
+rule "Check 5% <= 35% - PTI <= 10%"
+	when
+		RuleObject(pti != null && pti <= 0.3 && pti >= 0.25)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 14, 1000));
+end
+
+rule "Check 35% - PTI >10%"
+	when
+		RuleObject(pti != null && pti < 0.25)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 15, 16));
+end

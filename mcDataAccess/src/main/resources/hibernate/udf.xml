@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<query name="findActiveUser">
+	 	<![CDATA[ from Users WHERE RECORD_STATUS ='A' Order by USR_FULL_NAME asc ]]>
+	</query>
+	
+    <sql-query name="findUserMenu">
+        <![CDATA[ select mn.tree_level,mn.MODULE MENU_MODULE,mn.MENU_CODE,
+					mn.MENU_TITLE,mn.PARENT_MENU,mn.MENU_TYPE,fn.*,mn.ID MENU_ID from 
+					(select urm.OBJECT_TYPE,rd.ACCESS_RIGHT,rd.ROLE_ID,rd.OBJECT_ID FUNCTION_ID,
+					f.MODULE,f.FUNCTION_CODE,f.URL from USERS_ROLE_MAPPING urm
+					inner join ROLE_DETAILS rd on urm.OBJECT_TYPE = 'R' and rd.OBJECT_TYPE = 'F' and rd.ROLE_ID = urm.OBJECT_ID
+					inner join FUNCTIONS f on f.ID = rd.OBJECT_ID
+					where urm.USER_ID = (select ID from USERS u where u.LOGIN_ID = :loginId)
+					and urm.STATUS = 'A' and rd.STATUS = 'A' and f.STATUS = 'A'
+					union all
+					select urm.OBJECT_TYPE,nvl(urm.ACCESS_RIGHT, f.PAGE_ACCESS_RIGHT) ACCESS_RIGHT,null,f.ID FUNCTION_ID,
+					f.MODULE,f.FUNCTION_CODE,f.URL from USERS_ROLE_MAPPING urm
+					inner join FUNCTIONS f on urm.OBJECT_TYPE = 'F' and f.ID = urm.OBJECT_ID
+					where urm.USER_ID = (select ID from USERS u where u.LOGIN_ID = :loginId)
+					and urm.STATUS = 'A' and f.STATUS = 'A') fn inner join
+					(select level tree_level, m.* from MENU m
+					where m.STATUS = 'A' and m.MENU_CODE <> 'ROOT'
+					connect by prior m.ID = m.PARENT_MENU
+					start with m.MENU_CODE = 'ROOT') mn on fn.FUNCTION_ID = mn.FUNCTION_ID
+					order by fn.FUNCTION_ID, decode(fn.OBJECT_TYPE,'F',2,1) ]]>
+    </sql-query>
+    
+</hibernate-mapping>

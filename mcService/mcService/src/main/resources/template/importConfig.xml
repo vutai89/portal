@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>    
+    <IMPORT_XSELL realsize="25">
+        <STT pos="0" name="STT" require="0" max="300" type="integer"></STT>
+        <CUSTOMER_NAME pos="1" name="Họ tên *" require="1" max="100" type="String"></CUSTOMER_NAME>
+        <IDENTITY_NUMBER pos="2" name="Số CMND/CCCD *" require="0" min="9" max="12" type="long"></IDENTITY_NUMBER>
+        <IDENTITY_NUMBER_ARMY pos="3" name="Số CMQĐ" require="0" max="15" type="String"></IDENTITY_NUMBER_ARMY>
+        <BIRTH_DATE pos="4" name="Ngày sinh *" require="1" max="50"  date="1" mothFirst="1"></BIRTH_DATE>
+        <PRE_PRODUCT_NAME pos="5" name="Tên sản phẩm *" require="1" max="500" type="String"></PRE_PRODUCT_NAME>
+        <PRE_PRODUCT_CODE pos="6" name="Mã sản phẩm *" require="1" max="50" type="String"></PRE_PRODUCT_CODE>
+        <PRE_NUMBER_CASH_APP pos="7" name="Số tiền vay đã được phê duyệt *" require="1" max="30" type="integer"></PRE_NUMBER_CASH_APP>
+        <PRE_INTEREST_RATE pos="8" name="Lãi suất *" require="1" max="20" type="decimal"></PRE_INTEREST_RATE>
+        <PRE_TERM_LOAN pos="9" name="Kỳ hạn vay *" require="1" max="20" type="integer"></PRE_TERM_LOAN>
+        <PRE_RELEASE_DATE pos="10" name="Ngày giải ngân *" require="1" max="50" date="1" mothFirst="1"></PRE_RELEASE_DATE>
+        <PRE_RECKONING_DATE pos="11" name="Ngày tất toán" require="0" max="50" date="1" mothFirst="1"></PRE_RECKONING_DATE>
+        <PRE_EMI pos="12" name="EMI *" require="1" max="30" type="integer"></PRE_EMI>
+        <APP_PRODUCT_NAME pos="13" name="Tên sản phẩm *" require="1" max="100" type="String"></APP_PRODUCT_NAME>
+        <APP_PRODUCT_CODE pos="14" name="Mã sản phẩm *" require="1" max="50" type="String"></APP_PRODUCT_CODE>
+        <APP_LOAN_LIMIT_MIN pos="15" name="Min" require="1" max="30" type="integer"></APP_LOAN_LIMIT_MIN>
+        <APP_LOAN_LIMIT_MAX pos="16" name="Max" require="1" max="30" type="integer"></APP_LOAN_LIMIT_MAX>
+        <APP_TERM_LOAN_MIN pos="17" name="Min" require="1" max="30" type="integer"></APP_TERM_LOAN_MIN>
+        <APP_TERM_LOAN_MAX pos="18" name="Max" require="1" max="30" type="integer"></APP_TERM_LOAN_MAX>
+        <APP_EMI_MIN pos="19" name="Min" require="1" max="30" type="integer"></APP_EMI_MIN>
+        <APP_EMI_MAX pos="20" name="Max" require="1" max="30" type="integer"></APP_EMI_MAX>
+        <MERCHANDISE_CODE pos="21" name="Mã hàng hóa *" require="1" max="30" type="String"></MERCHANDISE_CODE>
+        <DATA_SOURCE pos="22" name="Nguồn data *" require="1" max="50" type="String"></DATA_SOURCE>
+        <LEAD_SOURCE pos="23" name="Leadsource" require="0" max="50" type="String"></LEAD_SOURCE>
+        <APP_NUMBER pos="24" name="App number *" require="1" max="11" type="integer"></APP_NUMBER>
+    </IMPORT_XSELL>
+    
+</root>

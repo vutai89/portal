@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<sql-query name="findIdNumberByCode">
+        <![CDATA[ select mo.id_number  from cust_monitor mo, code_table tb 
+				where mo.monitor_type = 'B' and mo.record_status='A'
+				and tb.category = 'IDTYP' and tb.code_value1 in (:codeValue)
+				and tb.record_status= 'A' and mo.id_type = tb.id ]]>
+	</sql-query>
+	
+	<sql-query name="insertCustMonitor">
+        <![CDATA[ insert into CUST_MONITOR 
+        (CREATED_BY, CREATED_DATE, CUST_ID, CUST_NAME, ID_NUMBER, ID_TYPE, LAST_UPDATED_BY, LAST_UPDATED_DATE, MONITOR_TYPE, RECORD_STATUS, CUST_LIST_ID) 
+        values (:createdBy, sysdate, (select nvl(max(cpi.ID),0) from CUST_PERSONAL_INFO cpi , CUST_IDENTITY ci where cpi.IDENTITY_ID = ci.ID and ci.IDENTITY_NUMBER = :idNumber), 
+        :custName, :idNumber, :idType, :lastUpdateBy, sysdate, 'B', 'A', (select max(cust_list_id)+1 from cust_monitor) ) ]]>
+	</sql-query>
+	
+	<sql-query name="findIdNumberByStatus">
+        <![CDATA[ select cm.id_number from cust_monitor cm where cm.record_status='C' ]]>
+	</sql-query>
+
+
+</hibernate-mapping>

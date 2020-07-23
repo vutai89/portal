@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<sql-query name="getReport">
+	<![CDATA[select to_char(contract_date, 'DD/MM/YYYY') as contract_date ,result, type, count(TP_PARTNER_REFID) as countTp,
+			count(MC_PARTNER_REFID) as countMc, sum(TP_CONTRACT_FEE) as sumTp, sum(MC_CONTRACT_FEE) as sumMc
+			from consolidate_payment where partner_id = (select id from partner where partner_name = :thirdParty)
+			and contract_date between to_date(:fromDate,'DD/MM/YYYY HH24:Mi:SS') and to_date(:toDate,'DD/MM/YYYY HH24:Mi:SS') 
+			group by to_char(contract_date, 'DD/MM/YYYY'), result, type]]>
+	</sql-query>
+
+	<sql-query name="getDetailDifferent">
+	 	<![CDATA[ select cp.contract_id, cpi.cust_name, ci.identity_number, cp.tp_contract_fee, to_char(cp.contract_date, 'DD-MM-YYYY')
+					from consolidate_payment cp inner join partner p on p.id = cp.partner_id
+					inner join credit_app_request car on car.mc_contract_number = cp.contract_id
+					inner join cust_personal_info cpi on cpi.id = car.cust_id
+					inner join cust_identity ci on ci.id = cpi.identity_id
+					where cp.contract_date >= to_date(:fromDate, 'DD/MM/YYYY HH24:Mi:SS')
+					and cp.contract_date <= to_date(:toDate, 'DD/MM/YYYY HH24:Mi:SS') and cp.result != '0' and cp.type = :type and p.partner_name = :thirdParty
+					and ci.identity_type_id = :identity_type_id]]>
+	</sql-query>
+
+	<sql-query name="getFalseVNPOST">
+	 	<![CDATA[ select id, tp_partner_refid, mc_partner_refid, contract_id, type, tp_contract_fee, mc_contract_fee, to_char(contract_date, 'DD/MM/YYYY'), tp_status, mc_status, result, to_char(partner_id), workflow, time_control
+	 	 from consolidate_payment WHERE type = :type and contract_date <= TO_DATE(:toDate, 'DD/MM/YYYY HH24:Mi:SS') 
+	 	and contract_date >= TO_DATE(:fromDate,'DD/MM/YYYY HH24:Mi:SS') and result != '0' and time_control = '17']]>
+	</sql-query>
+
+	<sql-query name="getTrueVNPOST">
+	 	<![CDATA[ select id, tp_partner_refid, mc_partner_refid, contract_id, type, tp_contract_fee, mc_contract_fee, to_char(contract_date, 'DD/MM/YYYY'), tp_status, mc_status, result, to_char(partner_id), workflow, time_control
+	 	 from consolidate_payment WHERE type = :type and contract_date <= TO_DATE(:toDate, 'DD/MM/YYYY HH24:Mi:SS') 
+	 	and contract_date >= TO_DATE(:fromDate,'DD/MM/YYYY HH24:Mi:SS') and result = '0' and time_control = '17']]>
+	</sql-query>
+
+	<sql-query name="deleteRecord17">
+	 	<![CDATA[ delete from consolidate_payment where to_char(contract_date, 'DDMMYYYY') = :date and time_control = '17h']]>
+	</sql-query>
+
+	<sql-query name="getVNPOST17h">
+	 	<![CDATA[ select ID, PAYMENT_AMOUNT, CREATED_DATE, PAYMENT_CHANNEL_CODE, COLLECTION_FEE, PARTNER_REF_ID, CONTRACT_NUMBER, CANCEL from DEBT_COLLECTION where payment_channel_code = 'VNPOST' and CREATED_DATE >= to_date(:fromDate, 'DDMMYYYY HH24:Mi:SS')
+	 	and CREATED_DATE <= to_date(:toDate, 'DDMMYYYY HH24:Mi:SS')]]>
+	</sql-query>
+
+	<sql-query name="getThirdPartyMapping">
+	 	<![CDATA[ select id, partner_name from partner where partner_name in ('VIETTEL', 'VNPOST','MOMO','PAYOO','VNPTEPAY','MB')]]>
+	</sql-query>
+
+	<sql-query name="getAllMBDebtCollection">
+	 	<![CDATA[ select ID, PAYMENT_AMOUNT, CREATED_DATE, PAYMENT_CHANNEL_CODE, COLLECTION_FEE, PARTNER_REF_ID, CONTRACT_NUMBER, CANCEL from debt_collection where payment_channel_code = 'MB' 
+	 	and EXTRACT(MONTH FROM CREATED_DATE) = :month and EXTRACT(YEAR FROM CREATED_DATE) = :year]]>
+	</sql-query>
+
+	<sql-query name="getAllMBDisbursement">
+	 	<![CDATA[ select ID, PAYMENT_AMOUNT, CREATED_DATE, PAYMENT_CHANNEL_CODE, DISBURSEMENT_FEE, PARTNER_REF_ID, CONTRACT_NUMBER, PAYMENT_CODE, DEBIT_ACCOUNT, DISBURSEMENT_DATE 
+	 	from Disbursement where payment_channel_code = 'MB' and EXTRACT(MONTH FROM to_date(disbursement_date, 'DDMMYYYY')) = :month and EXTRACT(YEAR FROM to_date(disbursement_date, 'DDMMYYYY')) = :year]]>
+	</sql-query>
+
+	<sql-query name="checkIfExist17h">
+	 	<![CDATA[ select distinct cp.partner_id from consolidate_payment cp inner join partner p on p.id = cp.partner_id 
+	 	 where cp.contract_date <= to_date(:to_date, 'DDMMYYYY HH24:MI:SS') and cp.contract_date >= to_date(:from_date, 'DDMMYYYY HH24:MI:SS')
+	 	 and p.partner_name = :thirdParty and cp.time_control = '17']]>
+	</sql-query>
+
+	<sql-query name="removeVNPOST17h">
+	 	<![CDATA[ delete from consolidate_payment where to_char(contract_date, 'DDMMYYYY') = :contract_date 
+	 	 and partner_id in (select id from partner where partner_name = :third_party)]]>
+	</sql-query>
+
+	<sql-query name="deleteMBRecords">
+	 	<![CDATA[ delete from consolidate_payment where partner_id in (select distinct id from partner where partner_name = 'MB') 
+	 	 and EXTRACT(MONTH FROM CONTRACT_DATE) = :month and EXTRACT(YEAR FROM CONTRACT_DATE) = :year]]>
+	</sql-query>
+
+</hibernate-mapping>	

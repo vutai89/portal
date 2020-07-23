@@ -1,0 +1,222 @@
+package com.mcredit.rule.engine.minDownpaymentRate
+
+import com.mcredit.model.object.RuleObject;
+
+global com.mcredit.rule.FormulaResult formulaResult;
+
+function String getVal(String val, int len, int max) {
+	String ret = val;
+	int start = 0;
+	if(val == null) {
+		ret = "";
+	} else {
+		start = val.length();
+	}
+	for(int i=start;i<len-1;i++) {
+		ret = ret + "N";
+	}
+	if(len < max) {
+		ret = ret + "Y";
+	} else if(ret.length() < max - 1) {
+		ret = ret + "N";
+	}
+
+	return ret;
+}
+
+rule "Check range 0 - 25"
+	when
+		RuleObject(downPaymentRate >= 0 && downPaymentRate < 25.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 1, 1000));
+
+end
+
+rule "Check range 0 - 40"
+	when
+		RuleObject(downPaymentRate >= 0 && downPaymentRate < 40.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 2, 1000));
+
+end
+
+rule "Check range 30 - 100"
+	when
+		RuleObject(downPaymentRate >= 30.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 3, 1000));
+
+end
+
+rule "Check range 50 - 100"
+	when
+		RuleObject(downPaymentRate >= 50.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 4, 1000));
+
+end
+
+rule "Check range 40 - 100"
+	when
+		RuleObject(downPaymentRate >= 40.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 5, 1000));
+
+end
+
+rule "Check range 25 - 40"
+	when
+		RuleObject(downPaymentRate >= 25.0 && downPaymentRate < 40.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 6, 1000));
+
+end
+
+rule "Check range 10 - 100"
+	when
+		RuleObject(downPaymentRate >= 10.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 7, 1000));
+
+end
+
+rule "Check range 20 - 100"
+	when
+		RuleObject(downPaymentRate >= 20.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 8, 1000));
+
+end
+
+rule "Check range 0 - 30"
+	when
+		RuleObject(downPaymentRate >= 0 && downPaymentRate < 30.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 9, 1000));
+
+end
+
+rule "Check range 25 - 100"
+	when
+		RuleObject(downPaymentRate >= 25)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 10, 1000));
+
+end
+
+rule "Check range 20 - 70"
+	when
+		RuleObject(downPaymentRate >= 20.0 && downPaymentRate <= 70.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 11, 1000));
+
+end
+
+rule "Check range 30 - 70"
+	when
+		RuleObject(downPaymentRate >= 30.0 && downPaymentRate <= 70.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 12, 1000));
+
+end
+
+rule "Check range 50 - 70"
+	when
+		RuleObject(downPaymentRate >= 50.0 && downPaymentRate <= 70.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 13, 1000));
+
+end
+
+rule "Check range 10 - 70"
+	when
+		RuleObject(downPaymentRate >= 10.0 && downPaymentRate <= 70.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 14, 1000));
+
+end
+
+rule "Check range 10 - 29.99"
+	when
+		RuleObject(downPaymentRate >= 10.0 && downPaymentRate <= 29.99)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 15, 1000));
+
+end
+
+rule "Check range 0 - 20"
+	when
+		RuleObject(downPaymentRate >= 0 && downPaymentRate < 20.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 16, 1000));
+
+end
+
+rule "Check range 25 - 30"
+	when
+		RuleObject(downPaymentRate >= 25.0 && downPaymentRate < 30.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 17, 1000));
+
+end
+
+rule "Check range 30 - 40"
+	when
+		RuleObject(downPaymentRate >= 30.0 && downPaymentRate < 40.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 18, 1000));
+
+end
+
+rule "Check range 50"
+	when
+		RuleObject(downPaymentRate == 50.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 19, 1000));
+
+end
+
+rule "Check range 10 - 20"
+	when
+		RuleObject(downPaymentRate >= 10.0 && downPaymentRate < 20.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 20, 1000));
+end
+
+rule "Check range 20 - 30"
+	when
+		RuleObject(downPaymentRate >= 20.0 && downPaymentRate < 30.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 21, 1000));
+end
+
+rule "Check range 40 - 50"
+	when
+		RuleObject(downPaymentRate >= 40.0 && downPaymentRate < 50.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 22, 1000));
+end
+
+rule "Check range 50 - 60"
+	when
+		RuleObject(downPaymentRate >= 50.0 && downPaymentRate < 60.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 23, 1000));
+end
+
+rule "Check range 60 - 70"
+	when
+		RuleObject(downPaymentRate >= 60.0 && downPaymentRate <= 70.0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 24, 1000));
+end
+
+rule "Check range 0 - 100"
+	when
+		RuleObject(downPaymentRate >= 0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 25, 25));
+
+end
+
+

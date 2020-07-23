@@ -1,0 +1,374 @@
+package rules
+ 
+
+import com.mcredit.model.object.Applicant;
+
+rule "Classify Applicant - init-Score"
+	when
+		$a: Applicant( typeOfLoan == Applicant.INSTALLMENT_LOAN )
+	then
+		$a.addScore(0);
+		
+end
+
+rule "Classify Applicant - salaryPayment_rule1"
+	when
+		$a: Applicant( salaryPayment == "Qua tai khoan MB" )
+	then
+		$a.addScore(63);
+	
+end
+
+rule "Classify Applicant - salaryPayment_rule2"
+	when
+		$a: Applicant( salaryPayment == "Qua tai khoan ngan hang khac" )
+	then
+		$a.addScore(63);
+	
+end
+
+rule "Classify Applicant - salaryPayment_rule3"
+	when
+		$a: Applicant( salaryPayment == "Tien mat" )
+	then
+		$a.addScore(48);
+	
+end
+
+rule "Classify Applicant - SchemeProduct_rule1"
+	when
+		$a: Applicant( SchemeProduct == "CD")
+	then
+		$a.addScore(49);
+	
+end
+
+rule "Classify Applicant - SchemeProduct_rule2"
+	when
+		$a: Applicant( SchemeProduct == "TW")
+	then
+		$a.addScore(64);
+	
+end
+
+rule "Classify Applicant - Gender-Female"
+	when
+		$a: Applicant( gender == Applicant.FEMALE )
+	then
+		$a.addScore(58);
+		
+end
+
+rule "Classify Applicant - Gender-Male"
+	when
+		$a: Applicant( gender == Applicant.MALE )
+	then
+		$a.addScore(48);
+	
+end
+
+rule "Classify Applicant - maritalStatus_Kethon"
+	when
+		$a: Applicant( maritalStatus == "Ket hon" )
+	then
+		$a.addScore(64);
+	
+end
+
+
+rule "Classify Applicant - maritalStatus_Docthan"
+	when
+		$a: Applicant( maritalStatus == "Doc than" )
+	then
+		$a.addScore(43);
+	
+end
+
+rule "Classify Applicant - maritalStatus_Lyhon"
+	when
+		$a: Applicant( maritalStatus == "Ly hon" )
+	then
+		$a.addScore(38);
+	
+end
+
+rule "Classify Applicant - maritalStatus_Goa"
+	when
+		$a: Applicant( maritalStatus == "Goa" )
+	then
+		$a.addScore(38);
+	
+end
+
+rule "Classify Applicant - maritalStatus_Lythan"
+	when
+		$a: Applicant( maritalStatus == "Ly than" )
+	then
+		$a.addScore(38);
+	
+end
+
+rule "Classify Applicant - downPayment_level1"
+	when
+		$a: Applicant( downPayment < 29 )
+	then
+		$a.addScore(44);
+	
+end
+
+
+
+rule "Classify Applicant - downPayment_level2"
+	when
+		$a: Applicant( downPayment >= 29 && downPayment <= 55 )
+	then
+		$a.addScore(60);
+	
+end
+
+rule "Classify Applicant - downPayment_level3"
+	when
+		$a: Applicant( downPayment > 55 )
+	then
+		$a.addScore(85);
+	
+end
+
+rule "Classify Applicant - accommodationType_Sohuu"
+	when
+		$a: Applicant( accommodationType == "So huu" )
+	then
+		$a.addScore(61);
+	
+end
+
+rule "Classify Applicant - accommodationType_Onho"
+	when
+		$a: Applicant( accommodationType == "O nho")
+	then
+		$a.addScore(46);
+	
+end
+
+rule "Classify Applicant - accommodationType_Songvoibome"
+	when
+		$a: Applicant( accommodationType == "Song voi bo me")
+	then
+		$a.addScore(52);
+	
+end
+
+rule "Classify Applicant - accommodationType_Thue"
+	when
+		$a: Applicant( accommodationType == "Thue")
+	then
+		$a.addScore(44);
+	
+end
+
+rule "Classify Applicant - accommodationType_DoanhtraiTaptheQuandoi"
+	when
+		$a: Applicant( accommodationType == "Doanh trai/Tap the Quan doi")
+	then
+		$a.addScore(51);
+	
+end
+
+rule "Classify Applicant - paymentHistory_rule1"
+	when
+		$a: Applicant( paymentHistory == "Khach hang moi" )
+	then
+		$a.addScore(47);
+	
+end
+
+
+rule "Classify Applicant - paymentHistory_rule2"
+	when
+		$a: Applicant( paymentHistory == "Tra no dung han (Bucket 1)" )
+	then
+		$a.addScore(57);
+	
+end
+
+rule "Classify Applicant - paymentHistory_rule3"
+	when
+		$a: Applicant( paymentHistory == "Bucket 2" )
+	then
+		$a.addScore(-300);
+	
+end
+
+rule "Classify Applicant - paymentHistory_rule4"
+	when
+		$a: Applicant( paymentHistory == "Bucket 3+" )
+	then
+		$a.addScore(-300);
+	
+end
+
+
+rule "Classify Applicant - Education_rule1"
+	when
+		$a: Applicant( Education == "Dai hoc" )
+	then
+		$a.addScore(85);
+	
+end
+
+rule "Classify Applicant - Education_rule2"
+	when
+		$a: Applicant( Education == "Sau dai hoc" )
+	then
+		$a.addScore(85);
+	
+end
+
+rule "Classify Applicant - Education_rule3"
+	when
+		$a: Applicant( Education == "Cao dang" )
+	then
+		$a.addScore(68);
+	
+end
+
+rule "Classify Applicant - Education_rule4"
+	when
+		$a: Applicant( Education == "Pho thong" )
+	then
+		$a.addScore(49);
+	
+end
+
+rule "Classify Applicant - Education_rule5"
+	when
+		$a: Applicant( Education == "Trung cap" )
+	then
+		$a.addScore(58);
+	
+end
+
+
+rule "Classify Applicant - job_rule1"
+	when
+		$a: Applicant( job == "Hoc sinh sinh vien" )
+	then
+		$a.addScore(63);
+	
+end
+
+rule "Classify Applicant - job_rule2"
+	when
+		$a: Applicant( job == "Huu tri" )
+	then
+		$a.addScore(63);
+	
+end
+
+rule "Classify Applicant - job_rule3"
+	when
+		$a: Applicant( job == "Cong chuc nha nuoc" )
+	then
+		$a.addScore(63);
+	
+end
+
+rule "Classify Applicant - job_rule4"
+	when
+		$a: Applicant( job == "Nhan vien cong ty" )
+	then
+		$a.addScore(63);
+	
+end
+
+rule "Classify Applicant - job_rule5"
+	when
+		$a: Applicant( job == "Cong nhan" )
+	then
+		$a.addScore(40);
+	
+end
+
+rule "Classify Applicant - job_rule6"
+	when
+		$a: Applicant( job == "Ho kinh doanh ca the" )
+	then
+		$a.addScore(43);
+	
+end
+
+rule "Classify Applicant - job_rule7"
+	when
+		$a: Applicant( job == "Phu viec/Giup viec" )
+	then
+		$a.addScore(43);
+	
+end
+
+rule "Classify Applicant - job_rule8"
+	when
+		$a: Applicant( job == "Noi tro" )
+	then
+		$a.addScore(43);
+	
+end
+
+rule "Classify Applicant - job_rule9"
+	when
+		$a: Applicant( job == "Kinh doanh tu do" )
+	then
+		$a.addScore(52);
+	
+end
+
+
+rule "Classify Applicant - job_rule10"
+	when
+		$a: Applicant( job == "Quan nhan" )
+	then
+		$a.addScore(50);
+	
+end
+
+rule "Classify Applicant - SoCTTCcoQuanHe_rule1"
+	when
+		$a: Applicant( loanAmount >= 5000000 )&& Applicant( totalLoanAtCreditCompany == 0)
+	then
+		$a.addScore(50);
+	
+end
+
+rule "Classify Applicant - SoCTTCcoQuanHe_rule2"
+	when
+		$a:Applicant( loanAmount >= 5000000 )&& Applicant( totalLoanAtCreditCompany >= 1)
+	then
+		$a.addScore(39);
+	
+end
+
+rule "Classify Applicant - SoCTTCcoQuanHe_rule3"
+	when
+		$a: Applicant( loanAmount < 5000000 )
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mcredit</groupId>
+  <artifactId>BuildMcService</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+  <name>Build MC Service</name>
+  <description>MC Service Builder</description>
+  <modules>
+    <module>../mcDataAccess</module>
+    <module>../mcRestCore</module>
+    <module>../mcUtil</module>
+    <module>../mcBusinessShared</module>
+    <module>../mcBizJob</module>
+    <module>../mcBizCommon</module>
+    <module>../mcBusinessCustomer</module>
+    <module>../mcBusinessPayment</module>
+    <module>../mcBusinessTelesale</module>
+    <module>../mcBusinessWareHouse</module>
+    
+    <module>../mcService/mcService</module>
+    <module>../mcDynamicRule</module>
+    <module>../mcModel</module>
+    <module>../mcDocumentECM</module>
+    
+    
+    <module>../mcLOSService</module>
+    
+    
+    <module>../mcBizAdmin</module>
+    <module>../mcBizDebtHome</module>
+    <module>../mcBizPCB</module>
+    <module>../mcBizAudit</module>
+    <module>../mcBizGenDoc</module>
+    <module>../mcBizTransactionProduct</module>
+    <module>../mcBizAppraisal</module>
+	<module>../mcBizCheckCat</module>
+    <module>../mcBusinessProduct</module>
+    <module>../mcBizOCR</module>
+    <module>../mcBizCheckCIC</module>
+    <module>../mcBizRepaymentSchedule</module>
+    <module>../mcBizCheckVehiclePrice</module>
+	<module>../mcBizCheckTools</module>
+	<module>../mcBizBlackList</module>
+  </modules>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <buildcommands />
+          <projectnatures>
+            <projectnature>org.wso2.developerstudio.eclipse.mavenmultimodule.project.nature</projectnature>
+          </projectnatures>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

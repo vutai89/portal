@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<sql-query name="removeUplCreditAppRequestId">
+	<![CDATA[delete from upl_credit_app_request where id in (:ids)]]>
+	</sql-query>
+
+	<sql-query name="getUplCreditAppRequestId">
+	<![CDATA[select * from upl_credit_app_request where id = :id]]>
+	</sql-query>
+
+	<sql-query name="removeUplCreditAppFilesId">
+	<![CDATA[delete from upl_credit_app_files where upl_credit_app_id in (:ids)]]>
+	</sql-query>
+
+	<sql-query name="removeDocument">
+	<![CDATA[delete from upl_credit_app_document where upl_credit_app_id in (:ids)]]>
+	</sql-query>
+
+	<sql-query name="removeMessageLogId">
+	<![CDATA[delete from message_log where trans_id in (:ids)]]>
+	</sql-query>
+
+	<sql-query name="getMessageLog">
+	<![CDATA[select * from message_log where trans_id = :trans_id and trans_type = 'abortLOSApplication']]>
+	</sql-query>
+
+	<sql-query name="getMessageLogNotification">
+	<![CDATA[select * from message_log where id = :id and trans_type = 'notifyLOSApplication']]>
+	</sql-query>
+
+	<sql-query name="removeProducts">
+	<![CDATA[delete from products where id in (:ids)]]>
+	</sql-query>
+
+	<sql-query name="getRandomAppNumber">
+		<![CDATA[  SELECT app_number FROM (SELECT app_number FROM upl_credit_app_request where app_id is not null ) WHERE ROWNUM = 1]]>
+	</sql-query>
+
+	<sql-query name="testGetCaseNote">
+		<![CDATA[  SELECT app_number, sale_id FROM (SELECT app_number,sale_id FROM upl_credit_app_request where app_id is not null ) WHERE ROWNUM = 1]]>
+	</sql-query>
+
+	<query name="getRequestByAppNumber"> from UplCreditAppRequest where appNumber =:appNumber
+	</query>
+
+	<query name="getFilesByUplCreditRequestId"> from UplCreditAppFiles where uplCreditAppId =:uplId
+	</query>
+
+	<query name="getDocumentByUplCreditAppId"> from UplCreditAppDocument where uplCreditAppId =:id
+	</query>
+
+	<sql-query name="removeMessageLogById">
+		<![CDATA[delete from Message_Log where relation_id in (:ids)]]>
+	</sql-query>
+
+	<sql-query name="getTaxNumber">
+	<![CDATA[select comp_tax_number from cust_company_info where rownum = 1]]>
+	</sql-query>
+
+	<sql-query name="getShopCode">
+	<![CDATA[select code_value1 from code_table where code_group = 'KIOSK' and CATEGORY = 'TRAN_OFF' and rownum = 1]]>
+	</sql-query>
+
+	<sql-query name="insertData">
+	<![CDATA[insert into products (id, created_date, last_updated_date, product_group_id, product_code, ccy, START_EFF_DATE, END_EFF_DATE, min_tenor, max_tenor, is_check_category) 
+	values (:id , to_date('31-12-9999', 'DD/MM/YY'), to_date('31-12-9999', 'DD/MM/YY'), :productGroupId, :productCode, :ccy, 
+	to_date('31-12-9999', 'DD/MM/YY'), to_date('31-12-9999', 'DD/MM/YY'), 6, 36, 1)]]>
+	</sql-query>
+
+	<sql-query name="getEmpIdEmpCode">
+	<![CDATA[select e.emp_code, u.emp_id  from users u inner join employee_link e on e.emp_id = u.emp_id where login_id = :loginId]]>
+	</sql-query>
+
+</hibernate-mapping>

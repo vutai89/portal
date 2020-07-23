@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<query name="checkListCreditDocument"> from UplCreditAppDocument where documentId = :docId
+		and uplCreditAppId= :id
+	</query>
+	<query name="getCaseForSyncFile"> from UplCreditAppRequest where status in ('S', 'I')
+	</query>
+	<query name="getFileForSync"> from UplCreditAppFiles where uplCreditAppId = :id
+		and status = 'X'
+	</query>
+
+	<sql-query name="getImei">
+	<![CDATA[select mobile_imei from users_profiles usp, users u where u.login_id = :login_id and usp.user_id = u.id]]>
+	</sql-query>
+
+	<sql-query name="getSaleId">
+	<![CDATA[select emp_id from employee_link where emp_code = :emp_code]]>
+	</sql-query>
+
+	<sql-query name="getSaleMobileBySaleId">
+	<![CDATA[select mobile_phone from employees where id = :id]]>
+	</sql-query>
+
+	<sql-query name="updateReturnedCase">
+	<![CDATA[update upl_credit_app_request set last_updated_date = sysdate, last_updated_by = :lastUpdatedBy, status = :status where id = :id]]>
+	</sql-query>
+
+	<sql-query name="getMaxDocumentVersion">
+	<![CDATA[select distinct document_id as documentId, (select max(version) from upl_credit_app_files upl1 where upl1.document_id = upl2.document_id and upl1.upl_credit_app_id = :id1)  as maxVersion 
+	from upl_credit_app_files upl2 where document_id in (:document_ids) and upl_credit_app_id = :id order by document_id]]>
+	</sql-query>
+
+	<sql-query name="checkValid">
+	<![CDATA[select id from upl_credit_app_request where id = :id and status = :status]]>
+	</sql-query>
+
+	<sql-query name="checkCancelCase">
+	<![CDATA[select * from upl_credit_app_request where id = :id and sale_code = :saleCode and status = :status]]>
+	</sql-query>
+
+	<sql-query name="getReasonsByCreditAppId">
+	<![CDATA[
+		SELECT
+		    cat.id,
+		    ct_reason2.description1 AS reason,
+		    ct_reason1.description1 AS reason_detail,
+		    cat.user_comment AS user_comment
+		
+		FROM CREDIT_APP_TRAIL cat
+		
+		LEFT JOIN code_table ct_reason1 ON (
+		    ct_reason1.id = cat.reason_id AND cat.action = (SELECT id FROM code_table WHERE code_group = 'ACT' AND category = 'ACTION_CS' AND code_value1 = 'RETURN')
+		)
+		LEFT JOIN code_table ct_reason2 ON (ct_reason1.parent_id = ct_reason2.id)
+		where
+		cat.credit_app_id = :credit_app_id
+		and cat.trail_seq = (select max(trail_seq) from CREDIT_APP_TRAIL cat where cat.credit_app_id = :credit_app_id)
+		AND cat.FROM_USER_CODE = (
+			SELECT FROM_USER_CODE FROM CREDIT_APP_TRAIL 
+			WHERE CREDIT_APP_ID = :credit_app_id
+			ORDER BY last_updated_date DESC
+			fetch first row only
+		)
+	]]>
+	</sql-query>
+
+	<sql-query name="isSaleOwnerDocument">
+	<![CDATA[
+		SELECT doc.id FROM UPL_CREDIT_APP_DOCUMENT doc 
+	    inner JOIN UPL_CREDIT_APP_REQUEST request ON doc.UPL_CREDIT_APP_ID = request.ID  WHERE 
+	    doc.id = :id AND request.SALE_CODE = :saleCode
+	]]>
+	</sql-query>
+
+	<sql-query name="getDashboardInfo">
+	<![CDATA[
+		    SELECT ( 
+				SELECT  
+					count(uca.id) 
+				FROM  
+				upl_credit_app_request uca 
+				WHERE uca.status IN ('C', 'T')
+				AND LAST_UPDATED_BY = :loginId
+				)  AS case_processing_count,  
+				( 
+				SELECT  
+				count(uca.id) 
+				FROM  
+				upl_credit_app_request uca 
+				 
+				WHERE uca.status = 'R'
+				AND LAST_UPDATED_BY = :loginId
+				)   AS case_abort_count 
+			FROM dual
+	]]>
+	</sql-query>
+
+	<sql-query name="getPdfFilesByUplCreditAppId">
+	<![CDATA[
+		SELECT id, created_date, remote_path_server FROM upl_credit_app_document WHERE upl_credit_app_id = :id
+	]]>
+	</sql-query>
+
+	<sql-query name="getPdfFileById">
+	<![CDATA[
+		SELECT id, created_date, remote_path_server FROM upl_credit_app_document WHERE id = :id
+	]]>
+	</sql-query>
+
+	<sql-query name="getCaseForAbort">
+	<![CDATA[SELECT ID, RECORD_STATUS, CREATED_DATE, LAST_UPDATED_DATE, CREATED_BY, LAST_UPDATED_BY, CREDIT_APP_ID
+				,APP_NUMBER ,APP_ID ,INSU_RATE ,SALE_CODE ,SALE_ID ,APP_CODE ,CUSTOMER_NAME  ,CITIZEN_ID ,ISSUE_DATE_CITIZEN
+				,ISSUE_PLACE ,BIRTH_DATE ,PRODUCT_ID ,TEMP_RESIDENCE ,LOAN_TENOR ,LOAN_AMOUNT ,HAS_INSURANCE ,MOBILE_IMEI
+				,APP_STATUS ,PREVIOUS_STATUS ,SHOP_CODE ,COMPANY_TAX_NUMBER ,STATUS, CHECKLIST,ABORT_REASON, ABORT_COMMENT FROM UPL_CREDIT_APP_REQUEST where STATUS = 'A' 
+			 	AND APP_STATUS in 
+			 	(SELECT id FROM code_table WHERE CODE_GROUP = 'STEP' AND  CATEGORY = 'STEP_STAT' AND CODE_VALUE1 IN ('DE_ABORT', 'POS_ABORT', 'UWC_ABORT', 'UWC_ABORT') ]]>
+	</sql-query>
+
+	<sql-query name="getSaleByAppNumber">
+	<![CDATA[
+		SELECT sale_id, app_id FROM upl_credit_app_request WHERE app_number = :appNumber
+	]]>
+	</sql-query>
+
+	<sql-query name="getEUMappingByEmpId">
+	<![CDATA[
+	SELECT eum.ID, eum.USERNAME, eum.PASSWORD, eum.ACCESS_TOKEN, eum.REFRESH_TOKEN, eum.CREATED_DATE, eum.CREATED_BY, eum.UPDATED_DATE, 
+	eum.UPDATED_BY, eum.STATUS, eum.TYPE, eum.user_uid from EXTERNAL_USER_MAPPING eum inner join USERS_PROFILES up on eum.ID = up.EXTERNAL_USER_MAPPING_ID 
+	INNER JOIN USERS us on up.USER_ID = us.ID where us.EMP_ID = :empId	]]>
+	</sql-query>
+
+	<sql-query name="getEUMappingByUplId">
+	<![CDATA[
+	SELECT eum.ID, eum.USERNAME, eum.PASSWORD, eum.ACCESS_TOKEN, eum.REFRESH_TOKEN, eum.CREATED_DATE, eum.CREATED_BY, eum.UPDATED_DATE, eum.UPDATED_BY
+, eum.STATUS, eum.TYPE from EXTERNAL_USER_MAPPING eum inner join USERS_PROFILES up on eum.ID = up.EXTERNAL_USER_MAPPING_ID 
+INNER JOIN USERS us on up.USER_ID = us.ID inner join UPL_CREDIT_APP_REQUEST upl on us.EMP_ID = upl.SALE_ID where upl.id =:uplId
+	]]>
+	</sql-query>
+
+	<sql-query name="getFileForSyncAppFiles">
+	<![CDATA[
+		SELECT * from upl_credit_app_files where upl_credit_app_id = :id and status = 'X'
+	]]>
+	</sql-query>
+
+	<sql-query name="findInfoMessForSale">
+	<![CDATA[
+		SELECT ml.id as messId, up.notification_id, ml.msg_request, ucar.APP_NUMBER as documentId, ucar.CITIZEN_ID, ucar.CUSTOMER_NAME, ml.msg_status,up.OS_TYPE FROM message_log ml 
+		INNER JOIN upl_credit_app_request ucar ON ml.relation_id = ucar.app_id INNER JOIN users u ON u.emp_id = ucar.sale_id INNER JOIN users_profiles up ON up.user_id = u.id 
+		WHERE ml.trans_type =:transType and ml.msg_status in :msgStatus and up.external_user_mapping_id = 1
+	]]>
+	</sql-query>
+
+	<sql-query name="findInfoMessForThirdParty">
+	<![CDATA[
+		SELECT ml.id as messId, ml.msg_request, up.external_user_mapping_id, ucar.app_number, ucar.app_id, exum.api FROM message_log ml
+		INNER JOIN upl_credit_app_request ucar ON ml.relation_id = ucar.app_id INNER JOIN users u ON u.emp_id = ucar.sale_id INNER JOIN users_profiles up ON up.user_id = u.id 
+		INNER JOIN external_user_mapping exum ON exum.id = up.external_user_mapping_id
+		WHERE ml.trans_type =:transType and ml.msg_status in :msgStatus and up.external_user_mapping_id != 1
+	]]>
+	</sql-query>
+
+	<sql-query name="getUplCARequestListByStatus">
+	<![CDATA[
+		SELECT * from upl_credit_app_request where status =:status1
+	]]>
+	</sql-query>
+
+	<sql-query name="getNotificationIdByRoleCode">
+	<![CDATA[
+		select up.notification_id from users_profiles up inner join users_role_mapping urm on up.user_id = urm.user_id 
+		inner join roles role on role.id = urm.object_id where role.role_code = :roleCode
+	]]>
+	</sql-query>
+
+	<sql-query name="getByUserId">
+	<![CDATA[
+		select * from users_profiles where user_id =:userId
+	]]>
+	</sql-query>
+
+	<sql-query name="updateStatusUplCreAppRe">
+	<![CDATA[update upl_credit_app_request set last_updated_date = sysdate, status = :status where id = :id]]>
+	</sql-query>
+
+	<sql-query name="updateForCreateCaseBPM">
+	<![CDATA[update upl_credit_app_request set last_updated_date = sysdate, status = :status, app_number = :appNumber, app_id = :appId where id = :id]]>
+	</sql-query>
+
+	<sql-query name="updateLastDateUplCreditAppReqeust">
+		<![CDATA[  update UPL_CREDIT_APP_REQUEST set LAST_UPDATED_DATE = SYSDATE where id = :id]]>
+	</sql-query>
+
+	<sql-query name="checkDuplicate">
+		<![CDATA[select * from upl_credit_app_request where customer_name = :customer_name and citizen_id = :citizen_id
+		and to_char(issue_date_citizen, 'dd/mm/yyyy') = :issue_date_citizen and product_id = :product_id and loan_tenor = :loan_tenor
+		and loan_amount = :loan_amount and (app_status in (SELECT id FROM code_table WHERE CODE_GROUP = 'STEP' AND  CATEGORY = 'STEP_STAT' 
+		AND (CODE_VALUE1 NOT LIKE '%ABORT' AND CODE_VALUE1 NOT LIKE '%REJECT' AND CODE_VALUE1 NOT LIKE '%DONE')) or app_status is null) and (created_date + 5) > sysdate and rownum = 1]]>
+	</sql-query>
+
+	<sql-query name="updateNotificationId">
+	<![CDATA[update users_profiles set notification_id = :notificationId where user_id = :userId ]]>
+	</sql-query>
+
+	<sql-query name="checkImei">
+	<![CDATA[select count(*) from users_profiles where user_id <>:userId and mobile_imei=:imei]]>
+	</sql-query>
+
+</hibernate-mapping>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+
+	<sql-query name="checkAssignPermision">
+   	<![CDATA[
+		SELECT count(id) FROM debt_home_assign
+		WHERE
+		contract_number = :contract_number AND (user_assign = :user OR teamlead = :user OR  administrator = :user)  and status = 'A'
+	]]>
+	</sql-query>
+	
+	
+	<sql-query name="findAppnumberByContractNumber">
+   	<![CDATA[ 
+			SELECT cab.bpm_app_number FROM credit_app_bpm cab
+			INNER JOIN CREDIT_APP_REQUEST car ON  car.id = cab.CREDIT_APP_ID
+			WHERE car.mc_contract_number = :contract_number
+	]]>
+	</sql-query>
+	
+	<sql-query name="findContractNumberByAppNumber">
+   	<![CDATA[
+			SELECT car.MC_CONTRACT_NUMBER FROM credit_app_bpm cab
+			INNER JOIN CREDIT_APP_REQUEST car ON  car.id = cab.CREDIT_APP_ID
+			WHERE cab.BPM_APP_NUMBER = :app_number
+	]]>
+	</sql-query>
+	
+	<sql-query name="disableDebtHomeAssigns">
+	   	<![CDATA[
+			UPDATE debt_home_assign SET status = 'C'
+		]]>
+	</sql-query>
+	
+	<sql-query name="checkExistContractNumber">
+	   	<![CDATA[
+			SELECT count(id) FROM debt_home_assign WHERE contract_number = :contractNumber AND status = 'A'
+		]]>
+	</sql-query>
+	
+	<sql-query name="findContractInfo">
+	   	<![CDATA[
+			SELECT cab.bpm_app_number, car.mc_contract_number, ci.IDENTITY_NUMBER, cci.CONTACT_VALUE, cpi.cust_name
+			FROM credit_app_bpm cab
+				inner JOIN CREDIT_APP_REQUEST car ON  car.id = cab.CREDIT_APP_ID
+				inner join CUST_IDENTITY ci on car.CUST_ID = ci.CUST_ID
+				inner join cust_contact_info cci on cci.CUST_ID = car.CUST_ID
+				inner join cust_personal_info cpi on cpi.id = ci.CUST_ID
+			WHERE cci.contact_type = (select id from code_table where category = 'CONTAC_TYP' and code_value1 = 'MOBILE')
+				and cci.contact_category = (select id from code_table where category = 'CONTAC_CAT' and code_value1 = 'CUSTOMER')
+				and (cab.bpm_app_number = :appNumber
+					or car.mc_contract_number = :contractNumber
+					or ci.identity_number = :identityNumber
+					or cci.CONTACT_VALUE = :mobilePhone)
+		]]>
+	</sql-query>
+	
+</hibernate-mapping>
+
+

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration SYSTEM "classpath://org/hibernate/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+		<property name="hibernate.connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
+		<property name="hibernate.dialect">org.hibernate.dialect.Oracle12cDialect</property>
+
+		<!-- Specifying Session Context -->
+		<property name="hibernate.current_session_context_class">thread</property>
+
+		<property name="hibernate.connection.datasource">java:comp/env/jdbc/MCreditDB</property>
+
+		<!--<property name="hibernate.connection.datasource">java:comp/env/jdbc/MCreditDB</property> -->
+
+
+		<!-- DEV -->
+<!-- 		<property name="connection.url">jdbc:oracle:thin:@//172.17.200.75:1521/MBFPDB01</property>
+		<property name="connection.username">SIT_MCP</property>
+		<property name="connection.password">mcportal</property>
+		<property name="hibernate.show_sql">true</property>
+ -->
+		<!-- DEV_CLONE -->
+		<!-- <property name="connection.url">jdbc:oracle:thin:@//172.17.200.75:1521/MBFPDB01</property> 
+			<property name="connection.username">MCPORTAL_1</property> <property name="connection.password">MCPORTAL_1</property> 
+			<property name="hibernate.show_sql">true</property> -->
+
+		<!-- SIT -->
+		<!-- <property name="connection.url">jdbc:oracle:thin:@//172.17.200.75:1521/MBFPDB01</property> 
+			<property name="connection.username">SIT_MCP</property> <property name="connection.password">mcportal</property> 
+			<property name="hibernate.show_sql">true</property> -->
+
+		<!-- UAT -->
+		<!-- <property name="connection.url">jdbc:oracle:thin:@//UAT-RAC-SCAN.mcredit.local:1521/UATDB01</property> 
+			<property name="connection.username">mcportaluser</property> <property name="connection.password">mcportaluser3321</property> 
+			<property name="hibernate.show_sql">true</property> -->
+
+
+		<!-- JDBC connection pool, use Hibernate internal connection pool -->
+		<property name="validationQuery">select 1 from dual</property>
+		<property name="testOnBorrow">true</property>
+		<property name="minEvictableIdleTimeMillis">60000</property>
+		<property name="connection.autocommit">false</property>
+		<property name="connection.pool_size">100</property>
+		<property name="cache.provider_class">org.cache.internal.NoCacheProvider</property>
+		<property name="connection.release_mode">after_transaction</property>
+		<property name="max_fetch_depth">2</property>
+		<property name="jdbc.batch_size">100</property>
+		<property name="show_sql">true</property>
+		<property name="generate_statistics">true</property>
+
+		<!-- Mapping with model class containing annotations -->
+		<mapping class="com.mcredit.data.customer.entity.CustomerAccountLink" />
+		<mapping class="com.mcredit.data.customer.entity.CustomerPersonalInfo" />
+		<mapping class="com.mcredit.data.customer.entity.CustomerAddlInfo" />
+		<mapping class="com.mcredit.data.customer.entity.CustomerContactInfo" />
+		<mapping class="com.mcredit.data.customer.entity.CustomerAddressInfo" />
+		<mapping class="com.mcredit.data.customer.entity.CustomerFinancialInfo" />
+		<mapping class="com.mcredit.data.customer.entity.CustomerPersonalInfo" />
+		<mapping class="com.mcredit.data.customer.entity.CustomerIdentity" />
+		<mapping class="com.mcredit.data.customer.entity.CustomerCompanyInfo" />
+		<mapping class="com.mcredit.data.credit.entity.CreditApplicationBPM" />
+		<mapping
+			class="com.mcredit.data.credit.entity.CreditApplicationLoanManagement" />
+		<mapping class="com.mcredit.data.credit.entity.CreditApplicationAppraisal" />
+		<mapping class="com.mcredit.data.credit.entity.CreditApplicationRequest" />
+		<mapping class="com.mcredit.data.credit.entity.CreditApplicationAdditional" />
+		<mapping class="com.mcredit.data.credit.entity.CreditApplicationOutstanding" />
+		<mapping class="com.mcredit.data.credit.entity.CreditApplicationSignature" />
+		<mapping class="com.mcredit.data.common.entity.CodeTable" />
+		<mapping class="com.mcredit.data.common.entity.MessageLog" />
+		<mapping class="com.mcredit.data.common.entity.ArchMessageLog" />
+		<mapping class="com.mcredit.data.common.entity.MessageTask" />
+		<mapping class="com.mcredit.data.common.entity.Partner" />
+		<mapping class="com.mcredit.data.common.entity.SystemDefineFields" />
+		<mapping class="com.mcredit.data.payment.entity.PostingInstance" />
+		<mapping class="com.mcredit.data.payment.entity.PostingConfiguration" />
+		<mapping class="com.mcredit.data.common.entity.Parameters" />
+		<mapping class="com.mcredit.data.common.entity.Product" />
+		<mapping class="com.mcredit.data.common.entity.NotificationTemplate" />
+		<mapping class="com.mcredit.data.common.entity.Calendar" />
+		<mapping class="com.mcredit.data.common.entity.SendEmail" />
+
+		<!-- <mapping class="com.mcredit.data.telesale.entity.AllocationDetail"/> 
+			<mapping class="com.mcredit.data.telesale.entity.AllocationMaster"/> -->
+
+		<!-- BEGIN for new Allocation -->
+		<mapping class="com.mcredit.data.common.entity.AllocationDetail" />
+		<mapping class="com.mcredit.data.common.entity.AllocationMaster" />
+		<mapping class="com.mcredit.data.common.entity.AllocateHistory" />
+		<!-- END for new Allocation -->
+
+		<mapping class="com.mcredit.data.telesale.entity.UplMaster" />
+		<mapping class="com.mcredit.data.telesale.entity.UplDetail" />
+		<mapping class="com.mcredit.data.telesale.entity.UplCustomer" />
+		<mapping class="com.mcredit.data.telesale.entity.UplCustomerHistory" />
+		<mapping class="com.mcredit.data.user.entity.UsersSession" />
+		<mapping class="com.mcredit.data.user.entity.Users" />
+		<mapping class="com.mcredit.data.user.entity.EmployeeLink" />
+		<mapping class="com.mcredit.data.telesale.entity.CallResult" />
+		<mapping class="com.mcredit.data.telesale.entity.CustProspect" />
+		<mapping class="com.mcredit.data.credit.entity.UplCcStatement" />
+		<mapping class="com.mcredit.data.telesale.entity.Team" />
+		<mapping class="com.mcredit.data.telesale.entity.TeamMember" />
+		<mapping class="com.mcredit.data.rule.entity.RuleOutput" />
+		<mapping class="com.mcredit.data.rule.entity.RuleDetail" />
+		<mapping class="com.mcredit.data.rule.entity.Rules" />
+		<mapping class="com.mcredit.data.rule.entity.RuleOutputDetail" />
+		<mapping class="com.mcredit.data.warehouse.entity.WhBorrowedDocument" />
+		<mapping class="com.mcredit.data.warehouse.entity.WhCavetInfo" />
+		<mapping class="com.mcredit.data.warehouse.entity.WhCode" />
+		<mapping class="com.mcredit.data.warehouse.entity.WhDocument" />
+		<mapping class="com.mcredit.data.warehouse.entity.WhDocumentChange" />
+		<mapping class="com.mcredit.data.warehouse.entity.WhLetter" />
+		<mapping class="com.mcredit.data.warehouse.entity.WhMapDocCode" />
+		<mapping class="com.mcredit.data.warehouse.entity.StateTransactionMatrix" />
+		<mapping class="com.mcredit.model.object.MenuFunction" />
+		<mapping class="com.mcredit.data.mobile.entity.DataReport" />
+		<mapping class="com.mcredit.data.mobile.entity.ApprovalReport" />
+		<mapping class="com.mcredit.data.warehouse.entity.WhDocumentErr" />
+		<mapping class="com.mcredit.data.warehouse.entity.WhExpectedDate" />
+		<mapping class="com.mcredit.data.mobile.entity.ExternalUserMapping" />
+		<mapping class="com.mcredit.data.mobile.entity.UsersProfiles" />
+		<mapping class="com.mcredit.data.mobile.entity.UplCreditAppRequest" />
+		<mapping class="com.mcredit.data.mobile.entity.UplCreditAppDocument" />
+		<mapping class="com.mcredit.data.mobile.entity.UplCreditAppFiles" />
+		<mapping class="com.mcredit.data.user.entity.Employee" />
+		<mapping class="com.mcredit.data.debt_home.entity.DebtHomeAssign" />
+		<mapping class="com.mcredit.data.pcb.entity.CreditBureauData" />
+		<mapping class="com.mcredit.data.audit.entity.AuditPaymentDebtCollection" />
+		<mapping class="com.mcredit.data.product.entity.MappingHierarchy" />
+		<mapping class="com.mcredit.data.common.entity.AuditDataChange" />
+		<mapping class="com.mcredit.data.telesale.entity.UplMaster"/>
+		<mapping class="com.mcredit.data.telesale.entity.UplDetail"/>
+		<mapping class="com.mcredit.data.telesale.entity.UplCustomer"/>
+		<mapping class="com.mcredit.data.telesale.entity.UplCustomerHistory"/>
+		<mapping class="com.mcredit.data.user.entity.UsersSession"/>
+		<mapping class="com.mcredit.data.user.entity.Users"/>
+		<mapping class="com.mcredit.data.user.entity.EmployeeLink"/>
+		<mapping class="com.mcredit.data.telesale.entity.CallResult"/>
+		<mapping class="com.mcredit.data.telesale.entity.CustProspect"/>
+		<mapping class="com.mcredit.data.credit.entity.UplCcStatement"/>
+		<mapping class="com.mcredit.data.telesale.entity.Team"/>
+		<mapping class="com.mcredit.data.telesale.entity.TeamMember"/>
+		<mapping class="com.mcredit.data.rule.entity.RuleOutput"/>
+		<mapping class="com.mcredit.data.rule.entity.RuleDetail"/>
+		<mapping class="com.mcredit.data.rule.entity.Rules"/>
+		<mapping class="com.mcredit.data.rule.entity.RuleOutputDetail"/>
+		<mapping class="com.mcredit.data.warehouse.entity.WhBorrowedDocument"/>
+		<mapping class="com.mcredit.data.warehouse.entity.WhCavetInfo"/>
+		<mapping class="com.mcredit.data.warehouse.entity.WhCode"/>
+		<mapping class="com.mcredit.data.warehouse.entity.WhDocument"/>
+		<mapping class="com.mcredit.data.warehouse.entity.WhDocumentChange"/>
+		<mapping class="com.mcredit.data.warehouse.entity.WhLetter"/>
+		<mapping class="com.mcredit.data.warehouse.entity.WhMapDocCode"/>
+		<mapping class="com.mcredit.data.warehouse.entity.StateTransactionMatrix"/>
+		<mapping class="com.mcredit.model.object.MenuFunction"/>
+		<mapping class="com.mcredit.data.mobile.entity.DataReport"/>
+		<mapping class="com.mcredit.data.mobile.entity.ApprovalReport"/>
+        <mapping class="com.mcredit.data.warehouse.entity.WhDocumentErr"/>
+        <mapping class="com.mcredit.data.warehouse.entity.WhExpectedDate"/>
+		<mapping class="com.mcredit.data.mobile.entity.ExternalUserMapping"/>
+		<mapping class="com.mcredit.data.mobile.entity.UsersProfiles"/>
+		<mapping class="com.mcredit.data.mobile.entity.UplCreditAppRequest"/>
+		<mapping class="com.mcredit.data.mobile.entity.UplCreditAppDocument"/>
+		<mapping class="com.mcredit.data.mobile.entity.UplCreditAppFiles"/>
+		<mapping class="com.mcredit.data.user.entity.Employee"/>
+		<mapping class="com.mcredit.data.debt_home.entity.DebtHomeAssign"/>
+		<mapping class="com.mcredit.data.pcb.entity.CreditBureauData"/>
+		<mapping class="com.mcredit.data.audit.entity.AuditPaymentDebtCollection"/>
+		<mapping class="com.mcredit.data.transaction.entity.Transactions"/>
+		<mapping class="com.mcredit.data.appraisal.entity.CreditAppraisalData"/>
+		<mapping class="com.mcredit.data.ecm.entity.DocumentToECM"/>
+		<mapping class="com.mcredit.data.cancelcasebpm.entity.UplAppAutoAbort"/>
+		<mapping class="com.mcredit.data.check_vehicle_price.entity.MotorPrice"/>
+		<mapping class="com.mcredit.data.black_list.entity.CustMonitor"/>
+
+        <!-- Mapping with resource query  -->
+		<mapping resource="hibernate/customer.xml"/>
+		<mapping resource="hibernate/common.xml"/>
+		<mapping resource="hibernate/payment.xml"/>
+		<mapping resource="hibernate/credit.xml"/>
+		<mapping resource="hibernate/telesale.xml"/>
+		<mapping resource="hibernate/user.xml"/>
+		<mapping resource="hibernate/rule.xml"/>
+		<mapping resource="hibernate/warehouse.xml"/>
+		<mapping resource="hibernate/mobile.xml"/>
+		<mapping resource="hibernate/mobiletest.xml"/>
+		<mapping resource="hibernate/manage-permission.xml"/>
+		<mapping resource="hibernate/debt-home.xml"/>
+		<mapping resource="hibernate/transaction.xml"/>
+		<mapping resource="hibernate/pcb.xml"/>
+		<mapping resource="hibernate/appraisal.xml"/>
+		<mapping resource="hibernate/document.xml" />
+		<mapping resource="hibernate/product.xml" />
+		<mapping resource="hibernate/cic.xml" />
+		<mapping resource="hibernate/cancel-case-bpm.xml"/>
+		<mapping resource="hibernate/black-list.xml"/>
+		
+	</session-factory>
+</hibernate-configuration>

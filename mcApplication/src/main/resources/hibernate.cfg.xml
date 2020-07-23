@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+		"http://hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.Oracle12cDialect</property>
+        
+		<!-- Specifying Session Context -->
+		<property name="hibernate.current_session_context_class">thread</property>
+		<!-- <property name="hibernate.connection.datasource">java:comp/env/jdbc/MCreditDB</property> -->
+
+        <property name="connection.url">jdbc:oracle:thin:@//172.17.200.75:1521/MBFPDB01</property>
+        <property name="connection.username">mcportal</property>
+        <property name="connection.password">mcportal</property>
+        <property name="hibernate.show_sql">true</property>
+
+        <!-- JDBC connection pool, use Hibernate internal connection pool -->
+        <property name="connection.autocommit">false</property>
+        <property name="connection.pool_size">10</property>
+		<property name="cache.provider_class">org.cache.internal.NoCacheProvider</property>
+        <property name="connection.release_mode">after_transaction</property>
+        <property name="max_fetch_depth">2</property>
+        <property name="jdbc.batch_size">100</property>
+        <property name="show_sql">true</property>
+        <property name="generate_statistics">true</property>        
+
+        <!-- Mapping with model class containing annotations -->
+		<mapping class="com.mcredit.data.entity.Scheduler"/>
+		<mapping class="com.mcredit.data.entity.SchedulerInstance"/>
+
+        <!-- Mapping with resource query  -->
+    </session-factory>
+</hibernate-configuration>

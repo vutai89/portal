@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<!-- <sql-query name="findNativeCardUnderMinPayment"> <![CDATA[ SELECT cal.CORE_LN_APP_ID, 
+		cao.DUE_BALANCE, cao.REMAIN_MIN_AMOUNT, cci.CONTACT_VALUE FROM CREDIT_APP_OUTSTANDING 
+		cao JOIN CREDIT_APP_LMS cal ON cao.CREDIT_APP_ID = cal.CREDIT_APP_ID JOIN 
+		CREDIT_APP_REQUEST car ON cal.CREDIT_APP_ID = car.ID LEFT JOIN CUST_PERSONAL_INFO 
+		cpi ON car.CUST_ID = cpi.ID LEFT JOIN CUST_CONTACT_INFO cci ON cpi.ID = cci.CUST_ID 
+		LEFT JOIN CODE_TABLE ct ON (cci.CONTACT_TYPE = (select ID from CODE_TABLE 
+		where CATEGORY='CONTAC_TYP' and CODE_VALUE1='MOBILE') and cci.CONTACT_CATEGORY 
+		= (select ID from CODE_TABLE where CATEGORY='CONTAC_CAT' and CODE_VALUE1='CUSTOMER')) 
+		WHERE cao.REMAIN_MIN_AMOUNT < 0 AND cao.DUE_BALANCE < 0]]> </sql-query> <sql-query 
+		name="findNativeCardUnderDuePayment"> <![CDATA[ SELECT cal.CORE_LN_APP_ID, 
+		cao.DUE_BALANCE, cao.REMAIN_MIN_AMOUNT, cci.CONTACT_VALUE FROM CREDIT_APP_OUTSTANDING 
+		cao JOIN CREDIT_APP_LMS cal ON cao.CREDIT_APP_ID = cal.CREDIT_APP_ID JOIN 
+		CREDIT_APP_REQUEST car ON cal.CREDIT_APP_ID = car.ID LEFT JOIN CUST_PERSONAL_INFO 
+		cpi ON car.CUST_ID = cpi.ID LEFT JOIN CUST_CONTACT_INFO cci ON cpi.ID = cci.CUST_ID 
+		LEFT JOIN CODE_TABLE ct ON (cci.CONTACT_TYPE = (select ID from CODE_TABLE 
+		where CATEGORY='CONTAC_TYP' and CODE_VALUE1='MOBILE') and cci.CONTACT_CATEGORY 
+		= (select ID from CODE_TABLE where CATEGORY='CONTAC_CAT' and CODE_VALUE1='CUSTOMER')) 
+		WHERE cao.REMAIN_MIN_AMOUNT = 0 AND cao.DUE_BALANCE < 0 ]]> </sql-query> -->
+
+	<sql-query name="findNativeCardUnderMinPayment">
+    	<![CDATA[ SELECT cal.CORE_LN_APP_ID, cao.DUE_BALANCE, cao.REMAIN_MIN_AMOUNT, cci.CONTACT_VALUE
+		    	 FROM CREDIT_APP_OUTSTANDING  cao
+		    	 JOIN CREDIT_APP_LMS cal ON cao.CREDIT_APP_ID          = cal.CREDIT_APP_ID
+		    	 JOIN CREDIT_APP_REQUEST      car ON cal.CREDIT_APP_ID = car.ID 
+				 LEFT JOIN CUST_PERSONAL_INFO cpi ON car.CUST_ID       = cpi.ID
+				 LEFT JOIN CUST_CONTACT_INFO  cci ON (cpi.ID           = cci.CUST_ID and cci.CONTACT_TYPE     = (select ID from CODE_TABLE where CATEGORY='CONTAC_TYP' and CODE_VALUE1='MOBILE')
+			  																		 and cci.CONTACT_CATEGORY = (select ID from CODE_TABLE where CATEGORY='CONTAC_CAT' and CODE_VALUE1='CUSTOMER'))
+		    	 WHERE cao.REMAIN_MIN_AMOUNT < 0 AND cao.DUE_BALANCE < 0]]>
+	</sql-query>
+	<sql-query name="findNativeCardUnderDuePayment">
+    	<![CDATA[ SELECT cal.CORE_LN_APP_ID, cao.DUE_BALANCE, cao.REMAIN_MIN_AMOUNT, cci.CONTACT_VALUE
+		    	 FROM CREDIT_APP_OUTSTANDING cao
+		    	 JOIN CREDIT_APP_LMS cal ON cao.CREDIT_APP_ID          = cal.CREDIT_APP_ID
+		    	 JOIN CREDIT_APP_REQUEST      car ON cal.CREDIT_APP_ID = car.ID 
+				 LEFT JOIN CUST_PERSONAL_INFO cpi ON car.CUST_ID       = cpi.ID
+				 LEFT JOIN CUST_CONTACT_INFO  cci ON (cpi.ID           = cci.CUST_ID and cci.CONTACT_TYPE     = (select ID from CODE_TABLE where CATEGORY='CONTAC_TYP' and CODE_VALUE1='MOBILE')
+			  																		 and cci.CONTACT_CATEGORY = (select ID from CODE_TABLE where CATEGORY='CONTAC_CAT' and CODE_VALUE1='CUSTOMER'))
+		    	 WHERE cao.REMAIN_MIN_AMOUNT = 0 AND  cao.DUE_BALANCE < 0 ]]>
+	</sql-query>
+
+
+	<sql-query name="getLatestVersionCreditApplicationSignatureBy">
+	<![CDATA[select ID,CREATED_BY,CREATED_DATE,CREDIT_APP_ID,RECORD_STATUS,VERSION,MC_CONTRACT_NUMBER,SIGNATURE,SIGNATURE_CONTENT from (select * from CREDIT_APP_SIGNATURE where MC_CONTRACT_NUMBER = :contract_number order by VERSION desc) where rownum = 1]]>
+	</sql-query>
+
+	<sql-query name="getCreditApplicationSignatureBy">
+	<![CDATA[select ID,CREATED_BY,CREATED_DATE,CREDIT_APP_ID,RECORD_STATUS,VERSION,MC_CONTRACT_NUMBER,SIGNATURE,SIGNATURE_CONTENT from CREDIT_APP_SIGNATURE 
+		where MC_CONTRACT_NUMBER = :contract_number and VERSION = :VERSION and SIGNATURE = :SIGNATURE]]>
+	</sql-query>
+	
+	<sql-query name="checkExistContractNumberForDebtColection">
+	   	<![CDATA[SELECT cab.BPM_APP_NUMBER FROM  credit_app_bpm cab  JOIN credit_app_request car ON car.id = cab.credit_app_id WHERE car.MC_CONTRACT_NUMBER = :contractNumber ]]>
+	</sql-query>
+
+
+
+
+
+
+
+
+
+</hibernate-mapping>

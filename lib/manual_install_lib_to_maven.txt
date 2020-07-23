@@ -1,0 +1,20 @@
+﻿To manually install new jar file to maven repositories
+	Install and configure maven on Windows
+	In pom.xml
+    <dependency>
+      <groupId>com.oracle</groupId>
+      <artifactId>ojdbc7</artifactId>
+      <version>12.1.0</version>
+      <scope>compile</scope>
+    </dependency>
+	
+	Intsall lib to your maven repository on local
+	mvn install:install-file -Dfile=path_to_jar_file_on_your_local_driver\ojdbc7.jar -DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0 -Dpackaging=jar
+	
+	
+	mvn install:install-file -Dfile=D:\work\Portal-CI\mcDataAccess\lib\docExport.jar -DgroupId=com.doc -DartifactId=docExport -Dversion=1.0 -Dpackaging=jar
+	
+	
+	mvn install:install-file -Dfile=D:\binhnt.ho\PROJECTS\GIT-Portal-Backend\resource\lib\ftp4j-1.7.2.jar -DgroupId=it.sauronsoftware -DartifactId=ftp4j -Dversion=1.7.2 -Dpackaging=jar
+	OR 
+	mvn install:install-file -Dfile=D:\binhnt.ho\PROJECTS\GIT-Portal-Backend\resource\lib\ftp4j-1.6.jar -DgroupId=it.sauronsoftware -DartifactId=ftp4j -Dversion=1.6 -Dpackaging=jar

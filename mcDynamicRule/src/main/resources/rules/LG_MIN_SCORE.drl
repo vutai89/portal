@@ -1,0 +1,124 @@
+package com.mcredit.rule.engine.lgScore;
+
+import com.mcredit.model.object.RuleObject;
+
+global com.mcredit.rule.FormulaResult formulaResult;
+
+function String getVal(String val, int len, int max) {
+	String ret = val;
+	int start = 0;
+	if(val == null) {
+		ret = "";
+	} else {
+		start = val.length();
+	}
+	for(int i=start;i<len-1;i++) {
+		ret = ret + "N";
+	}
+	if(len < max) {
+		ret = ret + "Y";
+	} else if(ret.length() < max - 1) {
+		ret = ret + "N";
+	}
+
+	return ret;
+}
+
+rule "Check range [646, 850]"
+	when
+		RuleObject(minScore != null && minScore >= 646 && minScore <= 850)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 1, 1000));
+end
+
+rule "Check range [601, 645]"
+	when
+		RuleObject(minScore != null && minScore >= 601 && minScore <= 645)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 2, 1000));
+end
+
+rule "Check range [550, 600]"
+	when
+		RuleObject(minScore != null && minScore >= 550 && minScore <= 600)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 3, 1000));
+end
+
+rule "Check range [651, max)"
+	when
+		RuleObject(minScore != null && minScore >= 651)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 4, 1000));
+end
+
+rule "Check range [601, 650]"
+	when
+		RuleObject(minScore != null && minScore >= 601 && minScore <= 650)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 5, 1000));
+end
+
+rule "Check range [671, max)"
+	when
+		RuleObject(minScore != null && minScore >= 671)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 6, 1000));
+end
+
+rule "Check range [550, 670]"
+	when
+		RuleObject(minScore != null && minScore >= 550 && minScore <= 670)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 7, 1000));
+end
+
+rule "Check range [550, 585]"
+	when
+		RuleObject(minScore != null && minScore >= 550 && minScore <= 585)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 8, 1000));
+end
+
+rule "Check range [586, 625]"
+	when
+		RuleObject(minScore != null && minScore >= 586 && minScore <= 625)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 9, 1000));
+end
+
+rule "Check range [626, 850]"
+	when
+		RuleObject(minScore != null && minScore >= 626 && minScore <= 850)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 10, 1000));
+end
+
+
+rule "Check range [0, 0]"
+	when
+		RuleObject(minScore != null && minScore == 0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 11, 1000));
+end
+
+rule "Check range [620, max)"
+	when
+		RuleObject(minScore != null && minScore >= 620)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 12, 1000));
+end
+
+rule "Check range [560, 619]"
+	when
+		RuleObject(minScore != null && minScore >= 560 && minScore <= 619)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 13, 1000));
+end
+
+rule "Check range [520, 559]"
+	when
+		RuleObject(minScore != null && minScore >= 520 && minScore <= 559)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 14, 15));
+end

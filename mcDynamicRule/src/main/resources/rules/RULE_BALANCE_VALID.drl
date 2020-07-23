@@ -1,0 +1,50 @@
+package com.mcredit.rule.engine.balanceAccount;
+
+import com.mcredit.model.object.RuleObject;
+
+global com.mcredit.rule.FormulaResult formulaResult;
+
+function String getVal(String val, int len, int max) {
+	String ret = val;
+	int start = 0;
+	if(val == null) {
+		ret = "";
+	} else {
+		start = val.length();
+	}
+	for(int i=start;i<len-1;i++) {
+		ret = ret + "N";
+	}
+	if(len < max) {
+		ret = ret + "Y";
+	} else if(ret.length() < max - 1) {
+		ret = ret + "N";
+	}
+
+	return ret;
+}
+
+rule "Check range [0 - 3M)"
+	when
+		RuleObject(averageAccountBalance != null && averageAccountBalance >= 0 && averageAccountBalance < 3000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 1, 1000));
+
+end
+
+rule "Check range [0 - 6M)"
+	when
+		RuleObject(averageAccountBalance != null && averageAccountBalance >= 0 && averageAccountBalance < 6000000)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 2, 1000));
+
+end
+
+rule "Check range > 0"
+	when
+		RuleObject(averageAccountBalance!= null && averageAccountBalance >= 0)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 3, 3));
+end
+
+

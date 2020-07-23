@@ -1,0 +1,131 @@
+package com.mcredit.rule.engine.oldContractDateValidation
+
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import com.mcredit.model.object.RuleObject;
+import java.util.Calendar;
+import java.text.DateFormat;
+
+global com.mcredit.rule.FormulaResult formulaResult;
+
+function String getVal(String val, int len, int max) {
+	String ret = val;
+	int start = 0;
+	if(val == null) {
+		ret = "";
+	} else {
+		start = val.length();
+	}
+	for(int i=start;i<len-1;i++) {
+		ret = ret + "N";
+	}
+	if(len < max) {
+		ret = ret + "Y";
+	} else if(ret.length() < max - 1) {
+		ret = ret + "N";
+	}
+
+	return ret;
+}
+
+
+function Date plusMonths(Date input , Integer month){
+	if (month == null) {
+		month = 0;
+	}
+	Calendar c = Calendar.getInstance();
+		c.setTime(input);
+		c.add(Calendar.MONTH, month);
+		return c.getTime();
+}
+
+function Date plusDate(Date input , Integer days){
+	if (days == null) {
+		days = 0;
+	}
+	Calendar c = Calendar.getInstance();
+		c.setTime(input);
+		c.add(Calendar.DATE, days);
+		return c.getTime();
+}
+function Date plusYear(Date input , int years){
+		Calendar c = Calendar.getInstance();
+		c.setTime(input);
+		c.add(Calendar.YEAR, years);
+		return c.getTime();
+}
+
+function Date toDate(String input){
+	Date date = null ;
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	
+	try {
+		date = sdf.parse(input.substring(0, 10));
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+	
+	return date;
+}
+
+function Date getEndDatePreviousLoan(String startDatePreviousLoan, Integer loanTenorOtherCredit){
+	return plusMonths(toDate(startDatePreviousLoan), loanTenorOtherCredit);
+}
+
+rule "Check (end date - create date) >= 1"
+	when
+		RuleObject(!toDate(endDatePreviousLoan).before(plusMonths(toDate(createdDate), 1)))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 1, 1000));
+end
+
+rule "Check (end date - create date) < 1"
+	when
+		RuleObject(toDate(endDatePreviousLoan).before(plusMonths(toDate(createdDate), 1)))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 2, 1000));
+end
+
+rule "Check 0 <= (create date - end date) <= 6"
+	when
+		RuleObject(!toDate(endDatePreviousLoan).after(toDate(createdDate)) && 
+						!toDate(endDatePreviousLoan).before(plusMonths(toDate(createdDate), -6)))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 3, 1000));
+end
+
+rule "Check 0 <= (end date - create date) < 1"
+	when
+		RuleObject(!toDate(endDatePreviousLoan).before(toDate(createdDate)) && 
+						toDate(endDatePreviousLoan).before(plusMonths(toDate(createdDate), 1)))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 4, 1000));
+end
+
+rule "Check (create date - end date) > 6"
+	when
+		RuleObject(toDate(endDatePreviousLoan).before(plusMonths(toDate(createdDate), -6)))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 5, 1000));
+end
+
+rule "Check 2 (end date - create date) >= 1"
+	when
+		RuleObject(!toDate(endDatePreviousLoan).before(plusMonths(toDate(createdDate), 1)))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 6, 1000));
+end
+
+rule "Check (create date - end date) <= 12"
+	when
+		RuleObject(!toDate(endDatePreviousLoan).before(plusMonths(toDate(createdDate), -12)))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 7, 1000));
+end
+
+rule "Check (create date - end date) > 12"
+	when
+		RuleObject(toDate(endDatePreviousLoan).before(plusMonths(toDate(createdDate), -12)))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 8, 9));
+end

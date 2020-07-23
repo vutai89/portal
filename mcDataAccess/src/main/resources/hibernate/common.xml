@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<sql-query name="Seq_message_log_Trans_ID">
+		<![CDATA[SELECT SEQ_MESSAGE_LOG_TRANS_ID.NEXTVAL FROM DUAL ]]>
+	</sql-query>
+
+	<sql-query name="Seq_message_log_ID">
+		<![CDATA[SELECT SEQ_MESSAGE_LOG_ID.NEXTVAL FROM DUAL ]]>
+	</sql-query>
+
+	<sql-query name="Seq_message_tag_ID">
+		<![CDATA[SELECT SEQ_MESSAGE_TAG_ID.NEXTVAL FROM DUAL ]]>
+	</sql-query>
+
+	<query name="findMessageTaskByRelationId">
+	 <![CDATA[ from MessageTask WHERE relationId =:relationId ]]>
+	</query>
+
+	<query name="findByCodeGroupAndcategory">
+    	<![CDATA[ from CodeTable WHERE recordStatus = 'A' and status = 'A' order by category, codeValue1 ]]>
+	</query>
+
+	<query name="findPartner">
+    	<![CDATA[ from Partner WHERE recordStatus = 'A' order by id desc ]]>
+	</query>
+
+	<query name="findParameters">
+    	<![CDATA[ from Parameters WHERE status = 'A' order by paramName ]]>
+	</query>
+
+	<query name="findParameter">
+    	<![CDATA[ from Parameters WHERE status = 'A' AND paramName = :paramName order by paramName ]]>
+	</query>
+
+	<query name="findPostingConfiguration">
+    	<![CDATA[ from PostingConfiguration WHERE recordStatus = 'A' order by id ]]>
+	</query>
+
+
+	<query name="findPostingInstance">
+    	<![CDATA[ from PostingInstance WHERE recordStatus = 'A' order by id desc ]]>
+	</query>
+
+	<query name="findPostingInstanceById">
+    	<![CDATA[ from PostingInstance WHERE Id = :id ]]>
+	</query>
+
+	<query name="findPostingInstanceByPartnerRefId">
+    	<![CDATA[ from PostingInstance WHERE recordStatus = 'A' order by id desc ]]>
+	</query>
+
+	<query name="findNotificationTemplateByCode">
+    	<![CDATA[ from NotificationTemplate WHERE recordStatus = 'A' AND notificationCode = :code ]]>
+	</query>
+
+	<query name="findCalendarByCategory">
+    	<![CDATA[ FROM Calendar WHERE category = :category ]]>
+	</query>
+
+	<query name="findProducts">
+    	<![CDATA[ from Product WHERE recordStatus = 'A' order by id desc ]]>
+	</query>
+
+	<sql-query name="findEffectiveProducts">
+   		<![CDATA[
+			select 
+				a.id,
+				a.ccy,
+				a.created_By,
+				a.created_Date,
+				a.end_Eff_Date,
+				a.last_Updated_By,
+				a.last_Updated_Date,
+				a.late_Penalty_Fee,
+				a.late_Rate_Index,
+				nvl(a.max_Loan_Amount, 100000000) as max_loan_amount,
+				a.max_Quantity_Commodities,
+				a.max_Tenor,
+				nvl (a.min_Loan_Amount, 0) as min_loan_amount,
+				a.min_Tenor,
+				a.pre_Liquidation_Fee,
+				a.product_Category_Id,
+				a.product_Code,
+				a.product_Group_Id,
+				a.product_Name,
+				a.pti,
+				a.rate_Index,
+				a.record_Status,
+				a.start_Eff_Date,
+				a.status,
+				a.tenor,
+				a.is_check_category,
+				ct_group.description1 AS product_group_name
+				
+			from PRODUCTS a 
+			
+			INNER JOIN CODE_TABLE ct_group ON ct_group.id = a.PRODUCT_GROUP_ID
+			
+			where a.START_EFF_DATE = (
+				select max(START_EFF_DATE) from PRODUCTS b where b.START_EFF_DATE <= sysdate AND b.END_EFF_DATE >= SYSDATE and b.PRODUCT_CODE = a.PRODUCT_CODE 
+			) 
+			and a.product_Group_Id = (SELECT id FROM CODE_TABLE WHERE CODE_GROUP = 'PROD' AND CATEGORY = 'PRD_GROUP' AND CODE_VALUE1 = 1)
+			and a.RECORD_STATUS = 'A' order by a.PRODUCT_CODE
+   		 ]]>
+	</sql-query>
+
+
+	<sql-query name="findTreeMenu">
+		<![CDATA[ select mn.ID parent_id,mn.MENU_CODE parent_code,mn.MENU_TITLE parent_title,mn.MODULE parent_module,
+					mn.MENU_TYPE parent_type,m.ID,m.MENU_CODE,m.MENU_TITLE,m.MODULE,m.MENU_TYPE, level tree_level
+					from MENU m left join MENU mn on m.PARENT_MENU = mn.ID
+					where m.MENU_TYPE not in ('R','L')
+					start with m.MENU_CODE = 'ROOT'
+					connect by prior m.ID = m.PARENT_MENU
+					order by tree_level ]]>
+	</sql-query>
+
+	<sql-query name="getListCompany">
+	<![CDATA[select COMP_NAME, CAT_TYPE, COMP_ADDR_STREET, OFFICE_PHONE_NUMBER, COMP_TAX_NUMBER FROM CUST_COMPANY_INFO]]>
+	</sql-query>
+
+	<sql-query name="getListDocument">
+	<![CDATA[SELECT ID, DOCUMENT_CODE, DOCUMENT_NAME FROM DOCUMENTS]]>
+	</sql-query>
+
+	<sql-query name="getLeafMenus">
+		<![CDATA[ select id, record_status, module, menu_code, menu_title, menu_message_key, 
+		parent_menu, status, menu_type, function_id from menu where menu_type = 'L' and status = 'A' order by module asc]]>
+	</sql-query>
+
+	<sql-query name="getMenuForRole">
+        <![CDATA[ select m.id, m.record_status, m.module, m.menu_code, m.menu_title, m.menu_message_key, 
+		m.parent_menu, m.status, m.menu_type, m.function_id from menu m inner join role_details rd on rd.object_id = m.function_id
+		where m.status = 'A' and m.menu_type = 'L' and rd.object_type = 'F' and rd.role_id = :roleId order by m.module asc]]>
+	</sql-query>
+	
+	<sql-query name="getFunctionForRole">
+        <![CDATA[ select f.id, f.record_status, f.module, f.function_code, f.description, f.status
+        from functions f 
+        inner join role_details rd on rd.object_id = f.id
+		where rd.role_id = :roleId order by f.module asc ]]>
+	</sql-query>
+	
+	<sql-query name="findRolesByRoleIds">
+        <![CDATA[ select id, created_by, last_updated_by, role_code, role_type, role_name, status 
+        from roles where RECORD_STATUS = 'A' and id in (:roleIds) ORDER BY ROLE_CODE ASC ]]>
+	</sql-query>
+	
+	<sql-query name="getAllFunction">
+		<![CDATA[ SELECT id, record_status, module, function_code, description, status
+		FROM functions]]>
+	</sql-query>
+	
+	<sql-query name="getFunctionIdsForRole">
+        <![CDATA[ select object_id from role_details where role_id = :roleId and object_type = 'F']]>
+	</sql-query>
+
+	<sql-query name="insertFunctionRoleId">
+        <![CDATA[ INSERT INTO ROLE_DETAILS(ID ,RECORD_STATUS ,CREATED_DATE ,LAST_UPDATED_DATE ,CREATED_BY ,LAST_UPDATED_BY ,OBJECT_TYPE ,ROLE_ID ,OBJECT_ID ,ACCESS_RIGHT ,STATUS)
+    	VALUES (SEQ_COMMON_ID.nextval,'A',sysdate,null,null,null,'F',:roleId,:functionId,'NYYYYNNNN','A') ]]>
+	</sql-query>
+	
+		<sql-query name="deleteFunctionRoleId">
+        <![CDATA[ DELETE FROM ROLE_DETAILS WHERE ROLE_ID = :roleId AND OBJECT_ID = :functionId ]]>
+	</sql-query>
+
+</hibernate-mapping>

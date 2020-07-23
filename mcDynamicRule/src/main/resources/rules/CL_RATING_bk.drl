@@ -1,0 +1,251 @@
+package rules
+ 
+
+import com.mcredit.model.object.Applicant;
+
+
+rule "Rating - D"
+	when
+		$a: Applicant( totalScore <= 525)
+	then
+		$a.setRating("D");
+		
+end
+
+
+rule "Rating - C"
+	when
+		$a: Applicant( totalScore >=526 && totalScore < 535)
+	then
+		$a.setRating("C");
+		
+end
+
+rule "Rating - CC"
+	when
+		$a: Applicant( totalScore >= 535 && totalScore < 543)
+	then
+		$a.setRating("CC");
+		
+end
+
+rule "Rating - CCC"
+	when
+		$a: Applicant( totalScore >= 543 && totalScore < 548)
+	then
+		$a.setRating("CCC");
+		
+end
+
+
+rule "Rating - B"
+	when
+		$a: Applicant( totalScore >= 548 && totalScore < 554)
+	then
+		$a.setRating("B");
+		
+end
+
+
+rule "Rating - BB"
+	when
+		$a: Applicant( totalScore >= 554 && totalScore < 561)
+	then
+		$a.setRating("BB");
+		
+end
+
+
+
+rule "Rating - BBB"
+	when
+		$a: Applicant( totalScore >= 561 && totalScore < 568)
+	then
+		$a.setRating("BBB");
+		
+end
+
+
+
+rule "Rating - A"
+	when
+		$a: Applicant( totalScore >= 568 && totalScore < 573)
+	then
+		$a.setRating("A");
+		
+end
+
+
+rule "Rating - AA"
+	when
+		$a: Applicant( totalScore >= 573 && totalScore < 581)
+	then
+		$a.setRating("AA");
+		
+end
+
+
+rule "Rating - AAA"
+	when
+		$a: Applicant( totalScore >= 581)
+	then
+		$a.setRating("AAA");
+		
+end
+
+
+rule "Proposal-for-Approve-Type1"
+	when
+		$a: Applicant( policyRegulation == "Pass" && fraud == "No" && SpecialCode == "No" && totalScore >= 561)
+	then
+		$a.setProposalForApprove("Approve");
+		
+end
+
+
+rule "Proposal-for-Approve-Type2_XSCS0001"
+	when
+		$a: Applicant( SchemeProduct == "XSCS0001" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditInstitutions >= 3 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+rule "Proposal-for-Approve-Type2_XSCS0002"
+	when
+		$a: Applicant( SchemeProduct == "XSCS0002" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditInstitutions >= 3 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+rule "Proposal-for-Approve-Type2_XSCS0003"
+	when
+		$a: Applicant( SchemeProduct == "XSCS0003" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditInstitutions >= 3 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+rule "Proposal-for-Approve-Type2_XSCD0001"
+	when
+		$a: Applicant( SchemeProduct == "XSCD0001" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditInstitutions >= 3 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+rule "Proposal-for-Approve-Type2_XSCD0002"
+	when
+		$a: Applicant( SchemeProduct == "XSCD0002" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditInstitutions >= 3 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+rule "Proposal-for-Approve-Type2_XSTW0001"
+	when
+		$a: Applicant( SchemeProduct == "XSTW0001" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditInstitutions >= 3 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+rule "Proposal-for-Approve-Type2_XSTW0002"
+	when
+		$a: Applicant( SchemeProduct == "XSTW0002" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditInstitutions >= 3 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+rule "Proposal-for-Approve-Type2_XSTW0003"
+	when
+		$a: Applicant( SchemeProduct == "XSTW0003" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditInstitutions >= 3 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+rule "Proposal-for-Approve-Type3_XSCS0001"
+	when
+		$a: Applicant( SchemeProduct == "XSCS0001" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditCompany >= 2 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+rule "Proposal-for-Approve-Type3_XSCS0002"
+	when
+		$a: Applicant( SchemeProduct == "XSCS0002" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditCompany >= 2 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+rule "Proposal-for-Approve-Type3_XSCS0003"
+	when
+		$a: Applicant( SchemeProduct == "XSCS0003" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditCompany >= 2 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+rule "Proposal-for-Approve-Type3_XSCD0001"
+	when
+		$a: Applicant( SchemeProduct == "XSCD0001" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditCompany >= 2 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+rule "Proposal-for-Approve-Type3_XSCD0002"
+	when
+		$a: Applicant( SchemeProduct == "XSCD0002" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditCompany >= 2 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+rule "Proposal-for-Approve-Type3_XSTW0001"
+	when
+		$a: Applicant( SchemeProduct == "XSTW0001" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditCompany >= 2 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+rule "Proposal-for-Approve-Type3_XSTW0002"
+	when
+		$a: Applicant( SchemeProduct == "XSTW0002" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditCompany >= 2 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+rule "Proposal-for-Approve-Type3_XSTW0003"
+	when
+		$a: Applicant( SchemeProduct == "XSTW0003" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditCompany >= 2 && totalLoanAtCreditInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		
+end
+
+
+
+

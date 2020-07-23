@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<query name="findOutput">
+	 	<![CDATA[ from RuleOutput where status ='A' ]]>
+	</query>
+  
+	<query name="findOutputByRuleId1">
+	 	<![CDATA[ select ro from RuleOutput ro where ro.ruleId = :ruleId and ro.status = 'A' ]]>
+	</query>
+  
+	<query name="findOutputByRuleId2">
+	 	<![CDATA[ select ro from RuleOutput ro where exists (select 1 from Rules r 
+	 		where r.id = ro.ruleId and r.parentRule = :ruleId and r.status = 'A') and ro.status = 'A' ]]>
+	</query>
+  
+	<query name="findOutputByRuleCode1">
+        <![CDATA[ select ro from RuleOutput ro where exists 
+        	(select 1 from Rules r where r.id = ro.ruleId and r.ruleCode = :ruleCode and r.status = 'A') and ro.status = 'A' ]]>
+	</query>
+
+	<query name="findOutputByRuleCode2">
+        <![CDATA[ select ro from RuleOutput ro where exists (select 1 from Rules r where r.id = ro.ruleId 
+        	and r.parentRule = (select id from Rules r where r.ruleCode = :ruleCode and r.status = 'A')) and ro.status = 'A' ]]>
+	</query>
+
+    <query name="findRule">
+        <![CDATA[ from Rules as r where r.ruleCode = :ruleCode and r.status = 'A' ]]>
+    </query>
+
+    <query name="getAllRules">
+        <![CDATA[ from Rules as r where r.status = 'A' order by r.ruleCode ]]>
+    </query>
+
+    <query name="findAllChildrenRuleById">
+        <![CDATA[ from Rules as r where r.parentRule = :ruleId and r.status = 'A' ]]>
+    </query>
+
+    <query name="getAllChildrenRules">
+        <![CDATA[ from Rules as r where r.status = 'A' and r.parentRule is not null order by r.parentRule ]]>
+    </query>
+
+    <query name="findAllChildrenRuleByCode">
+        <![CDATA[ from Rules as r where r.parentRule = (select id from Rules where ruleCode = :ruleCode) ]]>
+    </query>
+
+    <query name="findRuleDetail">
+        <![CDATA[ select rd from RuleDetail as rd inner join Rules as r on r.id = rd.ruleId
+					and r.ruleCode = :ruleCode ]]>
+    </query>
+
+    <query name="getAllRuleDetails">
+        <![CDATA[ from RuleDetail as rd where rd.status = 'A' order by rd.ruleId ]]>
+    </query>
+
+    <sql-query name="findRuleParameterList">
+        <![CDATA[ select rp.*, rpd.PARAM_DETAIL_NAME, rpd.JAVA_CLASS_NAME, rpd.PARAM_DETAIL_DECIMAL, rpl.RULE_ID
+                    from RULE_PARAMETER_LINK rpl inner join RULE_PARAMETERS rp on rpl.RULE_PARAM_ID = rp.ID
+                    left join RULE_PARAMETER_DETAIL rpd on rp.ID = rpd.PARAM_ID 
+                    	and rp.PARAM_TYPE not in ('L','J') and rpd.STATUS = 'A'
+                    where rpl.STATUS = 'A' and rp.STATUS = 'A' 
+                    and rpl.RULE_ID = :ruleId
+                    order by decode(rp.PARAM_LIST_TYPE,'REF',100,1) ]]>
+    </sql-query>
+
+    <sql-query name="getAllRulesParameterList">
+        <![CDATA[ select rp.*, rpd.PARAM_DETAIL_NAME, rpd.JAVA_CLASS_NAME, rpd.PARAM_DETAIL_DECIMAL, rpl.RULE_ID
+                    from RULE_PARAMETER_LINK rpl inner join RULE_PARAMETERS rp on rpl.RULE_PARAM_ID = rp.ID
+                    left join RULE_PARAMETER_DETAIL rpd on rp.ID = rpd.PARAM_ID 
+                    	and rp.PARAM_TYPE not in ('L','J') and rpd.STATUS = 'A'
+                    where rpl.STATUS = 'A' and rp.STATUS = 'A' 
+                    order by rpl.RULE_ID, decode(rp.PARAM_LIST_TYPE,'REF',100,1) ]]>
+    </sql-query>
+
+    <sql-query name="findRuleCacheParameterList">
+        <![CDATA[ select rp.ID,rp.PARAM_TYPE,rp.PARAM_DATA_TYPE,rp.PARAM_VALUE,rpd.PARAM_DETAIL_NAME
+                    from RULE_PARAMETER_LINK rpl inner join RULE_PARAMETERS rp on rpl.RULE_PARAM_ID = rp.ID
+                    left join RULE_PARAMETER_DETAIL rpd on rp.ID = rpd.PARAM_ID 
+                        and rp.PARAM_TYPE not in ('L','J') and rpd.STATUS = 'A'
+                    where rpl.STATUS = 'A' and rp.STATUS = 'A' 
+                    and rpl.RULE_ID = :ruleId
+                    order by decode(rp.PARAM_TYPE,'L',rp.PARAM_VALUE,'J',rp.PARAM_VALUE,rpd.PARAM_DETAIL_NAME) ]]>
+    </sql-query>
+
+    <sql-query name="getRuleCacheParameterList">
+        <![CDATA[ select rpl.RULE_ID, rp1.PARAM_TYPE,
+            rp1.PARAM_NAME PARAM_NAME,
+            decode(rp1.PARAM_TYPE,'F',rp2.PARAM_VALUE,rp1.PARAM_VALUE) BIND_VAR,
+            rp1.DATA_FORMAT,
+            decode(rp1.PARAM_TYPE,'F',rp2.PARAM_DATA_TYPE,rp1.PARAM_DATA_TYPE) PARAM_DATA_TYPE,
+            rp1.PARAM_LIST_TYPE
+            from RULE_PARAMETER_LINK rpl
+            inner join RULE_PARAMETERS rp1 on rp1.ID = rpl.RULE_PARAM_ID
+            left join RULE_PARAMETERS rp2 on to_char(rp1.ID) = substr(rp2.PARAM_VALUE,1,instr(rp2.PARAM_VALUE,':')-1)
+            order by rpl.RULE_ID, 3 ]]>
+    </sql-query>
+
+    <sql-query name="getRuleCacheList">
+        <![CDATA[ select distinct r.RULE_CODE,ro.RULE_ID,ro.RULE_COMBINATION_KEY 
+				from RULE_OUTPUT ro inner join RULES r on r.ID = ro.RULE_ID
+				order by ro.RULE_ID,ro.RULE_COMBINATION_KEY ]]>
+    </sql-query>
+
+</hibernate-mapping>

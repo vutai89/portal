@@ -1,0 +1,570 @@
+package rules
+ 
+
+import com.mcredit.model.object.Applicant;
+
+rule "Classify Applicant - init-Score"
+	when
+		$a: Applicant( typeOfLoan == Applicant.INSTALLMENT_LOAN )
+	then
+		$a.addScore(0);
+		
+end
+
+
+rule "Classify Applicant - Gender-Female"
+	when
+		$a: Applicant( gender == Applicant.FEMALE )
+	then
+		$a.addScore(78);
+		
+end
+
+rule "Classify Applicant - Gender-Male"
+	when
+		$a: Applicant( gender == Applicant.MALE )
+	then
+		$a.addScore(65);
+	
+end
+
+
+rule "Classify Applicant - livingTimeAtAdress_level1"
+	when
+		$a: Applicant( livingTimeAtTemporaryAddress <=240 )
+	then
+		$a.addScore(68);
+	
+end
+
+
+rule "Classify Applicant - livingTimeAtAdress_level2"
+	when
+		$a: Applicant( livingTimeAtTemporaryAddress >240 )
+	then
+		$a.addScore(77);
+	
+end
+
+
+rule "Classify Applicant - maritalStatus_Kethon"
+	when
+		$a: Applicant( maritalStatus == "Ket hon" )
+	then
+		$a.addScore(79);
+	
+end
+
+
+rule "Classify Applicant - maritalStatus_Docthan"
+	when
+		$a: Applicant( maritalStatus == "Doc than" )
+	then
+		$a.addScore(63);
+	
+end
+
+
+rule "Classify Applicant - maritalStatus_Lyhon"
+	when
+		$a: Applicant( maritalStatus == "Ly hon" )
+	then
+		$a.addScore(58);
+	
+end
+
+
+rule "Classify Applicant - maritalStatus_Goa"
+	when
+		$a: Applicant( maritalStatus == "Goa" )
+	then
+		$a.addScore(58);
+	
+end
+
+
+rule "Classify Applicant - maritalStatus_Lythan"
+	when
+		$a: Applicant( maritalStatus == "Ly than" )
+	then
+		$a.addScore(58);
+	
+end
+
+
+rule "Classify Applicant - loanAmount_level1"
+	when
+		$a: Applicant( loanAmount <= 4200000 )
+	then
+		$a.addScore(106);
+	
+end
+
+rule "Classify Applicant - loanAmount_level2"
+	when
+		$a: Applicant( loanAmount > 4200000 && loanAmount <= 6500000 )
+	then
+		$a.addScore(77);
+	
+end
+
+
+
+rule "Classify Applicant - loanAmount_level3"
+	when
+		$a: Applicant( loanAmount > 6500000  )
+	then
+		$a.addScore(59);
+	
+end
+
+
+rule "Classify Applicant - downPayment_level1"
+	when
+		$a: Applicant( downPayment <= 30 )
+	then
+		$a.addScore(61);
+	
+end
+
+
+
+rule "Classify Applicant - downPayment_level2"
+	when
+		$a: Applicant( downPayment > 30 && downPayment < 50)
+	then
+		$a.addScore(79);
+	
+end
+
+
+
+rule "Classify Applicant - downPayment_level3"
+	when
+		$a: Applicant( downPayment >= 50)
+	then
+		$a.addScore(87);
+	
+end
+
+
+
+rule "Classify Applicant - accommodationType_Sohuu"
+	when
+		$a: Applicant( accommodationType == "So huu")
+	then
+		$a.addScore(75);
+	
+end
+
+
+
+
+rule "Classify Applicant - accommodationType_Onho"
+	when
+		$a: Applicant( accommodationType == "O nho")
+	then
+		$a.addScore(68);
+	
+end
+
+
+
+rule "Classify Applicant - accommodationType_Songvoibome"
+	when
+		$a: Applicant( accommodationType == "Song voi bo me")
+	then
+		$a.addScore(68);
+	
+end
+
+
+rule "Classify Applicant - accommodationType_Thue"
+	when
+		$a: Applicant( accommodationType == "Thue")
+	then
+		$a.addScore(68);
+	
+end
+
+
+
+rule "Classify Applicant - accommodationType_DoanhtraiTaptheQuandoi"
+	when
+		$a: Applicant( accommodationType == "Doanh trai/Tap the Quan doi")
+	then
+		$a.addScore(68);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule1"
+	when
+		$a: Applicant( job == "Nhan vien cong ty" && salaryPayment == "Qua tai khoan ngan hang khac")
+	then
+		$a.addScore(83);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule2"
+	when
+		$a: Applicant( job == "Nhan vien cong ty" && salaryPayment == "Qua tai khoan MB")
+	then
+		$a.addScore(83);
+	
+end
+
+rule "Classify Applicant - salaryPayment_job_rule3"
+	when
+		$a: Applicant( job == "Nhan vien cong ty" && salaryPayment == "Tien mat")
+	then
+		$a.addScore(65);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule4"
+	when
+		$a: Applicant( job == "Cong chuc nha nuoc" && salaryPayment == "Qua tai khoan ngan hang khac")
+	then
+		$a.addScore(83);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule5"
+	when
+		$a: Applicant( job == "Cong chuc nha nuoc" && salaryPayment == "Qua tai khoan MB")
+	then
+		$a.addScore(83);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule6"
+	when
+		$a: Applicant( job == "Cong chuc nha nuoc" && salaryPayment == "Tien mat")
+	then
+		$a.addScore(65);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule7"
+	when
+		$a: Applicant( job == "Ho kinh doanh ca the" && salaryPayment == "Qua tai khoan ngan hang khac")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule8"
+	when
+		$a: Applicant( job == "Ho kinh doanh ca the" && salaryPayment == "Qua tai khoan MB")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule9"
+	when
+		$a: Applicant( job == "Ho kinh doanh ca the" && salaryPayment == "Tien mat")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule10"
+	when
+		$a: Applicant( job == "Cong nhan" && salaryPayment == "Qua tai khoan ngan hang khac")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule11"
+	when
+		$a: Applicant( job == "Cong nhan" && salaryPayment == "Qua tai khoan MB")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule12"
+	when
+		$a: Applicant( job == "Cong nhan" && salaryPayment == "Tien mat")
+	then
+		$a.addScore(69);
+	
+end
+
+
+rule "Classify Applicant - salaryPayment_job_rule13"
+	when
+		$a: Applicant( job == "Hoc sinh sinh vien" && salaryPayment == "Qua tai khoan ngan hang khac")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule14"
+	when
+		$a: Applicant( job == "Hoc sinh sinh vien" && salaryPayment == "Qua tai khoan MB")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule15"
+	when
+		$a: Applicant( job == "Hoc sinh sinh vien" && salaryPayment == "Tien mat")
+	then
+		$a.addScore(69);
+	
+end
+
+
+rule "Classify Applicant - salaryPayment_job_rule16"
+	when
+		$a: Applicant( job == "Noi tro" && salaryPayment == "Qua tai khoan ngan hang khac")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule17"
+	when
+		$a: Applicant( job == "Noi tro" && salaryPayment == "Qua tai khoan MB")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule18"
+	when
+		$a: Applicant( job == "Noi tro" && salaryPayment == "Tien mat")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule19"
+	when
+		$a: Applicant( job == "Phu viec/Giup viec" && salaryPayment == "Qua tai khoan ngan hang khac")
+	then
+		$a.addScore(69);
+	
+end
+
+
+rule "Classify Applicant - salaryPayment_job_rule20"
+	when
+		$a: Applicant( job == "Phu viec/Giup viec" && salaryPayment == "Qua tai khoan MB")
+	then
+		$a.addScore(69);
+	
+end
+
+
+rule "Classify Applicant - salaryPayment_job_rule21"
+	when
+		$a: Applicant( job == "Phu viec/Giup viec" && salaryPayment == "Tien mat")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule22"
+	when
+		$a: Applicant( job == "Huu tri" && salaryPayment == "Qua tai khoan ngan hang khac")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule23"
+	when
+		$a: Applicant( job == "Huu tri" && salaryPayment == "Qua tai khoan MB")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule24"
+	when
+		$a: Applicant( job == "Huu tri" && salaryPayment == "Tien mat")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule25"
+	when
+		$a: Applicant( job == "Kinh doanh tu do" && salaryPayment == "Qua tai khoan ngan hang khac")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule26"
+	when
+		$a: Applicant( job == "Kinh doanh tu do" && salaryPayment == "Qua tai khoan MB")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule27"
+	when
+		$a: Applicant( job == "Kinh doanh tu do" && salaryPayment == "Tien mat")
+	then
+		$a.addScore(69);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule28"
+	when
+		$a: Applicant( job == "Quan nhan" && salaryPayment == "Qua tai khoan ngan hang khac")
+	then
+		$a.addScore(83);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule29"
+	when
+		$a: Applicant( job == "Quan nhan" && salaryPayment == "Qua tai khoan MB")
+	then
+		$a.addScore(83);
+	
+end
+
+
+
+rule "Classify Applicant - salaryPayment_job_rule30"
+	when
+		$a: Applicant( job == "Quan nhan" && salaryPayment == "Tien mat")
+	then
+		$a.addScore(65);
+	
+end
+
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule1"
+	when
+		$a: Applicant( paymentHistory == "Khach hang moi" && totalLoanAtCreditInstitutionsandOtherInstitutions == 0)
+	then
+		$a.addScore(63);
+	
+end
+
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule2"
+	when
+		$a: Applicant( paymentHistory == "Khach hang moi" && totalLoanAtCreditInstitutionsandOtherInstitutions >= 1)
+	then
+		$a.addScore(63);
+	
+end
+
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule3"
+	when
+		$a: Applicant( paymentHistory == "Tra no dung han (Bucket 1)" && totalLoanAtCreditInstitutionsandOtherInstitutions == 0)
+	then
+		$a.addScore(94);
+	
+end
+
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule4"
+	when
+		$a: Applicant( paymentHistory == "Tra no dung han (Bucket 1)" && totalLoanAtCreditInstitutionsandOtherInstitutions >= 1)
+	then
+		$a.addScore(77);
+	
+end
+
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule5"
+	when
+		$a: Applicant( paymentHistory == "Bucket 2" && totalLoanAtCreditInstitutionsandOtherInstitutions == 0)
+	then
+		$a.addScore(-200);
+	
+end
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule6"
+	when
+		$a: Applicant( paymentHistory == "Bucket 2" && totalLoanAtCreditInstitutionsandOtherInstitutions >= 1)
+	then
+		$a.addScore(-200);
+	
+end
+
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule7"
+	when
+		$a: Applicant( paymentHistory == "Bucket 3+" && totalLoanAtCreditInstitutionsandOtherInstitutions == 0)
+	then
+		$a.addScore(-200);
+	
+end
+
+
+rule "Classify Applicant - paymentHistory_SoTCTDcoQuanHe_rule8"
+	when
+		$a: Applicant( paymentHistory == "Bucket 3+" && totalLoanAtCreditInstitutionsandOtherInstitutions >= 1)
+	then
+		$a.addScore(-200);
+	
+end

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<query name="getPCBResponse"> from CreditBureauData WHERE custIdentityNumber =
+		:custIdentityNumber
+	</query>
+
+	<sql-query name="getCusId">
+	<![CDATA[Select car.cust_id from credit_app_bpm cab inner join credit_app_request car on cab.credit_app_id = car.id where cab.bpm_app_id = :appId]]>
+	</sql-query>
+	
+</hibernate-mapping>

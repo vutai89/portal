@@ -1,0 +1,63 @@
+package com.mcredit.rule.engine.filesUpload;
+
+import com.mcredit.model.object.RuleObject;
+
+global com.mcredit.rule.FormulaResult formulaResult;
+
+function String getVal(String val, int len, int max) {
+	String ret = val;
+	int start = 0;
+	if(val == null) {
+		ret = "";
+	} else {
+		start = val.length();
+	}
+	for(int i=start;i<len-1;i++) {
+		ret = ret + "N";
+	}
+	if(len < max) {
+		ret = ret + "Y";
+	} else if(ret.length() < max - 1) {
+		ret = ret + "N";
+	}
+
+	return ret;
+}
+	
+rule "Check list file 1 contains file"
+	when
+		RuleObject(checkListNotContains(fileUploadedList, listFile1))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 1, 1000));
+end
+
+rule "Check list file 2 contains file"
+	when
+		RuleObject(checkListNotContains(fileUploadedList, listFile2))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 2, 1000));
+end
+
+rule "Check list file 3 contains file"
+	when
+		RuleObject(checkListNotContains(fileUploadedList, listFile3))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 3, 1000));
+end
+
+rule "Check list file 4 contains file"
+	when
+		RuleObject(checkListNotContains(fileUploadedList, listFile4))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 4, 1000));
+end
+
+rule "Check list file 5 contains file"
+	when
+		RuleObject(checkListNotContains(fileUploadedList, listFile5))
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 5, 6));
+end
+
+
+

@@ -1,0 +1,1036 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <query name="findAllocationMasterByuplMasterIdAllocatedType"> from AllocationMaster WHERE uplMasterId =:uplMasterId AND allocatedType =:allocatedType </query>
+    <query name="getAllocationDetailByallocationMasterIdTeamId">from AllocationDetail WHERE allocationMasterId =:allocationMasterId AND objectId =:teamId </query>
+    <query name="getAllocationDetailByUPLCustomerIdAndObjectId">from AllocationDetail WHERE uplCustomerId =:uplCustomerId and objectType = 'U' </query>
+    
+    <sql-query name="getAllocationDetailTelesale">
+    	select ad.ID as id, ad.ALLOCATED_NUMBER as allocatedNumber, ad.ALLOCATION_MASTER_ID as allocationMasterId, ad.ASSIGNEE_ID as objectId, ad.OBJECT_TYPE as objectType, ad.STATUS as status, ad.UPL_OBJECT_ID as uplCustomerId, ad.UPL_DETAIL_ID as uplDetailId, ad.NOTE as note 
+    	from ALLOCATION_DETAIL ad
+    	inner join ALLOCATION_MASTER am on ad.ALLOCATION_MASTER_ID = am.ID
+    	inner join UPL_MASTER um on am.UPL_MASTER_ID = um.ID
+    	WHERE um.FROM_SOURCE &lt;&gt; (select ID from CODE_TABLE where CATEGORY = 'UPL_SRC' and CODE_VALUE1 = 'WH') and ad.UPL_OBJECT_ID = :uplCustomerId and ad.OBJECT_TYPE = 'U' 
+    </sql-query>
+    
+    <query name="findUserByLoginId">from Users where loginId = :currentUsername </query>
+    <query name="findUplMasterbyID"> from UplMaster where id=:id </query>
+    <!-- <query name="findUplMasterbyUPLCode"> from UplMaster where UPL_CODE=:UPL_CODE </query> -->
+    <query name="findUplMasterbyUplCode"> from UplMaster where uplCode = :uplCode </query>
+    <query name="findUplDetailbyID"> from UplDetail where id=:id </query>
+    <query name="getListMemberByTeamId"> from TeamMember where teamId=:teamId  </query>
+    <query name="listTeamByTeamTypeTeamgroup">from Team where teamType=:teamType and teamGroup=:teamGroup and status ='A' Order by teamName asc</query>
+    <query name="getTeamByTeamleadLoginID"> from Team where managerId =:managerId </query>
+    <query name="findUplCustomerById"> from UplCustomer where id =:id </query>
+ 
+    <query name="findUPLDetailByUplMasterIdStatusVP">from UplDetail where uplMasterId =:uplMasterId and status in (:statusLst) order by uplSeq</query>
+    <query name="findUPLDetailByUplMasterIdStatusLeadGen">from UplDetail where uplMasterId =:uplMasterId order by uplSeq</query>
+    <sql-query name="findUPLDetailByUplMasterIdStatusVP_EXCEL">select ud.id, ud.UPL_MASTER_ID, ud.UPL_SEQ, ud.IMPORTED, ud.TOTAL_ALLOCATED, ud.UPL_FILE_NAME, ud.SERVER_FILE_NAME, ud.STATUS, ud.RECORD_STATUS, ud.CREATED_DATE, ud.LAST_UPDATED_DATE, ud.CREATED_BY, ud.LAST_UPDATED_BY, ud.ERROR_MESSAGE,
+        ud.STATUS_APP, ud.DATE_APP, ud.DATE_FROM, ud.DATE_TO, ud.REJECTION_REASON from UPL_DETAIL ud inner join CODE_TABLE ct on ct.id = ud.STATUS_APP where ud.upl_Master_Id =:uplMasterId and ud.status in (:statusLst) and ct.code_Group = 'MIS' and ct.code_Value1 = 'XSELL_APP_ACTIVE' order by ud.upl_Seq</sql-query>
+ 
+    <query name="findCallResultByCustProspectId">from CallResult where custProspectId = :custProspectId and status = 'A' order by callDate desc</query>
+    <query name="getCustProspectById">from CustProspect where id = :custProspectId</query>
+    <query name="getCustProspectByUplCustomerId">from CustProspect where uplCustomerId = :uplCustomerId</query>
+    <query name="getMaxCallTimesByCustProspectId">select max(callTimes) from  CallResult where custProspectId = :custProspectId</query>
+    <query name="getSeqTimesByUplMasterId">select max(uplSeq) from  UplDetail where uplMasterId = :uplMasterId</query>
+    <query name="findPendingUplDetail">from  UplDetail where createdBy = :userLogin and status in :status</query>
+    <query name="deleteUplCustomerByUplDetailId2">delete UplCustomer where uplDetailId = :uplDetailId</query>
+    <query name="deleteInvalidCustomerByUplDetailId">delete UplCustomer where uplDetailId = :uplDetailId AND responseCode != 'OK'</query>
+    <query name="findAllocationDetailByUserFresh"> from AllocationDetail ad  inner join CodeTable ct on ct.id = ad.status where ct.codeValue1 ='F' and ct.category='ALCTYPE_TL' and ad.objectId = :oldObjectId </query>
+    <query name="findAllocationDetailByUserWip"> from AllocationDetail ad  inner join CodeTable ct on ct.id = ad.status where ct.codeValue1 ='W' and ct.category='ALCTYPE_TL' and ad.objectId = :oldObjectId </query>
+ 
+    <sql-query name="deleteUplCustomerByUplDetailId1">Delete from UPL_CUSTOMER where UPL_DETAIL_ID = :uplDetailId </sql-query>
+    <sql-query name="Seq_UPL_MASTER_ID">SELECT SEQ_UPL_MASTER_ID.NEXTVAL FROM DUAL </sql-query>
+    <sql-query name="Seq_UPL_DETAIL_ID">SELECT SEQ_UPL_DETAIL_ID.NEXTVAL FROM DUAL </sql-query>
+    <sql-query name="Seq_UPL_CUSTOMER_ID">SELECT SEQ_UPL_CUSTOMER_ID.NEXTVAL FROM DUAL </sql-query>
+    <sql-query name="findUplCustomerAndProductByUplId"> SELECT
+        uc.id,
+        uc.last_updated_date,
+        uc.customer_name,
+        uc.address,
+        uc.birth_date,
+        uc.identity_number,
+        uc.mobile,
+        uc.note,
+        uc.province,
+        uc.score_range,
+        CASE uc.income
+        WHEN '0'   THEN '&lt; 10.000.000 vnd'
+        WHEN '1'   THEN '&gt;= 10.000.000 vnd'
+        ELSE 'N/A'
+        END AS income,
+        uc.source_system,
+        p.id as product_id,
+        p.product_name,
+        p.product_code,
+        TRIM(TO_CHAR(p.min_loan_amount,'999,999,999') )
+        || ' vnd' AS min_loan_amount,
+        TRIM(TO_CHAR(p.max_loan_amount,'999,999,999') )
+        || ' vnd' AS max_loan_amount,
+        p.min_tenor   AS min_tenor,
+        p.max_tenor   AS max_tenor,
+        it.yearly_rate || '%' AS yearly_rate,
+        it.monthly_rate || '%' AS monthly_rate,
+        uc.income as originIncome
+        FROM
+        upl_customer uc
+        LEFT JOIN products p ON uc.product_id = p.id
+        LEFT JOIN interest_table it ON p.rate_index = it.id
+        WHERE
+        uc.id = :id </sql-query>
+    <sql-query name="findCustomerProspectAndProductByUplId">
+    SELECT
+    cp.id,
+    cp.accommodation_type,
+    cp.allocation_detail_id,
+    cp.birth_date,
+    cp.comp_addr_district,
+    cp.comp_addr_province,
+    cp.comp_addr_street,
+    cp.permanent_ward,
+    cp.created_by,
+    cp.created_date,
+    cp.cust_income,
+    cp.cust_name,
+    cp.gender,
+    cp.identity_number,
+    cp.last_updated_by,
+    cp.last_updated_date,
+    nvl(cp.mobile, (
+        SELECT
+            contact_value
+        FROM
+            cust_contact_info
+        WHERE
+            contact_type = (
+                SELECT
+                    id
+                FROM
+                    code_table
+                WHERE
+                    category = 'CONTAC_TYP'
+                    AND code_value1 = 'MOBILE'
+            )
+            AND contact_category = (
+                SELECT
+                    id
+                FROM
+                    code_table
+                WHERE
+                    category = 'CONTAC_CAT'
+                    AND code_value1 = 'CUSTOMER'
+            )
+            AND contact_priority = 1
+            AND cust_id = uc.cust_id
+    ) ) AS mobile,
+    cp.note,
+    cp.permanent_addr,
+    cp.permanent_district,
+    cp.permanent_province,
+    cp.comp_addr_ward,
+    cp.professional,
+    cp.record_status,
+    cp.upl_customer_id,
+    cp.position,
+    uc.score_range,
+    CASE uc.income
+            WHEN '0'   THEN '&lt; 10.000.000 vnd'
+            WHEN '1'   THEN '&gt;= 10.000.000 vnd'
+            ELSE 'N/A'
+        END
+    AS income,
+    uc.source_system,
+    p.id AS product_id,
+    p.product_name,
+    p.product_code,
+    TRIM(TO_CHAR(p.min_loan_amount,'999,999,999') )
+    || ' vnd' AS min_loan_amount,
+    TRIM(TO_CHAR(p.max_loan_amount,'999,999,999') )
+    || ' vnd' AS max_loan_amount,
+    p.min_tenor AS min_tenor,
+    p.max_tenor AS max_tenor,
+    it.yearly_rate || '%' AS yearly_rate,
+    it.monthly_rate || '%' AS monthly_rate,
+    uc.province,
+    uc.min_score,
+    uc.max_score,
+    uc.ref_id,
+    uc.pre_product_name,
+    uc.pre_product_code,
+    uc.pre_min_limit,
+    uc.pre_max_limit,
+    uc.pre_min_tenor,
+    uc.pre_max_tenor,
+    uc.pre_min_emi,
+    uc.app_product_name,
+    uc.app_product_code,
+    uc.app_loan_approved_amt,
+    uc.app_int_rate,
+    uc.app_term_loan,
+    uc.disbursement_date,
+    uc.mat_date,
+    uc.commodities_code,
+    uc.data_source,
+    uc.lead_source,
+    uc.cust_id,
+    uc.pre_max_emi,
+    uc.app_emi,
+    cai.company_name AS company_name,
+    p.max_loan_amount AS premaxamount,
+    p.min_loan_amount AS preminamount,
+    (
+        SELECT
+            ln_tenor
+        FROM
+            (
+                SELECT
+                    ln_tenor
+                FROM
+                    credit_app_request
+                WHERE
+                    credit_app_request.cust_id = uc.cust_id
+                ORDER BY
+                    credit_app_request.created_date DESC
+            )
+        WHERE
+            ROWNUM = 1
+    ) AS pretenor,
+    p.min_tenor AS periodmintenor,
+    p.max_tenor AS periodmaxtenor,
+    cp.permanent_address,
+	
+    (
+        SELECT
+            code_value1
+        FROM
+            code_table
+        WHERE
+            code_table.id = uplm.from_source
+    ) AS fromsource,
+    cp.new_mobile
+FROM
+    upl_customer uc
+    INNER JOIN cust_prospect cp ON uc.id = cp.upl_customer_id
+    LEFT JOIN products p ON uc.product_id = p.id
+    LEFT JOIN interest_table it ON p.rate_index = it.id
+    INNER JOIN upl_detail ud ON ud.id = uc.upl_detail_id
+    LEFT JOIN cust_addl_info cai ON cai.cust_id = uc.cust_id
+    INNER JOIN upl_detail upld ON upld.id = uc.upl_detail_id
+    INNER JOIN upl_master uplm ON uplm.id = ud.upl_master_id
+
+
+    WHERE uc.id =:id
+    
+    </sql-query>
+    <sql-query name="findTeamIdOwnerByUplMasterId"> SELECT team_id  FROM Team_Member WHERE user_Id = (SELECT owner_Id FROM Upl_Master WHERE id =:uplMasterId ) </sql-query>
+    <sql-query name="findUplCustomerbyID"> select * from UPL_CUSTOMER where ID =:id </sql-query>
+    <sql-query name="findProspect"> select nvl(cp.CUST_NAME,uc.CUSTOMER_NAME) CUST_NAME, ad.STATUS, cr.CALL_DATE, 
+        (select DESCRIPTION1 from CODE_TABLE where ID = cr.CALL_STATUS) as CALL_STATUS,
+        (select DESCRIPTION1 from CODE_TABLE where ID = cr.CALL_RESULT) as CALL_RESULT,
+        (select DESCRIPTION1 from CODE_TABLE where ID = cr.NEXT_ACTION) as NEXT_ACTION
+        from ALLOCATION_MASTER am
+        inner join ALLOCATION_DETAIL ad on am.ID = ad.ALLOCATION_MASTER_ID
+        inner join UPL_CUSTOMER uc on ad.UPL_OBJECT_ID = uc.ID
+        left join CUST_PROSPECT cp on ad.UPL_OBJECT_ID = cp.ID
+        left join (select * from CALL_RESULT a where exists (select 1 from 
+        (select CUST_PROSPECT_ID,max(CALL_DATE) CALL_DATE from CALL_RESULT group by CUST_PROSPECT_ID) b 
+        where b.CALL_DATE = a.CALL_DATE and b.CUST_PROSPECT_ID = a.CUST_PROSPECT_ID)) cr
+        on cr.CUST_PROSPECT_ID = cp.ID
+        where am.ID = :uplMasterId and uc.MOBILE = :mobile and NEXT_ACTION = :nextAction and CALL_RESULT = :callResult
+        and cp.CUST_NAME = :custName and ad.STATUS = :status and cp.IDENTITY_NUMBER = :identityNumber </sql-query>
+        
+    <sql-query name="findMoreInfoForXsellByUplCustId"> SELECT
+    													cci.CONTACT_VALUE AS xsMobile,
+        												uc.identity_number_army,
+        												
+													    TO_CHAR(
+															(
+															SELECT
+																ci.identity_issue_date
+															FROM
+																cust_identity ci
+															WHERE
+																ci.cust_id = uc.cust_id
+																AND ci.identity_type_id = (
+																SELECT
+																	id
+																FROM
+																	code_table ct
+																WHERE
+																	ct.code_group = 'CUST'
+																	AND ct.category = 'IDTYP'
+																	AND ct.code_value1 = '1' ) ) 
+														, 'dd/mm/yyyy')
+														AS cmndissuedate,
+													    
+													    (
+													        SELECT
+													            ci.identity_issue_place_text
+													        FROM
+													            cust_identity ci
+													        WHERE
+													            ci.cust_id = uc.cust_id
+													            AND ci.identity_type_id = (
+													                SELECT
+													                    id
+													                FROM
+													                    code_table ct
+													                WHERE
+													                    ct.code_group = 'CUST'
+													                    AND ct.category = 'IDTYP'
+													                    AND ct.code_value1 = '1'
+													            )
+													    ) AS cmndissueplace,
+													    TO_CHAR((
+															SELECT
+																ci.identity_issue_date
+															FROM
+																cust_identity ci
+															WHERE
+																ci.cust_id = uc.cust_id
+																AND ci.identity_type_id = (
+																SELECT
+																	id
+																FROM
+																	code_table ct
+																WHERE
+																	ct.code_group = 'CUST'
+																	AND ct.category = 'IDTYP'
+																	AND ct.code_value1 = '2' ) ) , 'dd/mm/yyyy') AS cmqdissuedate,
+			
+													    (
+													        SELECT
+													            ci.identity_issue_place_text
+													        FROM
+													            cust_identity ci
+													        WHERE
+													            ci.cust_id = uc.cust_id
+													            AND ci.identity_type_id = (
+													                SELECT
+													                    id
+													                FROM
+													                    code_table ct
+													                WHERE
+													                    ct.code_group = 'CUST'
+													                    AND ct.category = 'IDTYP'
+													                    AND ct.code_value1 = '2'
+													            )
+													    ) AS cmqdissueplace,
+														TO_CHAR(ud.date_from, 'dd/mm/yyyy'),
+														TO_CHAR(ud.date_to, 'dd/mm/yyyy'),
+														cai.ref_full_name1,
+														(
+														SELECT
+															description1
+														FROM
+															code_table
+														WHERE
+															id = cai.relation_ref_person1) relation1,
+														cai.ref_person1_mobile,
+														cai.ref_full_name2,
+														(
+														SELECT
+															description1
+														FROM
+															code_table
+														WHERE
+															id = cai.relation_ref_person2) relation2,
+														cai.ref_person2_mobile,
+														ct_xs_gender.description1 AS xs_gender,
+														ct_professionnal.description1 AS xs_professionnal,
+														cari.address AS xs_house_number,
+														
+														nvl (
+															(SELECT description1 FROM CODE_TABLE WHERE id = cari.ward), 
+															cari.WARD_ADDR
+														) AS xs_ward,
+														
+														nvl (
+															(SELECT description1 FROM CODE_TABLE WHERE id = cari.district), 
+															cari.DISTRICT_ADDR
+														) AS xs_district,
+														
+														(SELECT description1 FROM CODE_TABLE WHERE id = cari.province ) AS xs_province,
+														accom.description1 AS xs_accommodation,
+														cari_per.address AS xs_per_house_number,
+														
+														nvl(
+															(SELECT description1 FROM CODE_TABLE WHERE id = cari_per.ward),
+															cari_per.WARD_ADDR
+														)  AS xs_per_ward,
+														nvl (
+															(SELECT description1 FROM CODE_TABLE WHERE id = cari_per.district),
+															cari_per.DISTRICT_ADDR
+														)
+														 AS xs_per_district,
+														
+														(SELECT description1 FROM CODE_TABLE WHERE id = cari_per.province ) AS xs_per_province,
+														
+														cai.COMPANY_NAME AS xs_company_name,
+														cai.COMPANY_ADDR AS xs_company_address,
+														ct_position_comp.description1 AS xs_position_comp,
+														cf.cust_income AS xs_cust_income,
+														nvl(ct_xs_comp_ward.description1, cai.company_ward) AS xs_comp_ward,
+														nvl(ct_xs_comp_district.description1, cai.company_district) AS xs_comp_district,
+														ct_xs_comp_province.description1 AS xs_comp_province
+														
+													FROM
+														upl_customer uc
+													INNER JOIN upl_detail ud ON uc.upl_detail_id = ud.id
+													LEFT JOIN cust_addl_info cai ON uc.cust_id = cai.cust_id
+													LEFT JOIN CUST_FINANCIAL_INFO cf ON uc.cust_id = cf.cust_id
+													LEFT JOIN CUST_PERSONAL_INFO cpi ON uc.cust_id = cpi.id
+													LEFT JOIN CODE_TABLE ct_xs_gender ON cpi.gender = ct_xs_gender.id
+													LEFT JOIN CODE_TABLE ct_professionnal ON ct_professionnal.id = cai.PROFESSIONAL
+													
+													LEFT JOIN CUST_ADDR_INFO cari ON (cari.CUST_ID = uc.CUST_ID AND cari.addr_type = (
+													        SELECT
+													            id
+													        FROM
+													            code_table ct
+													        WHERE
+													            ct.code_group = 'CONT'
+													            AND ct.category = 'ADDR_TYPE'
+													            AND ct.code_value1 = 'TEMPORARY'
+													))
+													
+														LEFT JOIN CUST_ADDR_INFO cari_per ON (cari_per.CUST_ID = uc.CUST_ID AND cari_per.addr_type = (
+													        SELECT
+													            id
+													        FROM
+													            code_table ct
+													        WHERE
+													            ct.code_group = 'CONT'
+													            AND ct.category = 'ADDR_TYPE'
+													            AND ct.code_value1 = 'PERMANENT'
+														))
+													
+													LEFT JOIN CODE_TABLE accom ON cai.accommodation_type = accom.id
+													LEFT JOIN CODE_TABLE ct_position_comp ON cai.position_in_comp = ct_position_comp.id
+													LEFT JOIN CODE_TABLE ct_xs_comp_ward ON cai.ward_id = ct_xs_comp_ward.id
+													LEFT JOIN CODE_TABLE ct_xs_comp_district ON cai.district_id = ct_xs_comp_district.id
+													LEFT JOIN CODE_TABLE ct_xs_comp_province ON cai.province_id = ct_xs_comp_province.id
+													
+													LEFT JOIN CUST_CONTACT_INFO cci ON ( cci.CUST_ID = uc.CUST_ID	AND 
+														cci.CONTACT_TYPE = (SELECT id FROM CODE_TABLE WHERE code_group = 'CONT' AND  category = 'CONTAC_TYP' AND code_value1 = 'MOBILE') 
+														AND cci.CONTACT_CATEGORY= (SELECT id FROM CODE_TABLE WHERE code_group = 'CONT' AND  category = 'CONTAC_CAT' AND code_value1 = 'CUSTOMER') 
+														AND cci.CONTACT_PRIORITY = 1
+													)
+													
+													WHERE
+														uc.id = :uplCustId 
+												</sql-query>
+        
+    <!-- <sql-query name="insertAllocationDetailAllTeanLead">insert into ALLOCATION_DETAIL(ID,ALLOCATION_MASTER_ID,UPL_DETAIL_ID,ALLOCATED_NUMBER,OBJECT_TYPE,ASSIGNEE_ID,STATUS)
+        select SEQ_ALLOCATION_DETAIL_ID.NEXTVAL,:allocationMasterId,:uplDetailId,
+        (select least(IMPORTED,:allocatedNumber) from UPL_DETAIL where ID =:uplDetailId), 
+        'T',ID,'S'from TEAMS where team_type='S' and team_group='T' </sql-query> -->
+        
+    <!-- <sql-query name="insertAllocationDetailAllTeanAxcept"> insert INTO allocation_detail ( allocation_master_id, upl_detail_id, allocated_number, object_type, ASSIGNEE_ID, status)
+        SELECT allocationmasterid, upldetailid, ( SELECT least( imported, :allocatedNumber)
+        FROM upl_detail WHERE id = upldetailid),'T', id, 'S' from teams t WHERE t.team_type = 'S' AND t.team_group = 'T' AND t.id not in (:listTeamId); </sql-query> -->
+        
+    <sql-query name="insertAllocationDetailAllTeamOwned">insert into ALLOCATION_DETAIL(ALLOCATION_MASTER_ID,UPL_DETAIL_ID,ALLOCATED_NUMBER,OBJECT_TYPE,ASSIGNEE_ID,STATUS)
+        select allocationMasterId,uplDetailId,(select least(IMPORTED,:allocatedNumber)
+        from UPL_DETAIL where ID = :uplDetailId),'T',t.ID,'S' from TEAMS t inner join TEAM_MEMBER tm on t.ID = tm.TEAM_ID
+        and USER_ID = (select OWNER_ID from ALLOCATION_MASTER am, UPL_DETAIL ud, UPL_MASTER um 
+        where am.UPL_DETAIL_ID = ud.ID and ud.UPL_MASTER_ID = um.ID and am.ID = :allocationMasterId); </sql-query>
+    <sql-query name="updateuplDetailSupervisor">update UPL_DETAIL set TOTAL_ALLOCATED = nvl(TOTAL_ALLOCATED,0) + min(:allocatedNumber,IMPORTED) where ID = :uplDetailId;
+        update UPL_DETAIL set STATUS = decode(nvl(IMPORTED-TOTAL_ALLOCATED,0,'A',decode(TOTAL_ALLOCATED,0,STATUS,'P')) where ID = :uplDetailId; </sql-query>
+    <sql-query name="buidAllocatedSeq"> select max(ALLOCATED_SEQ)  from Allocation_Master where UPL_MASTER_ID = :uplMasterId  and ALLOCATED_TYPE = :allocatedType group by UPL_MASTER_ID, ALLOCATED_TYPE </sql-query>
+    <sql-query name="updateUplMaterForSupervisor"> update UPL_MASTER set TOTAL_ALLOCATED = nvl(TOTAL_ALLOCATED,0) + :allocatedNumber where ID = :uplMasterId; </sql-query>
+    <sql-query name="findCustProspectId">select ID from  CUST_PROSPECT where ID = :custProspectId</sql-query>
+    <sql-query name="findAllocationDetailIdByCustProspectId">select ALLOCATION_DETAIL_ID from  CUST_PROSPECT where ID = :custProspectId</sql-query>
+    <sql-query name="runCheckDupAndValidUplCustomer">begin validate_Upload_Customer(:id); end;</sql-query>
+    <sql-query name="checkDupOldData">select count(*) from UPL_CUSTOMER where UPL_DETAIL_ID = :uplDetailId and substr(RESPONSE_CODE,1,1)='Y'</sql-query>
+    <sql-query name="checkDupDataLeadGenInput">select
+        count(car.ID)
+        from CREDIT_APP_REQUEST car
+        inner join CUST_IDENTITY ci      on car.CUST_ID  = ci.CUST_ID
+        inner join CODE_TABLE ct1        on (car.STATUS  = ct1.ID)
+        inner join CUST_CONTACT_INFO cci on (car.CUST_ID = cci.CUST_ID and cci.CONTACT_TYPE = (select ID from CODE_TABLE where CODE_GROUP='CONT' and CATEGORY='CONTAC_TYP' and CODE_VALUE1='MOBILE'))
+        where
+        ct1.CODE_VALUE1 like '%_REJECT' and (car.COMPLETED_DATE + 90) &gt; sysdate
+        and (ci.IDENTITY_NUMBER = :identityNumber or cci.CONTACT_VALUE = :mobile)</sql-query>
+        
+    <sql-query name="checkBlackListWatchListLeadGenInput"> select
+        count(ID) from CUST_MONITOR
+        where
+        MONITOR_TYPE = :monitorType and ID_NUMBER = :idNumber </sql-query>
+        
+    <sql-query name="checkBlackListCitizenId"> select
+        count(cm.id) from CUST_MONITOR cm
+        inner join CODE_TABLE c on c.id = cm.id_type
+        where cm.monitor_type = 'B' and cm.record_status = 'A' and cm.id_number = :idNumber 
+        	and c.category = 'IDTYP' and c.code_value1 in ('1', '2', '3') </sql-query>
+        
+    <sql-query name="findProductIdByProductCode"> select max(ID) from PRODUCTS
+        where PRODUCT_CODE = :productCode and START_EFF_DATE &lt;= sysdate </sql-query>
+        
+    <sql-query name="findUploadDataIdByUploadCode"> select um.ID as uploadMasterId, ud.ID as uploadDetailId from 
+        UPL_MASTER um
+        inner join UPL_DETAIL ud on um.ID = ud.UPL_MASTER_ID
+        where UPL_CODE = :uploadCode </sql-query>
+    <sql-query name="increaseImportedUplMaster"> UPDATE UPL_MASTER SET IMPORTED = (IMPORTED + :numOfIncre), LAST_UPDATED_DATE = sysdate WHERE ID = :uplMasterId </sql-query>
+    <sql-query name="increaseImportedUplDetail"> UPDATE UPL_DETAIL SET IMPORTED = (IMPORTED + :numOfIncre), LAST_UPDATED_DATE = sysdate WHERE ID = :uplDetailId </sql-query>
+    <sql-query name="checkDupCurrentData">select count(*) from UPL_CUSTOMER where UPL_DETAIL_ID = :uplDetailId and substr(RESPONSE_CODE,2,1)='Y'</sql-query>
+    <sql-query name="checkInvalidData">select count(*) from UPL_CUSTOMER where UPL_DETAIL_ID = :uplDetailId and (nvl(substr(RESPONSE_CODE,3,1),'N')='Y' or nvl(substr(RESPONSE_CODE,4,1),'N')='Y')</sql-query>
+    <sql-query name="getUplCodeByAllocationId">select UPL_CODE from ALLOCATION_DETAIL JOIN ALLOCATION_MASTER ON ALLOCATION_DETAIL.ALLOCATION_MASTER_ID = ALLOCATION_MASTER.ID JOIN UPL_MASTER ON ALLOCATION_MASTER.UPL_MASTER_ID = UPL_MASTER.ID WHERE ALLOCATION_DETAIL.ID = :allocationDetailId</sql-query>
+    <sql-query name="approveUplDetail">update UPL_DETAIL set STATUS_APP = :status,DATE_APP = sysdate, approver = :loginId where ID = :idFile</sql-query>
+    <sql-query name="rejectUplDetail">update UPL_DETAIL set STATUS_APP = :status,DATE_APP = sysdate,REJECTION_REASON = :rejectReason, approver = :loginId where ID = :idFile</sql-query>
+    <sql-query name="updateUplDetail">update UPL_DETAIL set RECORD_STATUS = :status where ID = :idFile</sql-query>
+    <sql-query name="deleteUplDetail">delete from UPL_DETAIL where ID = :idFile</sql-query>
+     <sql-query name="updateUplMaster">update UPL_MASTER set RECORD_STATUS = :status where ID = :idFile</sql-query>
+    <sql-query name="deleteUplCustomer">delete from upl_customer where UPL_DETAIL_ID = :idFile</sql-query>
+     <sql-query name="deleteUplMaster">delete from UPL_MASTER where ID = :idFile</sql-query>
+    <sql-query name="changeStatus">update UPL_DETAIL set STATUS_APP = :status where ID = :UPL_DETAIL_ID</sql-query>
+    <sql-query name="changeUplDetailStatus"> UPDATE UPL_DETAIL SET STATUS = :status, LAST_UPDATED_DATE = sysdate WHERE ID = :uplDetailId </sql-query>
+  
+    <sql-query name="getUplCode">
+		<![CDATA[select to_char(sysdate,'ddmmyyyy') || '-' ||(count(1) + 1) from upl_master a
+                            left join upl_detail b on b.UPL_MASTER_ID = a.id
+                            join CODE_TABLE ct on ct.id = a.FROM_SOURCE and ct.code_group='MISC' and ct.category='UPL_SRC' and ct.code_value1='MIS'                            
+                            where TRUNC(a.CREATED_DATE) = TRUNC(sysdate)]]>
+    </sql-query>
+
+	<!-- New fix sql 28052019 -->    
+    <!-- <sql-query name="getTotalImportedAndTotalAllocated">
+		<![CDATA[
+			select nvl(sum(ud.IMPORTED), 0) || '-' || nvl(sum(ud.TOTAL_ALLOCATED), 0)
+			from UPL_DETAIL ud inner join UPL_MASTER um on um.ID = ud.UPL_MASTER_ID
+			where um.ID = :uplMasterId
+		]]>
+    </sql-query>
+    
+    <sql-query name="getTotalImportedFromUplDetail">
+		<![CDATA[
+			select count(ID)
+			from UPL_CUSTOMER 
+			where UPL_DETAIL_ID = :uplDetailId
+		]]>
+    </sql-query> -->
+    
+    <!-- <sql-query name="updateImportedAndAllocatedUplMaster">
+		<![CDATA[
+			update UPL_DETAIL set IMPORTED = (
+			    select count(ID)
+			    from UPL_CUSTOMER 
+			    where UPL_DETAIL_ID = :uplDetailId and RESPONSE_CODE = 'OK'
+			)
+			where ID = :uplDetailId
+			
+			update UPL_MASTER set IMPORTED = (
+			    select nvl(sum(IMPORTED), 0)
+			    from UPL_DETAIL 
+			    where UPL_MASTER_ID = ( select UPL_MASTER_ID from UPL_DETAIL where ID = :uplDetailId )
+			)
+			, TOTAL_ALLOCATED = (
+			    select nvl(sum(TOTAL_ALLOCATED), 0)
+			    from UPL_DETAIL 
+			    where UPL_MASTER_ID = ( select UPL_MASTER_ID from UPL_DETAIL where ID = :uplDetailId )
+			)
+			where ID = ( select UPL_MASTER_ID from UPL_DETAIL where ID = :uplDetailId )
+		]]>
+    </sql-query> -->
+    
+    <sql-query name="updateImportedAndAllocatedUplMaster">
+		<![CDATA[
+			update UPL_MASTER set IMPORTED = (
+				select nvl(sum(IMPORTED), 0)
+				from UPL_DETAIL 
+				where STATUS in ('C', 'P') and UPL_MASTER_ID = ( select UPL_MASTER_ID from UPL_DETAIL where ID = :uplDetailId )
+			)
+			, TOTAL_ALLOCATED = (
+				select nvl(sum(TOTAL_ALLOCATED), 0)
+				from UPL_DETAIL 
+				where STATUS in ('C', 'P') and UPL_MASTER_ID = ( select UPL_MASTER_ID from UPL_DETAIL where ID = :uplDetailId )
+			)
+			where ID = ( select UPL_MASTER_ID from UPL_DETAIL where ID = :uplDetailId )
+		]]>
+    </sql-query>
+    
+    <sql-query name="updateImportedAndAllocatedUplDetail">
+		<![CDATA[
+			update UPL_DETAIL set IMPORTED = (
+				select count(ID) from UPL_CUSTOMER where UPL_DETAIL_ID = :uplDetailId and RESPONSE_CODE = 'OK'
+			)
+			where ID = :uplDetailId
+		]]>
+    </sql-query>
+    <!-- *** -->
+        
+    <sql-query name="checkDupIdentity">
+		<![CDATA[ SELECT uc.IDENTITY_NUMBER,gd.UPL_CODE FROM
+                            upl_customer uc
+                            JOIN (
+                                SELECT
+                                    codetableid,
+                                    upldetailid,
+                                    date_from,
+                                    created_date,
+                                    UPL_CODE                            
+                                FROM
+                                    (
+                                        SELECT
+                                            b.id   AS codetableid,
+                                            a.id   AS upldetailid,
+                                            a.date_from,
+                                            a.created_date,
+                                            c.UPL_CODE
+                                        FROM
+                                            upl_detail a,
+                                            code_table b,
+                                            upl_master c
+                                        WHERE
+                                            b.id = a.status_app
+                                            AND b.code_group = 'MIS'
+                                            AND b.category = 'STATUS_APP_XSELL'
+                                            AND b.code_value1 = 'XSELL_APP_ACTIVE'
+                                            AND a.record_status = 'A'
+                                            AND TRUNC(a.date_from) <= TRUNC(:dateFrom)
+                                            AND TRUNC(a.date_to) >= TRUNC(:dateFrom)
+                                            AND a.UPL_MASTER_ID = c.id
+                                            AND EXISTS (
+                                                SELECT
+                                                    1
+                                                FROM
+                                                    upl_customer
+                                                WHERE
+                                                    a.id = upl_detail_id
+                                            )
+                                    )
+                            ) gd ON gd.upldetailid = uc.upl_detail_id where uc.IDENTITY_NUMBER is not null ORDER BY gd.UPL_CODE]]>
+    </sql-query>
+    <sql-query name="checkDupIdentityArmy">
+		<![CDATA[ SELECT uc.IDENTITY_NUMBER_ARMY, gd.UPL_CODE FROM
+                            upl_customer uc
+                            JOIN (
+                                SELECT
+                                    codetableid,
+                                    upldetailid,
+                                    date_from,
+                                    created_date,
+                                    UPL_CODE                            
+                                FROM
+                                    (
+                                        SELECT
+                                            b.id   AS codetableid,
+                                            a.id   AS upldetailid,
+                                            a.date_from,
+                                            a.created_date,
+                                            c.UPL_CODE
+                                        FROM
+                                            upl_detail a,
+                                            code_table b,
+                                            upl_master c
+                                        WHERE
+                                            b.id = a.status_app
+                                            AND b.code_group = 'MIS'
+                                            AND b.category = 'STATUS_APP_XSELL'
+                                            AND b.code_value1 = 'XSELL_APP_ACTIVE'
+                                            AND a.record_status = 'A'
+                                            AND TRUNC(a.date_from) <= TRUNC(:dateFrom)
+                                            AND TRUNC(a.date_to) >= TRUNC(:dateFrom)
+                                            AND a.UPL_MASTER_ID = c.id
+                                            AND EXISTS (
+                                                SELECT
+                                                    1
+                                                FROM
+                                                    upl_customer
+                                                WHERE
+                                                    a.id = upl_detail_id
+                                            )
+                                    )
+                            ) gd ON gd.upldetailid = uc.upl_detail_id where uc.IDENTITY_NUMBER_ARMY is not null ORDER BY gd.UPL_CODE]]>
+    </sql-query>
+    <sql-query name="getCustId">
+		<![CDATA[select ci.cust_id  from cust_identity ci
+					join cust_personal_info cpi on (ci.id = cpi.IDENTITY_ID and cpi.record_status='A')
+                    where ci.record_status='A' and to_char(cpi.BIRTH_DATE,'dd/mm/yyyy') = :birthDate and ci.identity_number = :identityNumber]]>
+    </sql-query>
+        
+    <sql-query name="lstProductCode">
+		<![CDATA[select product_code from products where RECORD_STATUS='A' ]]>
+    </sql-query>
+         
+    <sql-query name="lstUplCusDetails">
+		<![CDATA[ select c.id, cp.CUST_NAME, cp.mobile, cp.identity_number, 
+					(select upl_code from upl_master where id=d.upl_master_id),el.emp_code tsa_code,u.USR_FULL_NAME,c.udf01, c.udf04, 
+					(select response_code from (select rownum row_num, cs.* from upl_customer_hist cs where cs.upl_customer_id = c.id and cs.ref_id='OTP' order by cs.last_updated_date desc) where rownum =1) mess_otp,
+					(select response_code from (select rownum row_num, cs.* from upl_customer_hist cs where cs.upl_customer_id = c.id and (cs.ref_id='MARK_TS' or cs.ref_id='MARK_ESB') order by cs.last_updated_date desc) where rownum =1) mess_TS,
+					c.min_score, c.udf07  
+					from upl_customer c, 
+                    upl_detail d, 
+                    allocation_detail ad, 
+                    users u,  
+                    EMPLOYEE_LINK el, 
+                    cust_prospect cp
+					where c.upl_detail_id = d.id
+					and ad.upl_object_id = c.id
+					and ad.assignee_id = u.id
+					and u.emp_id= el.emp_id
+                    and cp.UPL_CUSTOMER_ID = c.id
+                    and (u.id=:p_user_id or :p_user_id='-1')
+                    and (cp.identity_number=:p_identity_number or :p_identity_number = '-1')
+                    and (cp.MOBILE =:p_mobile or :p_mobile= '-1')
+                    and (TO_DATE(c.udf04, 'yyyy-MM-dd') >= TO_DATE(:p_from_date, 'yyyy-MM-dd') or :p_from_date ='-1')
+                    and (TO_DATE(c.udf04, 'yyyy-MM-dd') <= TO_DATE(:p_to_date, 'yyyy-MM-dd') or :p_to_date ='-1')
+                    and ad.object_type ='U'
+                    and u.id in (select user_id from team_member where status = 'A' and team_id in (select id from teams t where t.manager_id = (select id from users where id = t.manager_id and login_id =:p_login_id)))
+                    and c.udf01 ='1' ]]>
+    </sql-query> 
+    
+    <sql-query name="lstUplCusDetails_Sup">
+		<![CDATA[ select c.id, cp.CUST_NAME, cp.mobile, cp.identity_number, 
+					(select upl_code from upl_master where id=d.upl_master_id),el.emp_code tsa_code,u.USR_FULL_NAME,c.udf01, c.udf04, 
+					(select response_code from (select rownum row_num, cs.* from upl_customer_hist cs where cs.upl_customer_id = c.id and cs.ref_id='OTP' order by cs.last_updated_date desc) where rownum =1) mess_otp,
+					(select response_code from (select rownum row_num, cs.* from upl_customer_hist cs where cs.upl_customer_id = c.id and (cs.ref_id='MARK_TS' or cs.ref_id='MARK_ESB') order by cs.last_updated_date desc) where rownum =1) mess_TS,
+					c.min_score, c.udf07  
+					from upl_customer c, 
+                    upl_detail d, 
+                    allocation_detail ad, 
+                    users u,  
+                    EMPLOYEE_LINK el, 
+                    cust_prospect cp
+					where c.upl_detail_id = d.id
+					and ad.upl_object_id = c.id
+					and ad.assignee_id = u.id
+					and u.emp_id= el.emp_id
+                    and cp.UPL_CUSTOMER_ID = c.id
+                    and (u.id=:p_user_id or :p_user_id='-1')
+                    and (cp.identity_number=:p_identity_number or :p_identity_number = '-1')
+                    and (cp.MOBILE =:p_mobile or :p_mobile= '-1')
+                    and (TO_DATE(c.udf04, 'yyyy-MM-dd') >= TO_DATE(:p_from_date, 'yyyy-MM-dd') or :p_from_date ='-1')
+                    and (TO_DATE(c.udf04, 'yyyy-MM-dd') <= TO_DATE(:p_to_date, 'yyyy-MM-dd') or :p_to_date ='-1')
+                    and ad.object_type ='U'
+                    and c.udf01 ='1' ]]>
+    </sql-query> 
+    
+    <sql-query name="lstUplCusDetailsV2">
+		<![CDATA[ select uc.id, -- id
+			    cp.cust_name, -- customerName
+			    cp.mobile, -- customerPhone
+			    cp.identity_number, -- customerIndentify
+			    um.upl_code, -- campaign
+			    el.emp_code tsa_code,
+			    u.usr_full_name, -- tsaName
+			    uc.udf01, -- isMark
+			    cbd_score.last_updated_date, -- requestDate
+			    JSON_VALUE(cbd_otp.cb_data_detail, '$.responseCode') otp, -- statusOTP
+			    JSON_VALUE(cbd_score.cb_data_detail, '$.code') m_score, -- resultScoring
+			    JSON_VALUE(cbd_score.cb_data_detail, '$.score') score, 
+			    cbd_score.last_updated_date time_score
+			from allocation_detail ad
+			inner join upl_customer uc on ad.upl_object_id = uc.id
+			inner join upl_detail ud on ad.upl_detail_id = ud.id
+			inner join upl_master um on ud.upl_master_id = um.id
+			inner join cust_prospect cp on cp.upl_customer_id = uc.id
+			inner join users u on u.id = ad.assignee_id
+			inner join employee_link el on u.emp_id = el.emp_id
+			left join (select * from credit_bureau_data where id in (
+        		select max(id) from credit_bureau_data cbd_otp_sub
+		        where cbd_otp_sub.cb_source = 'T'
+		        and cbd_otp_sub.cb_key = 'OTP'
+		        and cbd_otp_sub.cb_type = 'C'
+		        group by trim(cbd_otp_sub.cust_identity_number), trim(cbd_otp_sub.cust_mobile))) cbd_otp
+		        on (trim(cbd_otp.cust_identity_number) = trim(cp.identity_number)
+		        and trim(cbd_otp.cust_mobile) = trim(cp.mobile))
+    		left join (select * from credit_bureau_data where id in (
+		        select max(id) from credit_bureau_data cbd_score_sub
+		        where cbd_score_sub.cb_source = 'T'
+		        and cbd_score_sub.cb_key like 'MARK%'
+		        and cbd_score_sub.cb_type = 'C'
+		        group by trim(cbd_score_sub.cust_identity_number), trim(cbd_score_sub.cust_mobile))) cbd_score
+		        on (trim(cbd_score.cust_identity_number) = trim(cp.identity_number)
+		        and trim(cbd_score.cust_mobile) = trim(cp.mobile))
+			where uc.udf01 = '1'
+			    and el.record_status = 'A'
+			    and u.id in (SELECT user_id FROM team_member 
+			                WHERE  status = 'A' AND team_id IN
+			                (SELECT id FROM teams t WHERE  t.manager_id = (SELECT id  FROM users WHERE  id = t.manager_id AND login_id = :loginId )))
+			    and (u.id = :tsaCode or :tsaCode = '-1')
+			    and (cp.identity_number = :identityNumber or :identityNumber = '-1')
+			    and (cp.mobile = :mobile or :mobile = '-1')
+			    and (cbd_score.last_updated_date >= TO_DATE(:sendDateFrom, 'DD-MM-YYYY HH24:MI:SS') or :sendDateFrom = '01/01/1900 00:00:00')
+			    and (cbd_score.last_updated_date <= TO_DATE(:sendDateTo, 'DD-MM-YYYY HH24:MI:SS') or :sendDateTo = '01/01/9999 00:00:00')
+			order by uc.last_updated_date desc,
+			cp.cust_name
+		]]>
+    </sql-query>
+    
+    <sql-query name="lstUplCusDetails_SupV2">
+		<![CDATA[ select uc.id, -- id
+			    cp.cust_name, -- customerName
+			    cp.mobile, -- customerPhone
+			    cp.identity_number, -- customerIndentify
+			    um.upl_code, -- campaign
+			    el.emp_code tsa_code,
+			    u.usr_full_name, -- tsaName
+			    uc.udf01, -- isMark
+			    cbd_score.last_updated_date, -- requestDate
+			    JSON_VALUE(cbd_otp.cb_data_detail, '$.responseCode') otp, -- statusOTP
+			    JSON_VALUE(cbd_score.cb_data_detail, '$.code') m_score, -- resultScoring
+			    JSON_VALUE(cbd_score.cb_data_detail, '$.score') score, 
+			    cbd_score.last_updated_date time_score
+			from allocation_detail ad
+			inner join upl_customer uc on ad.upl_object_id = uc.id
+			inner join upl_detail ud on ad.upl_detail_id = ud.id
+			inner join upl_master um on ud.upl_master_id = um.id
+			inner join cust_prospect cp on cp.upl_customer_id = uc.id
+			inner join users u on u.id = ad.assignee_id
+			inner join employee_link el on u.emp_id = el.emp_id
+			left join (select * from credit_bureau_data where id in (
+        		select max(id) from credit_bureau_data cbd_otp_sub
+		        where cbd_otp_sub.cb_source = 'T'
+		        and cbd_otp_sub.cb_key = 'OTP'
+		        and cbd_otp_sub.cb_type = 'C'
+		        group by trim(cbd_otp_sub.cust_identity_number), trim(cbd_otp_sub.cust_mobile))) cbd_otp
+		        on (trim(cbd_otp.cust_identity_number) = trim(cp.identity_number)
+		        and trim(cbd_otp.cust_mobile) = trim(cp.mobile))
+    		left join (select * from credit_bureau_data where id in (
+		        select max(id) from credit_bureau_data cbd_score_sub
+		        where cbd_score_sub.cb_source = 'T'
+		        and cbd_score_sub.cb_key like 'MARK%'
+		        and cbd_score_sub.cb_type = 'C'
+		        group by trim(cbd_score_sub.cust_identity_number), trim(cbd_score_sub.cust_mobile))) cbd_score
+		        on (trim(cbd_score.cust_identity_number) = trim(cp.identity_number)
+		        and trim(cbd_score.cust_mobile) = trim(cp.mobile))
+			where uc.udf01 = '1'
+			    and el.record_status = 'A'
+			    and (u.id = :tsaCode or :tsaCode = '-1')
+			    and (cp.identity_number = :identityNumber or :identityNumber = '-1')
+			    and (cp.mobile = :mobile or :mobile = '-1')
+			    and (cbd_score.last_updated_date >= TO_DATE(:sendDateFrom, 'DD-MM-YYYY HH24:MI:SS') or :sendDateFrom = '01/01/1900 00:00:00')
+			    and (cbd_score.last_updated_date <= TO_DATE(:sendDateTo, 'DD-MM-YYYY HH24:MI:SS') or :sendDateTo = '01/01/9999 00:00:00')
+			order by uc.last_updated_date desc,
+			cp.cust_name 
+		]]>
+    </sql-query>
+    
+    <sql-query name="getUplCustForScoring">
+		<![CDATA[ select
+			    uc.id, -- id
+			    cp.cust_name, -- customerName
+			    cp.mobile, -- customerPhone
+			    cp.identity_number, -- customerIndentify
+			    um.upl_code, -- campaign
+			    el.emp_code tsa_code,
+			    u.usr_full_name, -- tsaName
+			    uc.udf01, -- isMark
+			    uc.udf04, -- requestDate
+			    JSON_VALUE(cbd_otp.cb_data_detail, '$.responseCode') otp, -- statusOTP
+			    JSON_VALUE(cbd_score.cb_data_detail, '$.code') m_score, -- resultScoring
+			    JSON_VALUE(cbd_score.cb_data_detail, '$.score') score, 
+			    cbd_score.last_updated_date time_score,
+				cbd_score.cb_key partner,
+				JSON_VALUE(cbd_score.cb_data_detail, '$.telcoCode') vendor_code,
+				JSON_VALUE(cbd_score.cb_data_detail, '$.verifyInfo') verify_info
+			from allocation_detail ad
+			inner join upl_customer uc on ad.upl_object_id = uc.id
+			inner join upl_detail ud on ad.upl_detail_id = ud.id
+			inner join upl_master um on ud.upl_master_id = um.id
+			inner join cust_prospect cp on cp.upl_customer_id = uc.id
+			inner join users u on u.id = ad.assignee_id
+			inner join employee_link el on u.emp_id = el.emp_id
+			left join (select * from credit_bureau_data where id in (
+		        select max(id) from credit_bureau_data cbd_otp_sub
+		        where cbd_otp_sub.cb_source = 'T'
+		        and cbd_otp_sub.cb_key = 'OTP'
+		        and cbd_otp_sub.cb_type = 'C'
+		        group by trim(cbd_otp_sub.cust_identity_number), trim(cbd_otp_sub.cust_mobile))) cbd_otp
+		        on (trim(cbd_otp.cust_identity_number) = trim(cp.identity_number)
+		        and trim(cbd_otp.cust_mobile) = trim(cp.mobile))
+    		left join (select * from credit_bureau_data where id in (
+		        select max(id) from credit_bureau_data cbd_score_sub
+		        where cbd_score_sub.cb_source = 'T'
+		        and cbd_score_sub.cb_key like 'MARK%'
+		        and cbd_score_sub.cb_type = 'C'
+		        group by trim(cbd_score_sub.cust_identity_number), trim(cbd_score_sub.cust_mobile))) cbd_score
+		        on (trim(cbd_score.cust_identity_number) = trim(cp.identity_number)
+		        and trim(cbd_score.cust_mobile) = trim(cp.mobile))
+			where uc.udf01 = '1'
+			    and el.record_status = 'A'
+			    and uc.id = :upl_cust_id
+			    
+		]]>
+    </sql-query>
+    
+    <sql-query name="checkCustomerNTB">
+		<![CDATA[ select count(1)
+			from UPL_CUSTOMER cr  
+			inner join UPL_DETAIL dl on cr.UPL_DETAIL_ID = dl.ID
+			inner join UPL_MASTER mr on dl.UPL_MASTER_ID = mr.ID
+			left join CODE_TABLE co on mr.FROM_SOURCE = co.ID
+			where 1=1
+			and co.id in (select map_id1 from mapping_hierarchy where map_type = 'MAP_TELESALE_TS')
+			and cr.id= :p_id_upl_cus ]]>
+    </sql-query>
+    
+    <sql-query name="sendMarkToESB">   
+		<![CDATA[ SELECT uch.response_code,uc.MIN_SCORE,
+				    uc.udf07
+				FROM
+				    upl_customer uc,
+				    upl_customer_hist uch,
+                    cust_prospect cp
+				WHERE
+				    uc.id = uch.upl_customer_id
+                    and cp.UPL_CUSTOMER_ID = uc.id
+				    AND uch.ref_id = 'MARK_TS'
+				    -- and uch.RESPONSE_CODE = 'success'
+				    and uc.mobile = :p_mobile
+				    and cp.identity_number = :p_identity_number
+				ORDER BY
+				    uch.last_updated_date DESC ]]>
+	</sql-query>
+	
+	<sql-query name="getRoleCodeUser">   
+		<![CDATA[ select r.role_code from users_role_mapping urm, roles r, users u 
+					where urm.object_id = r.id
+					and urm.user_id = u.id
+					and r.role_code in ('NTB', 'CRM_TL')
+					and u.login_id = :p_login_id ]]>
+	</sql-query>
+	    
+	<sql-query name="getMemberNTB">   
+		<![CDATA[ select u.id, el.emp_code from team_member tm, users u, EMPLOYEE_LINK el where tm.user_id = u.id and u.emp_id= el.emp_id and tm.team_id in (select id from teams t where t.team_group = 'NTB') order by el.emp_code ]]>
+	</sql-query>
+	
+	<sql-query name="getMemberByTeamLead">   
+		<![CDATA[ select u.id, el.emp_code from users u, EMPLOYEE_LINK el where u.emp_id= el.emp_id and  u.id in (select user_id from team_member where team_id in (select id from teams t where t.manager_id = (select id from users where id = t.manager_id and login_id =:p_login_id))) order by el.emp_code ]]>
+	</sql-query>
+	
+	<sql-query name="findCustomerProspect">   
+		<![CDATA[ select uc.id from upl_customer uc, cust_prospect cp where uc.id = cp.upl_customer_id and trim(cp.identity_number) =:p_identity_number and trim(cp.mobile) =:p_mobile order by uc.udf07 asc ]]>
+	</sql-query>
+	
+	<sql-query name="findCustomerFromSrourceBPM">   
+		<![CDATA[ select uc.id from upl_customer uc where uc.mobile = :p_mobile and uc.identity_number =:p_identity_number and exists(select 1 from upl_master um, upl_detail ud where um.id =ud.upl_master_id and um.from_source = (select id from code_table where category='UPL_SRC' and code_value1='BPM') and ud.id = uc.upl_detail_id) order by uc.udf07 asc ]]>
+	</sql-query>
+	
+	<sql-query name="getUplDetailFromSourceBPM">
+		<![CDATA[ select ud.id from UPL_MASTER um, UPL_DETAIL ud where um.id =ud.UPL_MASTER_ID and um.FROM_SOURCE = (select id from code_table where category='UPL_SRC' and code_value1='BPM') ]]> 
+    </sql-query>
+    
+    <sql-query name="updateUplCustWhenScoringFail">
+		<![CDATA[ update upl_customer set MIN_SCORE='',udf05 = '',udf06 = '',udf07 = '' where id = :p_id ]]> 
+    </sql-query>
+    
+    <sql-query name="getClosestSuccessScore">
+		<![CDATA[ select uch.ID, uch.LAST_UPDATED_DATE, uch.UPL_CUSTOMER_ID, uch.UPL_MASTER_ID, uch.REF_ID, uch.RESPONSE_CODE, uch.MESSAGE
+				from upl_customer uc, CUST_PROSPECT up, UPL_CUSTOMER_HIST uch 
+				where uc.id = up.UPL_CUSTOMER_ID  
+				and uc.id = uch.UPL_CUSTOMER_ID 
+				and trim(up.mobile) =:p_mobile 
+				and trim(up.identity_number) in (:p_identity_number, :p_identity_number_old)
+				and uch.REF_ID ='MARK_TS' 
+				and uch.RESPONSE_CODE = 'success'  
+				order by uch.LAST_UPDATED_DATE desc ]]> 
+    </sql-query>
+    
+    <sql-query name="getClosestSuccessScoreSourceBPM">
+		<![CDATA[ select uch.ID, uch.LAST_UPDATED_DATE, uch.UPL_CUSTOMER_ID, uch.UPL_MASTER_ID, uch.REF_ID, uch.RESPONSE_CODE, uch.MESSAGE
+				from upl_customer uc, UPL_CUSTOMER_HIST uch
+				where uc.id = uch.UPL_CUSTOMER_ID
+				and trim(uc.mobile) =:p_mobile 
+				and trim(uc.identity_number) in (:p_identity_number, :p_identity_number_old)
+				and uch.REF_ID ='MARK_TS' 
+				and uch.RESPONSE_CODE = 'success'  
+				and exists(select 1 from upl_master um, upl_detail ud where um.id =ud.upl_master_id and um.from_source = (select id from code_table where category='UPL_SRC' and code_value1='BPM') and ud.id = uc.upl_detail_id)
+				order by uch.LAST_UPDATED_DATE desc ]]> 
+    </sql-query>
+    
+    <sql-query name="findUcNotInUp">   
+		<![CDATA[ select uc.id from UPL_CUSTOMER uc where MOBILE=:p_mobile and IDENTITY_NUMBER = :p_identity_number and id not in (select UPL_CUSTOMER_ID from CUST_PROSPECT where MOBILE=:p_mobile and IDENTITY_NUMBER = :p_identity_number) ]]>
+	</sql-query>
+	
+    <query name="getListDataWaitForApprove"><![CDATA[from UplCustomer where responseCode = :responseCode and rownum < 1000 ]]></query>
+    
+    <sql-query name="checkTSAHasDataXcell">
+	 	<![CDATA[ 
+	 	SELECT count(*) FROM allocation_detail ad
+			INNER JOIN users u ON ad.assignee_id = u.id
+			INNER JOIN upl_detail ud ON ad.upl_detail_id = ud.id
+			INNER JOIN upl_master um ON ud.upl_master_id = um.id
+			INNER JOIN code_table ct ON um.from_source = ct.id
+			WHERE u.id = :id AND ct.category = 'UPL_SRC' AND ct.code_value1 = 'MIS'
+	]]>
+	</sql-query>
+    
+    <sql-query name="checkTSAHasDataXcellExpired">
+	 	<![CDATA[ 
+	 	SELECT count(*) FROM allocation_detail ad
+			INNER JOIN users u ON ad.assignee_id = u.id
+			INNER JOIN upl_detail ud ON ad.upl_detail_id = ud.id
+			INNER JOIN upl_master um ON ud.upl_master_id = um.id
+			INNER JOIN code_table ct ON um.from_source = ct.id
+			WHERE u.id = :id AND ct.category = 'UPL_SRC' AND ct.code_value1 = 'MIS' AND TRUNC(sysdate) <= TRUNC(ud.date_to)
+	]]>
+	</sql-query>
+	
+	<sql-query name="checkTSADontHasDataXcellValidProspectStatus">
+	 	<![CDATA[ 
+	 	SELECT count(*) FROM allocation_detail ad
+			INNER JOIN users u ON ad.assignee_id = u.id
+			INNER JOIN upl_detail ud ON ad.upl_detail_id = ud.id
+			INNER JOIN upl_master um ON ud.upl_master_id = um.id
+			INNER JOIN code_table ct ON um.from_source = ct.id
+			WHERE u.id = :id AND ct.category = 'UPL_SRC' AND ct.code_value1 <> 'MIS' and ad.status in (select id from code_table where code_value1 in ('F', 'W'))
+	]]>
+	</sql-query>
+	
+	<sql-query name="checkRenew">
+		<![CDATA[ select count(1) from upl_customer cu, upl_detail ud, upl_master um, code_table ct
+				where cu.upl_detail_id = ud.id and ud.upl_master_id = um.id
+				and ct.id = um.from_source and ct.category='UPL_SRC' and ct.code_value1='TELESALE'
+				and um.created_by is null
+				AND cu.ID = :p_id_upl_cus ]]>
+    </sql-query>
+    
+    <sql-query name="deleteInvalidAllocationDetail">
+		<![CDATA[ delete from allocation_detail ad where ad.upl_detail_id=:uplDetailId 
+		and ad.upl_object_id not in (select id from upl_customer uc where uc.upl_detail_id=:uplDetailId) ]]>
+    </sql-query>
+    
+    <sql-query name="deleteAllocationMaster">
+		<![CDATA[ delete from allocation_master a1 where a1.id in (:lstId) ]]>
+    </sql-query>
+    
+    <sql-query name="deleteInvalidAllocationMaster">
+		<![CDATA[ delete from  allocation_master am
+					where am.upl_master_id in (select ud.upl_master_id from upl_detail ud where ud.id= :uplDetailId)
+					and (select count(1) from allocation_detail ad where ad.allocation_master_id = am.id) = 0 ]]>
+    </sql-query>
+    
+    <sql-query name="findAllocationMasterByDetailId">
+		<![CDATA[ delete from  allocation_master am
+					where am.upl_master_id in (select ud.upl_master_id from upl_detail ud where ud.id= :uplDetailId)
+					and (select count(1) from allocation_detail ad where ad.allocation_master_id = am.id) = 0 ]]>
+    </sql-query>
+    
+    <sql-query name="findListByDetailId">
+		<![CDATA[select distinct ad.allocation_master_id from allocation_detail ad, upl_detail ud where  ud.id =:uplDetailId and ad.upl_detail_id = ud.id ]]>
+    </sql-query>
+    
+    <sql-query name="updateStatusByImportTSA">
+		<![CDATA[ update upl_detail ud set ud.status='R' where 1=1 and ud.id =:uplDetailId ]]>
+    </sql-query>
+    
+    <sql-query name="removeCustomerByImportTSA">
+		<![CDATA[ delete from upl_customer uc where uc.upl_detail_id =:uplDetailId ]]>
+    </sql-query>
+    
+    <sql-query name="removeAlloMasterByImportTSA">
+		<![CDATA[ delete from allocation_master am where am.id in (select ad.allocation_master_id from allocation_detail ad, upl_customer cu where ad.upl_object_id = cu.id and cu.upl_detail_id=:uplDetailId) ]]>
+    </sql-query>
+    
+    <sql-query name="removeAlloDetailByImportTSA">
+		<![CDATA[ delete from allocation_detail where id in (select ad.id from allocation_detail ad, upl_customer cu where ad.upl_object_id = cu.id and cu.upl_detail_id=:uplDetailId) ]]>
+    </sql-query>
+    
+    <sql-query name="getUplCodeByDetailId">
+		<![CDATA[ select um.upl_code from upl_detail ud, upl_master um  where ud.id =:uplDetailId and ud.upl_master_id = um.id  ]]>
+    </sql-query>
+	
+</hibernate-mapping>

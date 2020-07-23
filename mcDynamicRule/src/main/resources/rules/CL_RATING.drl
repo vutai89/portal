@@ -1,0 +1,448 @@
+package rules
+ 
+
+import com.mcredit.model.object.Applicant;
+
+
+rule "Rating - D"
+	when
+		$a: Applicant( totalScore <= 525)
+	then
+		$a.setRating("D");
+		
+end
+
+
+rule "Rating - C"
+	when
+		$a: Applicant( totalScore >=526 && totalScore < 535)
+	then
+		$a.setRating("C");
+		
+end
+
+rule "Rating - CC"
+	when
+		$a: Applicant( totalScore >= 535 && totalScore < 543)
+	then
+		$a.setRating("CC");
+		
+end
+
+rule "Rating - CCC"
+	when
+		$a: Applicant( totalScore >= 543 && totalScore < 548)
+	then
+		$a.setRating("CCC");
+		
+end
+
+
+rule "Rating - B"
+	when
+		$a: Applicant( totalScore >= 548 && totalScore < 554)
+	then
+		$a.setRating("B");
+		
+end
+
+
+rule "Rating - BB"
+	when
+		$a: Applicant( totalScore >= 554 && totalScore < 561)
+	then
+		$a.setRating("BB");
+		
+end
+
+
+
+rule "Rating - BBB"
+	when
+		$a: Applicant( totalScore >= 561 && totalScore < 568)
+	then
+		$a.setRating("BBB");
+		
+end
+
+
+
+rule "Rating - A"
+	when
+		$a: Applicant( totalScore >= 568 && totalScore < 573)
+	then
+		$a.setRating("A");
+		
+end
+
+
+rule "Rating - AA"
+	when
+		$a: Applicant( totalScore >= 573 && totalScore < 581)
+	then
+		$a.setRating("AA");
+		
+end
+
+
+rule "Rating - AAA"
+	when
+		$a: Applicant( totalScore >= 581)
+	then
+		$a.setRating("AAA");
+		
+end
+
+
+rule "Proposal-for-Approve-Type1"
+	when
+		$a: Applicant( policyRegulation == "Pass" && fraud == "No" && SpecialCode == "No" && totalScore >= 561)
+	then
+		$a.setProposalForApprove("Approve");
+		$a.setMessageForApprove("Đề xuất phê duyệt");
+end
+
+
+rule "Proposal-for-Approve-Type1_1_Remove"
+	when
+		$a: Applicant((SchemeProduct=="XSCS0004" || SchemeProduct=="XSTW0004" || SchemeProduct=="C0000024") && dtiApprover > 0.45)
+	then
+		
+		$a.removeMessageForApprove("Đề xuất phê duyệt");
+		
+end
+
+
+rule "Proposal-for-Approve-Type1_2_Remove"
+	when
+		$a: Applicant((SchemeProduct=="C0000025" || SchemeProduct=="C0000027" || SchemeProduct=="C0000028" || SchemeProduct=="C0000029" || SchemeProduct=="C0000008" || SchemeProduct=="C0000039") && dtiApprover > 0.4)
+	then
+		
+		$a.removeMessageForApprove("Đề xuất phê duyệt");
+		
+end
+
+
+rule "Proposal-for-Approve-Type6_1_ALL"
+	when
+		$a: Applicant( totalScore <= 525 && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore <= 505)
+	then
+		$a.setProposalForApprove("Reject_Combine_score");			
+		$a.setMessageForApprove("Đề xuất: Từ chối theo chiến lược score");
+end
+
+
+rule "Proposal-for-Approve-Type6_2_ALL"
+	when
+		$a: Applicant( (SchemeProduct=="C0000024" || SchemeProduct=="C0000025" || SchemeProduct=="C0000026"  || SchemeProduct=="C0000053" || SchemeProduct=="C0000054" || SchemeProduct=="C0000055" || SchemeProduct=="C0000056" || SchemeProduct=="C0000057") && totalScore <= 525 && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore <= 505)
+	then
+		$a.setProposalForApprove("");			
+		$a.removeMessageForApprove("Đề xuất: Từ chối theo chiến lược score");
+end
+
+
+rule "Proposal-for-Approve-Type6_1_C0000027"
+	when
+		$a: Applicant( SchemeProduct=="C0000027" && totalScore <= 553 && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore <= 539)
+	then
+		$a.setProposalForApprove("Reject_Combine_score");
+		$a.setMessageForApprove("Đề xuất: Từ chối theo chiến lược score");
+end
+
+
+rule "Proposal-for-Approve-Type6_1_C0000028"
+	when
+		$a: Applicant( SchemeProduct=="C0000028" && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore <= 507)
+	then
+		$a.setProposalForApprove("Reject_Combine_score");
+		$a.setMessageForApprove("Đề xuất: Từ chối theo chiến lược score");
+		
+end
+
+
+rule "Proposal-for-Approve-Type6_1_C0000029"
+	when
+		$a: Applicant( SchemeProduct=="C0000029" && totalScore <= 559 && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore <= 522)
+	then
+		$a.setProposalForApprove("Reject_Combine_score");
+		$a.setMessageForApprove("Đề xuất: Từ chối theo chiến lược score");
+		
+end
+
+
+rule "Proposal-for-Approve-Type6_1_C0000008"
+	when
+		$a: Applicant( SchemeProduct=="C0000008" && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore <= 541)
+	then
+		$a.setProposalForApprove("Reject_Combine_score");
+		$a.setMessageForApprove("Đề xuất: Từ chối theo chiến lược score");
+		
+end
+
+
+rule "Proposal-for-Approve-Type6_1_C0000039"
+	when
+		$a: Applicant( SchemeProduct=="C0000039" && totalScore <= 531 && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore <= 505)
+	then
+		$a.setProposalForApprove("Reject_Combine_score");
+		$a.setMessageForApprove("Đề xuất: Từ chối theo chiến lược score");
+		
+end
+
+
+rule "Proposal-for-Approve-Type5_1_XSCS0004"
+	when
+		$a: Applicant(SchemeProduct=="XSCS0004" && dtiApprover > 0.45)
+	then
+		$a.setProposalForApprove("Reject_DTI_0.45");
+		$a.addMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.45");
+		
+end
+
+
+rule "Proposal-for-Approve-Type5_3_XSCS0004"
+	when
+		$a: Applicant(SchemeProduct=="XSCS0004" && dtiApprover > 0.45 && dtiApprover <= 0.6 && policyRegulation == "Pass" && fraud == "No" && totalScore >= 543 && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore >= 633)
+	then
+	    $a.removeMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.45");
+		$a.setProposalForApprove("Approve");
+		$a.setMessageForApprove("Đề xuất phê duyệt");
+end
+
+
+rule "Proposal-for-Approve-Type5_1_XSTW0004"
+	when
+		$a: Applicant(SchemeProduct=="XSTW0004" && dtiApprover > 0.45)
+	then
+		$a.setProposalForApprove("Reject_DTI_0.45");
+		$a.addMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.45");
+		
+end
+
+
+rule "Proposal-for-Approve-Type5_3_XSTW0004"
+	when
+		$a: Applicant(SchemeProduct=="XSTW0004" && dtiApprover > 0.45 && dtiApprover <= 0.6 && policyRegulation == "Pass" && fraud == "No" && totalScore >= 537 && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore >= 556)
+	then
+	    $a.removeMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.45");
+		$a.setProposalForApprove("Approve");
+		$a.setMessageForApprove("Đề xuất phê duyệt");
+end
+
+
+rule "Proposal-for-Approve-Type5_4_XSTW0004"
+	when
+		$a: Applicant(SchemeProduct=="XSTW0004" && dtiApprover > 0.45 && dtiApprover <= 0.6 && policyRegulation == "Pass" && fraud == "No" && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore >= 601)
+	then
+	    $a.removeMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.45");
+		$a.setProposalForApprove("Approve");
+		$a.setMessageForApprove("Đề xuất phê duyệt");
+end
+
+
+rule "Proposal-for-Approve-Type5_1_C0000024"
+	when
+		$a: Applicant(SchemeProduct=="C0000024" && dtiApprover > 0.45)
+	then
+		$a.setProposalForApprove("Reject_DTI_0.45");
+		$a.addMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.45");
+		
+end
+
+
+rule "Proposal-for-Approve-Type5_2_C0000024"
+	when
+		$a: Applicant(SchemeProduct=="C0000024" && dtiApprover <= 0.6 && policyRegulation == "Pass" && fraud == "No" && totalScore >= 533 && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore >= 708)
+	then
+	    $a.removeMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.45");
+		$a.setProposalForApprove("Approve");
+		$a.setMessageForApprove("Đề xuất phê duyệt");
+end
+
+
+rule "Proposal-for-Approve-Type5_1_C0000025"
+	when
+		$a: Applicant(SchemeProduct=="C0000025" && dtiApprover > 0.4)
+	then
+		$a.setProposalForApprove("Reject_DTI_0.4");
+		$a.addMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.4");
+		
+end
+
+
+rule "Proposal-for-Approve-Type5_2_C0000025"
+	when
+		$a: Applicant(SchemeProduct=="C0000025" && dtiApprover <= 0.6 && policyRegulation == "Pass" && fraud == "No" && totalScore >= 550 && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore >= 598)
+	then
+	    $a.removeMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.4");
+		$a.setProposalForApprove("Approve");
+		$a.setMessageForApprove("Đề xuất phê duyệt");
+end
+
+
+rule "Proposal-for-Approve-Type5_1_C0000027"
+	when
+		$a: Applicant(SchemeProduct=="C0000027" && dtiApprover > 0.4)
+	then
+		$a.setProposalForApprove("Reject_DTI_0.4");
+		$a.addMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.4");
+		
+end
+
+
+rule "Proposal-for-Approve-Type5_3_C0000027"
+	when
+		$a: Applicant(SchemeProduct=="C0000027" && dtiApprover > 0.4 && dtiApprover <= 0.6 && policyRegulation == "Pass" && fraud == "No" && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore >= 599)
+	then
+	    $a.removeMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.4");
+		$a.setProposalForApprove("Approve");
+		$a.setMessageForApprove("Đề xuất phê duyệt");
+end
+
+
+rule "Proposal-for-Approve-Type5_1_C0000028"
+	when
+		$a: Applicant(SchemeProduct=="C0000028" && dtiApprover > 0.4)
+	then
+		$a.setProposalForApprove("Reject_DTI_0.4");
+		$a.addMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.4");
+		
+end
+
+
+rule "Proposal-for-Approve-Type5_4_C0000028"
+	when
+		$a: Applicant(SchemeProduct=="C0000028" && dtiApprover > 0.4 && dtiApprover <= 0.6 && policyRegulation == "Pass" && fraud == "No" && totalScore >= 545 && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore >= 619)
+	then
+	    $a.removeMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.4");
+		$a.setProposalForApprove("Approve");
+		$a.setMessageForApprove("Đề xuất phê duyệt");
+end
+
+
+rule "Proposal-for-Approve-Type5_5_C0000028"
+	when
+		$a: Applicant(SchemeProduct=="C0000028" && dtiApprover > 0.4 && dtiApprover <= 0.6 && policyRegulation == "Pass" && fraud == "No"  && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore >= 673)
+	then
+	    $a.removeMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.4");
+		$a.setProposalForApprove("Approve");
+		$a.setMessageForApprove("Đề xuất phê duyệt");
+end
+
+
+rule "Proposal-for-Approve-Type5_1_C0000029"
+	when
+		$a: Applicant(SchemeProduct=="C0000029" && dtiApprover > 0.4)
+	then
+		$a.setProposalForApprove("Reject_DTI_0.4");
+		$a.addMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.4");
+		
+end
+
+
+rule "Proposal-for-Approve-Type5_2_C0000029"
+	when
+		$a: Applicant(SchemeProduct=="C0000029" && dtiApprover > 0.4 && dtiApprover <= 0.6 && policyRegulation == "Pass" && fraud == "No" && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore >= 615)
+	then
+	    $a.removeMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.4");
+		$a.setProposalForApprove("Approve");
+		$a.setMessageForApprove("Đề xuất phê duyệt");
+end
+
+
+rule "Proposal-for-Approve-Type5_1_C0000008"
+	when
+		$a: Applicant(SchemeProduct=="C0000008" && dtiApprover > 0.4)
+	then
+		$a.setProposalForApprove("Reject_DTI_0.4");
+		$a.addMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.4");
+		
+end
+
+
+rule "Proposal-for-Approve-Type5_2_C0000008"
+	when
+		$a: Applicant(SchemeProduct=="C0000008" && dtiApprover > 0.4 && dtiApprover <= 0.6 && policyRegulation == "Pass" && fraud == "No" && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore >= 657)
+	then
+	    $a.removeMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.4");
+		$a.setProposalForApprove("Approve");
+		$a.setMessageForApprove("Đề xuất phê duyệt");
+end
+
+
+rule "Proposal-for-Approve-Type5_1_C0000039"
+	when
+		$a: Applicant(SchemeProduct=="C0000039" && dtiApprover > 0.4)
+	then
+		$a.setProposalForApprove("Reject_DTI_0.4");
+		$a.addMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.4");
+		
+end
+
+
+rule "Proposal-for-Approve-Type5_3_C0000039"
+	when
+		$a: Applicant(SchemeProduct=="C0000039" && dtiApprover > 0.4 && dtiApprover <= 0.6 && policyRegulation == "Pass" && fraud == "No" && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore >= 566)
+	then
+	    $a.removeMessageForApprove("DTI không thỏa mãn. DTI tối đa 0.4");
+		$a.setProposalForApprove("Approve");
+		$a.setMessageForApprove("Đề xuất phê duyệt");
+end
+
+
+rule "Proposal-for-Approve-Type2_XSTW0004"
+	when
+		$a: Applicant( SchemeProduct=="XSTW0004" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditInstitutionsandOtherInstitutions >= 3 && totalLoanAtCreditInstitutionsandOtherInstitutions < 5 && totalScore < 530 && dtiApprover > 0.45 && dtiApprover <= 0.6 && policyRegulation == "Pass" && fraud == "No" && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore >= 601)
+	then
+		
+		$a.removeMessageForApprove("Đề xuất phê duyệt");
+end
+
+
+rule "Proposal-for-Approve-Type2_ALLXSELL"
+	when
+		$a: Applicant( (SchemeProduct=="XSCS0001" || SchemeProduct=="XSCS0002" || SchemeProduct=="XSCS0003" || SchemeProduct=="XSCD0001" || SchemeProduct=="XSCD0002" || SchemeProduct=="XSTW0001" || SchemeProduct=="XSTW0002" || SchemeProduct=="XSTW0003" || SchemeProduct=="XSCS0004" || SchemeProduct=="XSCS0005" || SchemeProduct=="XSTW0004" || SchemeProduct=="XSTW0005") && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditInstitutionsandOtherInstitutions >= 3 && totalLoanAtCreditInstitutionsandOtherInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		$a.addMessageForApprove("Từ chối khoản vay do chính sách");
+		
+end
+
+
+rule "Proposal-for-Approve-Type3_XSTW0004"
+	when
+		$a: Applicant( SchemeProduct=="XSTW0004" && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditCompany >= 2 && totalLoanAtCreditInstitutionsandOtherInstitutions < 5 && totalScore < 530 && dtiApprover > 0.45 && dtiApprover <= 0.6 && policyRegulation == "Pass" && fraud == "No" && (telcoCode == "Viettel" || telcoCode == "Mobifone") && tsScore >= 601)
+	then
+		
+		$a.removeMessageForApprove("Đề xuất phê duyệt");
+end
+
+
+rule "Proposal-for-Approve-Type3_ALLXSELL"
+	when
+		$a: Applicant( (SchemeProduct=="XSCS0001" || SchemeProduct=="XSCS0002" || SchemeProduct=="XSCS0003" || SchemeProduct=="XSCD0001" || SchemeProduct=="XSCD0002" || SchemeProduct=="XSTW0001" || SchemeProduct=="XSTW0002" || SchemeProduct=="XSTW0003" || SchemeProduct=="XSCS0004" || SchemeProduct=="XSCS0005" || SchemeProduct=="XSTW0004" || SchemeProduct=="XSTW0005") && totalLoanAmountAtCreditInstitutions >= 20000000 && totalLoanAtCreditCompany >= 2 && totalLoanAtCreditInstitutionsandOtherInstitutions < 5 && totalScore < 530)
+	then
+		$a.setProposalForApprove("Suggest Rejecting");
+		$a.addMessageForApprove("Từ chối khoản vay do chính sách");
+		
+end
+
+
+rule "Proposal-for-Approve-Type4_C0000015"
+	when
+		$a: Applicant(SchemeProduct=="C0000015" && totalScore < 539)
+	then
+		$a.setProposalForApprove("Reject");
+		$a.setProposalForCall("Reject");
+		$a.addMessageForApprove("Từ chối khoản vay");
+end
+
+
+rule "Proposal-for-Approve-Type4_C0000023"
+	when
+		$a: Applicant(SchemeProduct=="C0000023" && totalScore < 539)
+	then
+		$a.setProposalForApprove("Reject");
+		$a.setProposalForCall("Reject");
+		$a.addMessageForApprove("Từ chối khoản vay");
+end

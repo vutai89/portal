@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <sql-query name="getLstProduct">
+	<![CDATA[select pd.id, pd.product_code ,pd.product_name,
+                    (CASE
+                        WHEN ( (pd.start_eff_date <= SYSDATE) and (pd.end_eff_date >= SYSDATE)) THEN 'Active'        
+                        ELSE 'Inactive'
+                    END ) AS statuspresent
+                   from products pd
+                   join code_table ct on ct.id = pd.product_category_id and ct.category='PRD_CAT'
+                   where pd.record_status='A' and (pd.bpm_product_id <> 0) and pd.start_eff_date = (select max(a.start_eff_date) from products a where a.product_code = pd.product_code and a.bpm_product_id <> 0) ORDER BY pd.product_code ,pd.product_name]]>
+    </sql-query>       
+    <sql-query name="searchTransactions">
+	<![CDATA[select ts.id as transactionId, pd.id as productId,to_char(ts.init_transaction_date,'dd/mm/yyyy') as createdDate, JSON_VALUE(ts.TRANSACTION_COMMENT, '$.ticketCode') as ticketCode, pd.product_code, pd.product_name, cto.DESCRIPTION1 as statusDesire,
+                    cto.code_value1 as statusDesireCode, us.login_id as createdBy, JSON_VALUE(ts.TRANSACTION_COMMENT, '$.effectDate') as effectDate, ctt.DESCRIPTION1 as statusApp, pd.bpm_product_id as bpmProductId
+                    from transactions ts
+                    JOIN products pd on pd.id = ts.reference_record_id and master_table_name='PRODUCTS'
+                    join code_table cto on cto.id = ts.operation_code                                  
+                    join code_table ctt on ctt.id = ts.transaction_status
+                    join users us on ts.init_user_id = us.id and us.record_status='A'
+                    where 1=1 ]]>
+    </sql-query>
+    <sql-query name="searchTransactionsCountRecord">
+	<![CDATA[select count(1)                    
+                    from transactions ts
+                    JOIN products pd on pd.id = ts.reference_record_id and master_table_name='PRODUCTS'
+                    join code_table cto on cto.id = ts.operation_code                                  
+                    join code_table ctt on ctt.id = ts.transaction_status
+                    join users us on ts.init_user_id = us.id and us.record_status='A'
+                    where 1=1 ]]>
+    </sql-query> 
+    <sql-query name="updateActiveProducts">
+	<![CDATA[update PRODUCTS set END_EFF_DATE = to_date('31-12-9999 00:00:00','dd/mm/yyyy HH24:MI:SS') where id = :productId]]>
+    </sql-query>
+    <sql-query name="updateInactiveProducts">
+	<![CDATA[update PRODUCTS set END_EFF_DATE = to_date(:effDate,'dd/mm/yyyy HH24:MI:SS') where id = :productId]]>
+    </sql-query>
+    <sql-query name="updateStatusTransactions">
+	<![CDATA[update transactions set transaction_status = :transactionStatus where id = :transactionId]]>
+    </sql-query>
+    <sql-query name="updateInforTransaction">
+	<![CDATA[update transactions set last_updated_date = sysdate, last_updated_user_id = :userId where id = :transactionId]]>
+    </sql-query>
+    <sql-query name="getInforSendEmail">
+	<![CDATA[select ts.id, pd.product_name, JSON_VALUE(ts.TRANSACTION_COMMENT, '$.ticketCode') as ticketCode, cto.DESCRIPTION1 as statusDesire,
+                    DECODE(ctt.code_value1, 'TRANS_APP_OK', 'approved','TRANS_APP_REJECT','denied',null) as statusApp, us.login_id as createdBy, JSON_VALUE(ts.TRANSACTION_COMMENT, '$.effectDate') as effectDate,
+                    us.login_id || '@mcredit.com.vn' as email, uma.login_id || '@mcredit.com.vn'  as emailTeamLead                    
+                    from transactions ts
+                    JOIN products pd on pd.id = ts.reference_record_id and master_table_name='PRODUCTS'
+                    join code_table cto on cto.id = ts.operation_code                                  
+                    join code_table ctt on ctt.id = ts.transaction_status
+                    join users us on ts.init_user_id = us.id and us.record_status='A'
+                    join team_member tm on  tm.user_id = ts.init_user_id
+                    join teams t on t.id = tm.team_id and t.TEAM_CODE = 'SYS_OPERA' and t.TEAM_GROUP='SYS_OPERA' and t.TEAM_TYPE='A'
+                    join users uma on uma.id = t.manager_id and uma.record_status='A' where ts.id in (:transactionId)]]>
+    </sql-query>
+</hibernate-mapping>

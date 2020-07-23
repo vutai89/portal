@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<query name="getCICResponse"><![CDATA[ from CreditBureauData WHERE cbSource = 'C' and custIdentityNumber = :custIdentityNumber ]]> 
+	</query>
+	
+	<query name="getCICResponseAvailable"><![CDATA[ from CreditBureauData WHERE cbSource = 'C' and custIdentityNumber = :custIdentityNumber and (trunc(sysdate) - trunc(lastUpdatedDate)) <= :cicResultExpireDays ]]> 
+	</query>
+	
+	<query name="getListCICResponseAvailable"><![CDATA[ from CreditBureauData WHERE cbSource = 'C' and custIdentityNumber in :listIdentity and (trunc(sysdate) - trunc(lastUpdatedDate)) <= :cicResultExpireDays ]]> 
+	</query>
+
+	<sql-query name="getCustIdByIdentity">
+	<![CDATA[Select cpi.id from cust_personal_info cpi 
+		    inner join cust_identity ci on cpi.identity_id = ci.id 
+		    inner join code_table ct on ci.identity_type_id = ct.id and ct.category = 'IDTYP' and ct.code_value1 in ('1', '2', '3')
+		where ci.identity_number = :identity]]>
+	</sql-query>
+	
+	<sql-query name="claimCICRequest">
+	<![CDATA[select id, trans_id from message_log where id in (
+				    select id from message_log 
+				        where trans_type = 'checkCICManual' and msg_status = 'N' and service_name != 'autoJob' order by id OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY)
+				for update  of msg_status, response_payload_id, process_time ]]>
+	</sql-query>
+	
+	<sql-query name="claimCICRequestAutoJob">
+	<![CDATA[select id, trans_id from message_log where id in (
+				    select id from message_log 
+				        where trans_type = 'checkCICManual' and msg_status = 'N' and service_name = 'autoJob' order by id OFFSET 0 ROWS FETCH NEXT :limit ROWS ONLY)
+				for update  of msg_status, response_payload_id, process_time ]]>
+	</sql-query>
+	
+	<query name="getListCICInfoById"><![CDATA[ from CreditBureauData WHERE id in :listId ]]> 
+	</query>
+	
+	<sql-query name="updateStateAssign">
+	<![CDATA[Update message_log set  process_time = sysdate, msg_status = 'A', response_payload_id = :username where id in :listId ]]>
+	</sql-query>
+	
+<!-- 	<sql-query name="updateStateResult">
+	<![CDATA[Update message_log set response_time = sysdate, msg_status = 'R', msg_response = :response where id = :id ]]>
+	</sql-query> -->
+	
+	<sql-query name="updateCICResult">
+	<![CDATA[Update credit_bureau_data set last_updated_date = sysdate, cb_data_detail = :dataDetail where cb_source = 'C' and cust_identity_number = :cust_identity_number ]]>
+	</sql-query>
+	
+	<sql-query name="resetCICRequestStatus">
+	<![CDATA[Update message_log set msg_status = 'N', response_payload_id = null where trans_type = 'checkCICManual' and msg_status = 'A' and response_payload_id = :username ]]>
+	</sql-query>
+	
+	<query name="getPcbByCitizenId"><![CDATA[ from CreditBureauData WHERE cbSource = 'P' and custIdentityNumber = :custIdentityNumber order by createdDate desc]]> 
+	</query>
+</hibernate-mapping>

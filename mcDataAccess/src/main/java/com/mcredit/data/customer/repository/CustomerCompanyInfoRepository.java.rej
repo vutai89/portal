@@ -1,0 +1,9 @@
+diff a/mcDataAccess/src/main/java/com/mcredit/data/customer/repository/CustomerCompanyInfoRepository.java b/mcDataAccess/src/main/java/com/mcredit/data/customer/repository/CustomerCompanyInfoRepository.java	(rejected hunks)
+@@ -11,6 +11,7 @@
+ import org.hibernate.query.NativeQuery;
+ 
+ import com.mcredit.common.Labels;
++import com.mcredit.common.MessageCheck;
+ import com.mcredit.common.Messages;
+ import com.mcredit.data.BaseRepository;
+ import com.mcredit.data.DataException;

@@ -1,0 +1,68 @@
+package com.mcredit.rule.engine.score3rd
+
+import com.mcredit.model.object.RuleObject;
+
+global com.mcredit.rule.FormulaResult formulaResult;
+
+function String getVal(String val, int len, int max) {
+	String ret = val;
+	int start = 0;
+	if(val == null) {
+		ret = "";
+	} else {
+		start = val.length();
+	}
+	for(int i=start;i<len-1;i++) {
+		ret = ret + "N";
+	}
+	if(len < max) {
+		ret = ret + "Y";
+	} else if(ret.length() < max - 1) {
+		ret = ret + "N";
+	}
+
+	return ret;
+}
+
+rule "Check range tsScore <= 505"
+	when
+		RuleObject(tsScore != null && tsScore <= 505)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 1, 1000));
+end
+
+rule "Check range tsScore <= 539"
+	when
+		RuleObject(tsScore != null && tsScore <= 539)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 2, 1000));
+end
+
+rule "Check range tsScore <= 507"
+	when
+		RuleObject(tsScore != null && tsScore <= 507)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 3, 1000));
+end
+
+rule "Check range tsScore <= 522"
+	when
+		RuleObject(tsScore != null && tsScore <= 522)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 4, 1000));
+end
+
+rule "Check range tsScore <= 541"
+	when
+		RuleObject(tsScore != null && tsScore <= 541)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 5, 1000));
+end
+
+rule "Check range cicScore <= 535"
+	when
+		RuleObject(cicScore != null && cicScore <= 535)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 6, 7));
+end
+

@@ -1,0 +1,110 @@
+package com.mcredit.rule.engine.scoreCard
+
+import com.mcredit.model.object.RuleObject;
+
+global com.mcredit.rule.FormulaResult formulaResult;
+
+function String getVal(String val, int len, int max) {
+	String ret = val;
+	int start = 0;
+	if(val == null) {
+		ret = "";
+	} else {
+		start = val.length();
+	}
+	for(int i=start;i<len-1;i++) {
+		ret = ret + "N";
+	}
+	if(len < max) {
+		ret = ret + "Y";
+	} else if(ret.length() < max - 1) {
+		ret = ret + "N";
+	}
+
+	return ret;
+}
+
+rule "Check range < 553"
+	when
+		RuleObject(scoreCard != null && scoreCard < 553)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 1, 1000));
+end
+
+rule "Check range < 545"
+	when
+		RuleObject(scoreCard != null && scoreCard < 545)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 2, 1000));
+end
+
+rule "Check range < 557"
+	when
+		RuleObject(scoreCard != null && scoreCard < 557)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 3, 1000));
+end
+
+rule "Check range < 524"
+	when
+		RuleObject(scoreCard != null && scoreCard < 524)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 4, 1000));
+end
+
+rule "Check range < 526"
+	when
+		RuleObject(scoreCard != null && scoreCard < 526)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 5, 1000));
+end
+
+rule "Check range < 554"
+	when
+		RuleObject(scoreCard != null && scoreCard < 554)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 6, 1000));
+end
+
+rule "Check range < 544"
+	when
+		RuleObject(scoreCard != null && scoreCard < 544)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 7, 1000));
+end
+
+rule "Check range < 560"
+	when
+		RuleObject(scoreCard != null && scoreCard < 560)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 8, 1000));
+end
+
+rule "Check range < 532"
+	when
+		RuleObject(scoreCard != null && scoreCard < 532)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 9, 1000));
+end
+
+rule "Check range > 542"
+	when
+		RuleObject(scoreCard != null && scoreCard > 542)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 10, 1000));
+end
+
+rule "Check range > 563"
+	when
+		RuleObject(scoreCard != null && scoreCard > 563)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 11, 1000));
+end
+
+rule "Check range > 540"
+	when
+		RuleObject(scoreCard != null && scoreCard > 540)
+	then
+		formulaResult.setStringValue(getVal(formulaResult.getStringValue(), 12, 13));
+end
+
